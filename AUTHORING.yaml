@@ -1,0 +1,103 @@
+version: 1
+approval: CKS requested 2026-10-11; established reading-only scope
+course:
+  id: ATS033
+  certification:
+    name: Certified Kubernetes Security Specialist
+    code: CKS
+    provider: CNCF / Linux Foundation
+    domain: System Hardening
+    weight: 10
+    competencies:
+    - Minimize host OS footprint (reduce attack surface)
+    - Using least-privilege identity and access management
+    - Minimize external access to the network
+    - Appropriately use kernel hardening tools such as AppArmor, seccomp
+defaults:
+  playground: false
+  module_lab: false
+  capstone: false
+  section_quiz: false
+  final_quiz: true
+assessment_format: YAML question banks v1, registered in assessments/index.yaml
+sections:
+- id: section-010
+  title: Minimize host OS footprint (reduce attack surface)
+  curriculum_item: Minimize host OS footprint (reduce attack surface)
+  capstone: false
+  section_quiz: false
+  modules:
+  - id: module-01
+    title: Reducing The Host Operating-System Attack Surface
+    objectives:
+    - Inventory services, packages and privileged interfaces by required function.
+    - Explain why host compromise affects container isolation.
+    - Evaluate persistent service configuration and patch ownership.
+    - Preserve operational dependencies while removing unnecessary exposure.
+    outline:
+    - Reducing The Host Operating-System Attack Surface
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+      adapted_from: null
+- id: section-020
+  title: Using least-privilege identity and access management
+  curriculum_item: Using least-privilege identity and access management
+  capstone: false
+  section_quiz: false
+  modules:
+  - id: module-01
+    title: Least Privilege For Host Identities And Administration
+    objectives:
+    - Distinguish Linux users and groups from Kubernetes identities.
+    - Evaluate file, socket and privilege-elevation authority.
+    - Separate routine operational access from exceptional administration.
+    - Review credential revocation and auditable privileged actions.
+    outline:
+    - Least Privilege For Host Identities And Administration
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+      adapted_from: null
+- id: section-030
+  title: Minimize external access to the network
+  curriculum_item: Minimize external access to the network
+  capstone: false
+  section_quiz: false
+  modules:
+  - id: module-01
+    title: Minimizing External Access To Host Services
+    objectives:
+    - Map host listeners and required communication peers.
+    - Distinguish bind addresses, filtering and endpoint authorization.
+    - Evaluate ingress and egress rules without breaking dependencies.
+    - Account for persistence, address families and alternate traffic paths.
+    outline:
+    - Minimizing External Access To Host Services
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+      adapted_from: null
+- id: section-040
+  title: Appropriately use kernel hardening tools such as AppArmor, seccomp
+  curriculum_item: Appropriately use kernel hardening tools such as AppArmor, seccomp
+  capstone: false
+  section_quiz: false
+  modules:
+  - id: module-01
+    title: Seccomp And AppArmor As Different Kernel Boundaries
+    objectives:
+    - Distinguish syscall filtering from resource-oriented mandatory access control.
+    - Interpret RuntimeDefault, Localhost and unconfined profile choices.
+    - Explain node prerequisites and container-level overrides.
+    - Diagnose profile failures while preserving the intended boundary.
+    outline:
+    - Seccomp And AppArmor As Different Kernel Boundaries
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+      adapted_from: null

@@ -1,8 +1,9 @@
-# Preparation scaffold. Technical pages stay draft until authoring and review.
+# Reading-only content; YAML knowledge checks have a separate index.
 training:
   id: ATS033
   title: 'CKS: System Hardening'
-  description: Preparation scaffold for System Hardening. Lessons and environments are planned.
+  description: 'Detailed reading material and reusable YAML knowledge checks for CKS: System Hardening.
+    Technical content remains draft. No labs or playgrounds.'
   certification:
     name: Certified Kubernetes Security Specialist
     code: CKS
@@ -17,7 +18,7 @@ training:
 modules:
 - id: module-intro
   title: Introduction
-  description: Planned introduction and authoring status.
+  description: Audience, reading method and review process.
   content:
   - type: reading
     title: Introduction
@@ -33,41 +34,70 @@ modules:
     path: sections/intro/course-03-how-this-course-is-made.md
 - id: module-010
   title: Minimize host OS footprint (reduce attack surface)
-  description: Planned coverage of this curriculum objective.
+  description: Developed reading and reasoning for Minimize host OS footprint (reduce attack surface).
+  draft: true
   content:
-  - type: reading
-    title: Section Overview
-    path: sections/section-010/README.md
   - type: reading
     title: Minimize host OS footprint (reduce attack surface)
+    path: sections/section-010/README.md
+  - type: reading
+    title: Reducing The Host Operating-System Attack Surface
     path: sections/section-010/module-01/course.md
+  - type: reading
+    title: Reducing The Host Operating-System Attack Surface
+    path: sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+  - type: reading
+    title: Summary
+    path: sections/section-010/module-01/course-02-summary.md
 - id: module-020
   title: Using least-privilege identity and access management
-  description: Planned coverage of this curriculum objective.
+  description: Developed reading and reasoning for Using least-privilege identity and access management.
+  draft: true
   content:
-  - type: reading
-    title: Section Overview
-    path: sections/section-020/README.md
   - type: reading
     title: Using least-privilege identity and access management
+    path: sections/section-020/README.md
+  - type: reading
+    title: Least Privilege For Host Identities And Administration
     path: sections/section-020/module-01/course.md
+  - type: reading
+    title: Least Privilege For Host Identities And Administration
+    path: sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+  - type: reading
+    title: Summary
+    path: sections/section-020/module-01/course-02-summary.md
 - id: module-030
   title: Minimize external access to the network
-  description: Planned coverage of this curriculum objective.
+  description: Developed reading and reasoning for Minimize external access to the network.
+  draft: true
   content:
-  - type: reading
-    title: Section Overview
-    path: sections/section-030/README.md
   - type: reading
     title: Minimize external access to the network
+    path: sections/section-030/README.md
+  - type: reading
+    title: Minimizing External Access To Host Services
     path: sections/section-030/module-01/course.md
+  - type: reading
+    title: Minimizing External Access To Host Services
+    path: sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+  - type: reading
+    title: Summary
+    path: sections/section-030/module-01/course-02-summary.md
 - id: module-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
-  description: Planned coverage of this curriculum objective.
+  description: Developed reading and reasoning for Appropriately use kernel hardening tools such as AppArmor,
+    seccomp.
+  draft: true
   content:
   - type: reading
-    title: Section Overview
+    title: Appropriately use kernel hardening tools such as AppArmor, seccomp
     path: sections/section-040/README.md
   - type: reading
-    title: Appropriately use kernel hardening tools such as AppArmor, seccomp
+    title: Seccomp And AppArmor As Different Kernel Boundaries
     path: sections/section-040/module-01/course.md
+  - type: reading
+    title: Seccomp And AppArmor As Different Kernel Boundaries
+    path: sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+  - type: reading
+    title: Summary
+    path: sections/section-040/module-01/course-02-summary.md
