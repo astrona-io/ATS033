@@ -5,6 +5,20 @@ exam_objectives:
 ---
 # Seccomp And AppArmor As Different Kernel Boundaries
 
+A process can open a permitted file but attempts a disallowed system call. File-access policy and syscall filtering constrain different behavior, even when both protect the same container.
+
+## Learning objectives
+
+- Distinguish syscall filtering from resource-oriented mandatory access control.
+- Interpret RuntimeDefault, Localhost and unconfined profile choices.
+- Explain node prerequisites and container-level overrides.
+
+## Before you start
+
+This chapter is standalone reading material; no running cluster or installed tools are required. A Pod is the Kubernetes unit for running one or more containers, and a namespace groups namespaced objects. Treat the worked configurations as teaching examples rather than recorded observations from a provisioned environment.
+
+## Responsible components and behavior
+
 A container process uses the host kernel. Running as a non-root user and dropping capabilities reduce authority, but the process still invokes system calls and accesses resources. Seccomp and AppArmor impose additional kernel boundaries. Understanding their different mechanisms helps choose a profile and interpret a denial without confusing runtime security with Kubernetes API authorization.
 
 ## Seccomp Filters System Calls
@@ -32,6 +46,29 @@ Custom profiles need knowledge of application behavior, including startup, norma
 A seccomp denial can appear as a failed system call or process termination depending on the profile's action. AppArmor denials can identify a prohibited resource operation in host security records. Correlate the process, container, active profile and attempted operation before attributing an application failure to another control.
 
 If a file write is genuinely required, consider a narrow allowed path and a dedicated writable volume. Do not make the entire process unconfined to accommodate one temporary file. Kernel boundaries complement read-only roots, capability removal, user identity and admission policy. They do not validate image authenticity or limit Kubernetes RBAC by themselves.
+
+## Work through the decision
+
+Seccomp filters supported Linux system calls according to a selected profile. AppArmor applies mandatory access-control rules to supported process operations, commonly including file and execution behavior. Their enforcement depends on host support and the profile actually applied.
+
+An object that names a profile does not prove the node loaded or supports it. Check the effective declaration and platform prerequisites before attributing a failure to the policy. A missing or overly restrictive profile can prevent legitimate execution, while a broad profile may provide little reduction. Preserve the application requirement and verify the intended restricted operation without treating either mechanism as a substitute for identity or minimal capabilities.
+
+```mermaid
+flowchart TB
+    N0["Host mechanism support"]
+    N1["Loaded applicable profile"]
+    N2["Process execution request"]
+    N3["Kernel policy decision"]
+    N4["Allowed or denied operation"]
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+```
+
+A profile is useful through its supported kernel enforcement and the specific behavior it restricts.
+
+A profile is useful through its supported kernel enforcement and the specific behavior it restricts.
 
 ## Common pitfalls
 
