@@ -5,6 +5,20 @@ exam_objectives:
 ---
 # Reducing The Host Operating-System Attack Surface
 
+A worker hosts unused network services and development tools. Removing unnecessary components reduces exposed behavior, but removing a runtime dependency can also break legitimate workloads.
+
+## Learning objectives
+
+- Inventory services, packages and privileged interfaces by required function.
+- Explain why host compromise affects container isolation.
+- Evaluate persistent service configuration and patch ownership.
+
+## Before you start
+
+This chapter is standalone reading material; no running cluster or installed tools are required. A Pod is the Kubernetes unit for running one or more containers, and a namespace groups namespaced objects. Treat the worked configurations as teaching examples rather than recorded observations from a provisioned environment.
+
+## Responsible components and behavior
+
 Containers rely on the host kernel, runtime, storage and networking. A compromised node can undermine multiple workloads even if their Kubernetes objects appear properly configured. Minimizing the host operating-system footprint means reducing unnecessary software, services and authority while retaining the responsibilities required to operate the node safely.
 
 ## Build A Responsibility Inventory
@@ -34,6 +48,29 @@ Durable configuration should survive host replacement and reboot through the app
 ## Interpret Minimality Correctly
 
 A minimal host reduces attack surface, but it is not intrinsically invulnerable. Required software can contain defects, and narrow packages can still run with excessive privileges. Combine footprint reduction with restricted administration, network boundaries, audit evidence and timely updates. Retain a controlled diagnostic and recovery path rather than embedding unrestricted troubleshooting tools in every application container.
+
+## Work through the decision
+
+Begin with the node's required responsibilities: container execution, networking, storage and protected administration. Inventory listening services, installed software and privileged integrations against those requirements. An unused service with a reachable listener creates a different risk from a required service constrained to its intended callers.
+
+Apply supported updates and remove or disable unnecessary behavior through managed configuration. Preserve logs and operating evidence before changing a suspect host. A reduced package count is not a complete security guarantee; required components can still be vulnerable or misconfigured. Verify both the reduced exposure and representative node operation after each meaningful change.
+
+```mermaid
+flowchart TB
+    N0["Required host responsibilities"]
+    N1["Installed and listening components"]
+    N2["Unnecessary exposure removal"]
+    N3["Supported maintenance"]
+    N4["Node workload verification"]
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+```
+
+Host hardening removes unjustified behavior while preserving the platform functions workloads actually need.
+
+Host hardening removes unjustified behavior while preserving the platform functions workloads actually need.
 
 ## Common pitfalls
 
