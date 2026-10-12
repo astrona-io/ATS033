@@ -5,7 +5,9 @@ exam_objectives:
 ---
 # Minimize host OS footprint (reduce attack surface)
 
-This section covers minimize host OS footprint (reduce attack surface). It develops reducing The Host Operating-System Attack Surface through mechanisms, examples, prerequisites and failure reasoning.
+A worker hosts unused network services and development tools. Removing unnecessary components reduces exposed behavior, but removing a runtime dependency can also break legitimate workloads.
+
+The explanations identify the responsible components, compare intended and observed state, and work through the decisions needed to preserve the requirement. Read the worked examples as reasoning about a proposed system; no environment is started by this section.
 
 Read the module goals, teaching and closing summary in order. YAML checks are indexed separately and appear after designated summaries. Larger domains include an intermediate checkpoint before the final review.
 
