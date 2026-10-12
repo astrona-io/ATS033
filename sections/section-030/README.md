@@ -5,7 +5,9 @@ exam_objectives:
 ---
 # Minimize external access to the network
 
-This section covers minimize external access to the network. It develops minimizing External Access To Host Services through mechanisms, examples, prerequisites and failure reasoning.
+A management service listens on all interfaces even though administrators use one protected network. Its exposure exceeds its operating requirement regardless of whether application Services are restricted.
+
+The explanations identify the responsible components, compare intended and observed state, and work through the decisions needed to preserve the requirement. Read the worked examples as reasoning about a proposed system; no environment is started by this section.
 
 Read the module goals, teaching and closing summary in order. YAML checks are indexed separately and appear after designated summaries. Larger domains include an intermediate checkpoint before the final review.
 
