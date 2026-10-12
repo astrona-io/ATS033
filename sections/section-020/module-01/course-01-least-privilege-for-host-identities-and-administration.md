@@ -5,6 +5,20 @@ exam_objectives:
 ---
 # Least Privilege For Host Identities And Administration
 
+An automation account can restart a service but also has unrestricted host administrator access. Its required action does not justify every operation available through that broader authority.
+
+## Learning objectives
+
+- Distinguish Linux users and groups from Kubernetes identities.
+- Evaluate file, socket and privilege-elevation authority.
+- Separate routine operational access from exceptional administration.
+
+## Before you start
+
+This chapter is standalone reading material; no running cluster or installed tools are required. A Pod is the Kubernetes unit for running one or more containers, and a namespace groups namespaced objects. Treat the worked configurations as teaching examples rather than recorded observations from a provisioned environment.
+
+## Responsible components and behavior
+
 Host administration uses Linux identities and authorization mechanisms that are distinct from Kubernetes ServiceAccounts and RBAC. An operator may have narrow Kubernetes permissions but broad SSH or runtime access on a node. Least privilege must therefore be assessed at the host boundary as well as the API boundary.
 
 ## Define The Required Task
@@ -34,6 +48,29 @@ Credential lifetime, protected storage and rotation reduce the duration and spre
 ## Verify The Effective Boundary
 
 The desired outcome is a working task with bounded authority. Review the actual identities used by running processes, durable permission definitions and audit evidence for privileged operations. Ensure that recovery access is documented and controlled so an outage does not invite an untracked blanket privilege grant. Least privilege is a maintained relationship between responsibility and authority, not merely the absence of the username root.
+
+## Work through the decision
+
+Host privilege and Kubernetes API privilege are separate. An account with access to a runtime socket or sensitive host files can affect workloads even without an administrative API binding. Conversely, broad API authority can create workloads with host access if admission permits it.
+
+Grant administration according to specific responsibilities and protect credential ownership, distribution and revocation. Shared credentials weaken attribution because logs identify the presented account rather than the individual operator. A narrow service permission still needs careful command and argument handling. Review indirect authority, preserve necessary operational access and verify that unwanted actions remain unavailable after the change.
+
+```mermaid
+flowchart TB
+    N0["Administrative responsibility"]
+    N1["Host identity and credential"]
+    N2["Direct and indirect authority"]
+    N3["Narrow permitted operation"]
+    N4["Attributable evidence"]
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+```
+
+Least privilege needs review of what an identity can accomplish through every granted host interface.
+
+Least privilege needs review of what an identity can accomplish through every granted host interface.
 
 ## Common pitfalls
 
