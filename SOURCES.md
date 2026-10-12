@@ -16,3 +16,15 @@
 - [Kubernetes release verification](https://kubernetes.io/docs/tasks/administer-cluster/verify-signed-artifacts/)
 
 Version-specific fields and options need confirmation against the intended deployed release before adding executable material. Configuration excerpts illustrate intent and do not claim installation or runtime results. Question banks are independently authored practice, not official examination items.
+
+## Material expansion review — 2026-10-12
+
+Applied the local astrona-course-expand-material skill with CLAUDE.md plain-English, standalone-page and diagram rules. Existing author sources remain applicable. Additional mechanism checks used:
+
+- https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+- https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/
+- https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/
+- https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/
+- https://kubernetes.io/docs/tutorials/security/seccomp/
+- https://kubernetes.io/docs/tutorials/security/apparmor/
+- https://falco.org/docs/concepts/
