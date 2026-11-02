@@ -1,0 +1,243 @@
+schema_version: 1
+kind: question_bank
+id: ats033-domain-review
+course_id: ATS033
+exam_code: CKS
+status: draft
+provenance: Original practice material; not official examination questions.
+scope:
+  type: domain
+  id: domain-review
+  title: System Hardening
+placement:
+  position: after
+  reading: sections/section-040/module-01/course-02-summary.md
+questions:
+- id: ats033-domain-review-q01
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Inventory services, packages and privileged interfaces by required function.
+  source_readings:
+  - sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+  prompt: Which host service is a candidate for removal?
+  options:
+  - id: a
+    text: Every service unfamiliar to the reviewer.
+    explanation: Unfamiliar services may implement essential runtime or networking dependencies.
+  - id: b
+    text: The kubelet solely because it has network access.
+    explanation: The kubelet has a required node management responsibility that needs protection.
+  - id: c
+    text: A service with no justified node or operational responsibility.
+    explanation: Inventory and dependency review determine whether its attack surface is necessary.
+  correct_option: c
+  explanation: Inventory and dependency review determine whether its attack surface is necessary.
+- id: ats033-domain-review-q02
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain why host compromise affects container isolation.
+  source_readings:
+  - sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+  prompt: Why is host runtime socket access particularly sensitive?
+  options:
+  - id: a
+    text: It is governed exclusively by namespaced Pod labels.
+    explanation: Host socket permissions and runtime authorization are separate boundaries.
+  - id: b
+    text: It can grant control over containers and host resources.
+    explanation: The socket exposes runtime authority outside ordinary Pod isolation.
+  - id: c
+    text: It is harmless whenever the caller runs as a non-root user.
+    explanation: An authorized socket client can still exercise powerful runtime operations.
+  correct_option: b
+  explanation: The socket exposes runtime authority outside ordinary Pod isolation.
+- id: ats033-domain-review-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Preserve operational dependencies while removing unnecessary exposure.
+  source_readings:
+  - sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+  prompt: What makes a hardening change operationally sound?
+  options:
+  - id: a
+    text: It reduces unnecessary exposure and preserves required node behavior.
+    explanation: Both security intent and service dependencies must be satisfied.
+  - id: b
+    text: It maximizes the number of disabled services regardless of impact.
+    explanation: Breaking required functions is not a justified hardening outcome.
+  - id: c
+    text: It changes only a temporary service state and ignores reboot.
+    explanation: Transient changes can disappear when the host restarts.
+  correct_option: a
+  explanation: Both security intent and service dependencies must be satisfied.
+- id: ats033-domain-review-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Distinguish Linux users and groups from Kubernetes identities.
+  source_readings:
+  - sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+  prompt: Does a namespaced Kubernetes Role constrain a user's SSH privileges automatically?
+  options:
+  - id: a
+    text: Yes; all host access inherits the smallest Kubernetes Role.
+    explanation: The two authorization systems govern different operations.
+  - id: b
+    text: Yes; namespace names become Linux user groups.
+    explanation: No such automatic mapping is established by a namespace.
+  - id: c
+    text: No; host identity and Linux authorization are separate controls.
+    explanation: Kubernetes grants do not define host file permissions or privilege elevation.
+  correct_option: c
+  explanation: Kubernetes grants do not define host file permissions or privilege elevation.
+- id: ats033-domain-review-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Evaluate file, socket and privilege-elevation authority.
+  source_readings:
+  - sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+  prompt: Why can a non-root user still have effective host administrator authority?
+  options:
+  - id: a
+    text: The username's length determines its authority.
+    explanation: Authority comes from permissions and credentials, not spelling.
+  - id: b
+    text: Its groups or elevation rules may permit powerful privileged operations.
+    explanation: Runtime control or broad elevation can bypass ordinary account restrictions.
+  - id: c
+    text: Non-root users can never modify privileged service behavior.
+    explanation: Writable service configuration and delegated operations can grant indirect authority.
+  correct_option: b
+  explanation: Runtime control or broad elevation can bypass ordinary account restrictions.
+- id: ats033-domain-review-q06
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Review credential revocation and auditable privileged actions.
+  source_readings:
+  - sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+  prompt: What belongs in a host access revocation review?
+  options:
+  - id: a
+    text: Credentials, active sessions and remaining indirect grants.
+    explanation: Removing one entry can leave another route to the same authority.
+  - id: b
+    text: Only deleting the user's Kubernetes RoleBinding.
+    explanation: That does not necessarily revoke host credentials or sessions.
+  - id: c
+    text: Only changing the display name in an inventory.
+    explanation: An inventory label does not alter authorization.
+  correct_option: a
+  explanation: Removing one entry can leave another route to the same authority.
+- id: ats033-domain-review-q07
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Map host listeners and required communication peers.
+  source_readings:
+  - sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+  prompt: What is the right basis for a host network allowlist?
+  options:
+  - id: a
+    text: Every source in the entire organization by default.
+    explanation: That broadens reachability beyond demonstrated requirements.
+  - id: b
+    text: Only the ports visible to an external internet scanner.
+    explanation: Internal and node-local management paths also require review.
+  - id: c
+    text: Documented component peers, ports and operational dependencies.
+    explanation: The allowlist should follow actual required communication.
+  correct_option: c
+  explanation: The allowlist should follow actual required communication.
+- id: ats033-domain-review-q08
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Distinguish bind addresses, filtering and endpoint authorization.
+  source_readings:
+  - sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+  prompt: Does binding a service to a private address authenticate its callers?
+  options:
+  - id: a
+    text: Yes; private addresses encrypt connections by definition.
+    explanation: Encryption depends on the protocol and configuration.
+  - id: b
+    text: No; authentication and authorization remain separate requirements.
+    explanation: A private address narrows reachability but does not identify authorized users.
+  - id: c
+    text: Yes; every private-network caller is trusted automatically.
+    explanation: Network location alone does not establish identity or authority.
+  correct_option: b
+  explanation: A private address narrows reachability but does not identify authorized users.
+- id: ats033-domain-review-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Account for persistence, address families and alternate traffic paths.
+  source_readings:
+  - sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+  prompt: Why review both IPv4 and IPv6 rules?
+  options:
+  - id: a
+    text: An allowed alternate address-family path can bypass the intended restriction.
+    explanation: Filtering must cover the supported paths to the service.
+  - id: b
+    text: IPv6 permissions are automatically copied from every IPv4 rule.
+    explanation: That is not a universal host firewall contract.
+  - id: c
+    text: IPv6 cannot carry management API traffic.
+    explanation: Management services can be reachable over either supported family.
+  correct_option: a
+  explanation: Filtering must cover the supported paths to the service.
+- id: ats033-domain-review-q10
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Distinguish syscall filtering from resource-oriented mandatory access control.
+  source_readings:
+  - sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+  prompt: Which distinction is correct?
+  options:
+  - id: a
+    text: Seccomp grants Kubernetes API permissions.
+    explanation: API authorization is a separate control.
+  - id: b
+    text: AppArmor is a substitute for image publisher verification.
+    explanation: Runtime access control does not establish artifact provenance.
+  - id: c
+    text: Seccomp filters syscalls while AppArmor constrains resource access and operations.
+    explanation: They operate at different kernel security boundaries.
+  correct_option: c
+  explanation: They operate at different kernel security boundaries.
+- id: ats033-domain-review-q11
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Interpret RuntimeDefault, Localhost and unconfined profile choices.
+  source_readings:
+  - sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+  prompt: What does a Localhost seccomp profile require?
+  options:
+  - id: a
+    text: No runtime or kernel support because the API stores the field.
+    explanation: Stored intent does not establish enforcement prerequisites.
+  - id: b
+    text: The referenced profile must be available on the node that runs the container.
+    explanation: A declaration does not distribute the profile to every node.
+  - id: c
+    text: Only a matching ConfigMap name anywhere in the cluster.
+    explanation: A ConfigMap is not automatically a node-local seccomp profile.
+  correct_option: b
+  explanation: A declaration does not distribute the profile to every node.
+- id: ats033-domain-review-q12
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Diagnose profile failures while preserving the intended boundary.
+  source_readings:
+  - sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+  prompt: An application is denied an unnecessary syscall. What should be preserved?
+  options:
+  - id: a
+    text: The confinement boundary while the application requirement is reviewed.
+    explanation: A narrow compatibility decision is preferable to removing all filtering.
+  - id: b
+    text: An unconfined setting on every workload permanently.
+    explanation: That discards unrelated protections and does not establish necessity.
+  - id: c
+    text: A broad cluster administrator binding for the application.
+    explanation: Kubernetes API grants do not repair a kernel syscall denial.
+  correct_option: a
+  explanation: A narrow compatibility decision is preferable to removing all filtering.
