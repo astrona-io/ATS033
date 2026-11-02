@@ -11,14 +11,14 @@ scope:
   title: System Hardening
 placement:
   position: after
-  reading: sections/section-040/module-01/course-02-summary.md
+  reading: sections/section-040/module-01/course-05-summary.md
 questions:
 - id: ats033-domain-review-q01
   type: single_choice
   difficulty: intermediate
   learning_objective: Inventory services, packages and privileged interfaces by required function.
   source_readings:
-  - sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+  - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
   prompt: Which host service is a candidate for removal?
   options:
   - id: a
@@ -37,7 +37,7 @@ questions:
   difficulty: intermediate
   learning_objective: Explain why host compromise affects container isolation.
   source_readings:
-  - sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+  - sections/section-010/module-01/course-04-privileged-host-interfaces.md
   prompt: Why is host runtime socket access particularly sensitive?
   options:
   - id: a
@@ -56,7 +56,7 @@ questions:
   difficulty: intermediate
   learning_objective: Preserve operational dependencies while removing unnecessary exposure.
   source_readings:
-  - sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+  - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
   prompt: What makes a hardening change operationally sound?
   options:
   - id: a
@@ -75,7 +75,7 @@ questions:
   difficulty: intermediate
   learning_objective: Distinguish Linux users and groups from Kubernetes identities.
   source_readings:
-  - sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+  - sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
   prompt: Does a namespaced Kubernetes Role constrain a user's SSH privileges automatically?
   options:
   - id: a
@@ -94,7 +94,7 @@ questions:
   difficulty: intermediate
   learning_objective: Evaluate file, socket and privilege-elevation authority.
   source_readings:
-  - sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+  - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
   prompt: Why can a non-root user still have effective host administrator authority?
   options:
   - id: a
@@ -113,7 +113,7 @@ questions:
   difficulty: intermediate
   learning_objective: Review credential revocation and auditable privileged actions.
   source_readings:
-  - sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+  - sections/section-020/module-01/course-04-revocation-and-audit.md
   prompt: What belongs in a host access revocation review?
   options:
   - id: a
@@ -132,7 +132,7 @@ questions:
   difficulty: intermediate
   learning_objective: Map host listeners and required communication peers.
   source_readings:
-  - sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+  - sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
   prompt: What is the right basis for a host network allowlist?
   options:
   - id: a
@@ -151,7 +151,7 @@ questions:
   difficulty: intermediate
   learning_objective: Distinguish bind addresses, filtering and endpoint authorization.
   source_readings:
-  - sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+  - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
   prompt: Does binding a service to a private address authenticate its callers?
   options:
   - id: a
@@ -170,7 +170,7 @@ questions:
   difficulty: intermediate
   learning_objective: Account for persistence, address families and alternate traffic paths.
   source_readings:
-  - sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+  - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
   prompt: Why review both IPv4 and IPv6 rules?
   options:
   - id: a
@@ -189,7 +189,7 @@ questions:
   difficulty: intermediate
   learning_objective: Distinguish syscall filtering from resource-oriented mandatory access control.
   source_readings:
-  - sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+  - sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
   prompt: Which distinction is correct?
   options:
   - id: a
@@ -208,7 +208,7 @@ questions:
   difficulty: intermediate
   learning_objective: Interpret RuntimeDefault, Localhost and unconfined profile choices.
   source_readings:
-  - sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+  - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
   prompt: What does a Localhost seccomp profile require?
   options:
   - id: a
@@ -227,7 +227,7 @@ questions:
   difficulty: intermediate
   learning_objective: Diagnose profile failures while preserving the intended boundary.
   source_readings:
-  - sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+  - sections/section-040/module-01/course-04-diagnosing-profile-failures.md
   prompt: An application is denied an unnecessary syscall. What should be preserved?
   options:
   - id: a

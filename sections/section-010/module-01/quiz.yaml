@@ -1,0 +1,243 @@
+# Knowledge check for section 010, module 01. Contract:
+# schemas/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-010-01
+course_id: ATS033
+exam_code: CKS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-010/module-01
+  title: Reduce The Host Operating-System Attack Surface
+questions:
+  - id: ats033-010-01-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain why the host operating system is part of the cluster security boundary."
+    source_readings:
+      - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
+    prompt: "Why does an unneeded service on a worker node weaken the security of pods that have a strict security context?"
+    options:
+      - id: a
+        text: "Pods share the node's kernel and runtime, so control of the node means control of its pods."
+        explanation: "Correct. A compromise of the host is not limited by the settings of one pod."
+      - id: b
+        text: "Every service on a node adds latency to pod networking."
+        explanation: "Performance is not the security concern here."
+      - id: c
+        text: "Pods copy the node's running services into their own namespaces."
+        explanation: "Pods do not copy host services. They share the host kernel."
+      - id: d
+        text: "The scheduler refuses to start pods on nodes with extra services."
+        explanation: "The scheduler does not look at host services."
+    correct_option: a
+    explanation: "Containers share the host kernel, container runtime and files. A compromised host undermines every pod on it."
+
+  - id: ats033-010-01-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "List the services that start at boot."
+    source_readings:
+      - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
+    prompt: "Which command lists the service unit files that are set to start at boot?"
+    options:
+      - id: a
+        text: "`systemctl list-units --type=service --state=running`"
+        explanation: "This lists services that run now, not the ones set to start at boot."
+      - id: b
+        text: "`systemctl list-unit-files --type=service --state=enabled`"
+        explanation: "Correct. It reads the unit files and filters by the enabled state."
+      - id: c
+        text: "`ss -tlnp`"
+        explanation: "`ss` lists listening sockets, not unit files."
+      - id: d
+        text: "`systemctl daemon-reload`"
+        explanation: "This makes systemd read unit files again. It lists nothing."
+    correct_option: b
+    explanation: "Active state and enabled state are separate. `list-unit-files` with `--state=enabled` shows what a reboot would start."
+
+  - id: ats033-010-01-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the output of `ss -tlnp` to find services reachable from other machines."
+    source_readings:
+      - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
+    prompt: "In the output of `ss -tlnp`, which local address means that a service accepts connections from other machines on every IPv4 interface?"
+    options:
+      - id: a
+        text: "`127.0.0.1:8080`"
+        explanation: "This is loopback. Only processes on the node itself can connect."
+      - id: b
+        text: "`0.0.0.0:8080`"
+        explanation: "Correct. `0.0.0.0` means all IPv4 addresses of the node."
+      - id: c
+        text: "`[::1]:8080`"
+        explanation: "This is the IPv6 loopback address, reachable from the node only."
+      - id: d
+        text: "`127.0.0.53:53`"
+        explanation: "This is also a loopback address."
+    correct_option: b
+    explanation: "A bind address of `0.0.0.0` (or `*`) exposes the listener on all IPv4 interfaces. Loopback addresses limit it to the node."
+
+  - id: ats033-010-01-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the action that stops a service now and keeps it off after a reboot."
+    source_readings:
+      - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
+    prompt: "An administrator runs `systemctl stop training-extra.service` on a node. The service is enabled. What happens at the next reboot?"
+    options:
+      - id: a
+        text: "The service stays stopped, because it was stopped by an administrator."
+        explanation: "systemd does not remember a manual stop across a reboot."
+      - id: b
+        text: "The service starts again, because `stop` does not change the enabled state."
+        explanation: "Correct. Only `disable` removes the boot behavior."
+      - id: c
+        text: "The service is masked and cannot start."
+        explanation: "Masking needs `systemctl mask`."
+      - id: d
+        text: "systemd deletes the unit file during shutdown."
+        explanation: "systemd never deletes unit files on its own."
+    correct_option: b
+    explanation: "`stop` changes the running state. `disable --now` changes the boot behavior and stops the process."
+
+  - id: ats033-010-01-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Distinguish `disable` from `mask`."
+    source_readings:
+      - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
+    prompt: "A package ships `legacy-agent.service`. Another package needs the first package installed, so you cannot uninstall it. You must make sure that nothing, not even a dependency, starts the agent. Which command does that?"
+    options:
+      - id: a
+        text: "`systemctl stop legacy-agent.service`"
+        explanation: "The service can start again at boot or by dependency."
+      - id: b
+        text: "`systemctl disable legacy-agent.service`"
+        explanation: "A disabled unit can still be started by hand or as a dependency of another unit."
+      - id: c
+        text: "`systemctl mask --now legacy-agent.service`"
+        explanation: "Correct. Masking links the unit to `/dev/null`, so it cannot be started at all, and `--now` stops it."
+      - id: d
+        text: "`systemctl daemon-reload`"
+        explanation: "This reloads unit files. It does not change the state of a service."
+    correct_option: c
+    explanation: "`mask` blocks every start of the unit and package updates do not undo it."
+
+  - id: ats033-010-01-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Verify that a hardening change did not break the node."
+    source_readings:
+      - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
+    prompt: "You disabled `training-extra.service` on the control-plane node. Which set of checks best shows that the node still works?"
+    options:
+      - id: a
+        text: "`systemctl is-enabled training-extra.service` prints `disabled`."
+        explanation: "This confirms the change, but says nothing about the rest of the node."
+      - id: b
+        text: "`kubelet.service` and `containerd.service` are `active`, `/readyz` answers `ok` and the node shows `Ready`."
+        explanation: "Correct. These checks cover the runtime, the node agent, the API server and the node status."
+      - id: c
+        text: "The disabled service is gone from `ss -tlnp`."
+        explanation: "This shows the listener is gone. It does not show that Kubernetes works."
+      - id: d
+        text: "`kubectl get namespaces` lists `starfleet`."
+        explanation: "The API can list namespaces even when a node is `NotReady`."
+    correct_option: b
+    explanation: "A hardening change has two halves: the exposure is reduced, and the required services still work."
+
+  - id: ats033-010-01-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Simulate a package removal and read the result."
+    source_readings:
+      - sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+    prompt: "`apt-get remove --simulate tool-x` prints `Remv tool-x` and also `Remv containerd.io`. What should you do?"
+    options:
+      - id: a
+        text: "Run `apt-get remove --yes tool-x`, because the simulation changes nothing."
+        explanation: "The real command would remove `containerd.io` as well and stop the runtime."
+      - id: b
+        text: "Keep `tool-x`, because the container runtime depends on it."
+        explanation: "Correct. Removing the package removes the runtime package too, so the package is a dependency of the node."
+      - id: c
+        text: "Run `apt-get autoremove` to clean up the dependency first."
+        explanation: "`autoremove` removes unused packages. It does not remove a dependency relationship."
+      - id: d
+        text: "Run the removal with `purge` instead, which skips dependent packages."
+        explanation: "`purge` removes dependent packages in the same way as `remove`."
+    correct_option: b
+    explanation: "Each extra `Remv` line is another package the removal takes with it. A runtime package in that list means the package must stay."
+
+  - id: ats033-010-01-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Explain why a file outside the package manager is a patching risk."
+    source_readings:
+      - sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+    prompt: "`dpkg -S /usr/local/bin/node-agent` reports that no path matches. An advisory announces a flaw in `node-agent`, and the team runs `apt-get upgrade` on all nodes. What is the result for this binary?"
+    options:
+      - id: a
+        text: "It is patched, because `apt-get upgrade` upgrades everything on the node."
+        explanation: "`apt-get upgrade` upgrades installed packages only."
+      - id: b
+        text: "It is patched at the next reboot."
+        explanation: "A reboot restarts processes. It does not replace files."
+      - id: c
+        text: "It stays unpatched, because no package owns the file."
+        explanation: "Correct. Files outside the package system need their own update process or a new node image."
+      - id: d
+        text: "`dpkg` replaces it with the package version automatically."
+        explanation: "`dpkg -S` only reports ownership. It changes nothing."
+    correct_option: c
+    explanation: "The package manager patches only files that belong to packages."
+
+  - id: ats033-010-01-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Identify the host interface that gives root-equivalent authority."
+    source_readings:
+      - sections/section-010/module-01/course-04-privileged-host-interfaces.md
+    prompt: "A user on a node can write to `/run/containerd/containerd.sock` but has no `sudo` rights. Why is this a problem?"
+    options:
+      - id: a
+        text: "The user can fill the node's disk with logs."
+        explanation: "That is a minor concern compared with the real one."
+      - id: b
+        text: "The user can ask the runtime to start a privileged container that mounts the host filesystem."
+        explanation: "Correct. That gives root-level access to the node."
+      - id: c
+        text: "The user can restart the kubelet."
+        explanation: "The socket belongs to the container runtime, not to the kubelet service."
+      - id: d
+        text: "Nothing. A Unix socket cannot be used without network access."
+        explanation: "A Unix socket works through the filesystem and needs no network."
+    correct_option: b
+    explanation: "Control of the container runtime equals administrator authority on the node."
+
+  - id: ats033-010-01-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Apply Pod Security Admission to block `hostPath` volumes."
+    source_readings:
+      - sections/section-010/module-01/course-04-privileged-host-interfaces.md
+    prompt: "The label `pod-security.kubernetes.io/enforce=baseline` is added to the `starfleet` namespace. A pod with a `hostPath` volume already runs there. A new pod with the same volume is applied. What happens?"
+    options:
+      - id: a
+        text: "The running pod is deleted and the new pod is rejected."
+        explanation: "Enforcement does not delete running pods."
+      - id: b
+        text: "The running pod keeps running and the new pod is rejected by the API server."
+        explanation: "Correct. `enforce` is checked when a pod is created or updated."
+      - id: c
+        text: "Both pods are allowed, because `baseline` permits `hostPath`."
+        explanation: "The `baseline` standard forbids `hostPath` volumes."
+      - id: d
+        text: "The new pod is created, and the kubelet refuses to start it."
+        explanation: "The API server rejects it before it reaches a node."
+    correct_option: b
+    explanation: "Pod Security Admission runs in the API server on create and update. Existing pods are not removed."

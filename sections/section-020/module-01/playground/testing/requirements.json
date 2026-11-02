@@ -1,0 +1,23 @@
+{
+  "context": "kind-astro-ats-033-playground-020-01",
+  "resources": [
+    {
+      "kind": "configmap",
+      "name": "identity-review",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ConfigMap",
+        "metadata": {
+          "name": "identity-review",
+          "namespace": "starfleet"
+        },
+        "data": {
+          "identity": "training-reader",
+          "result": "scoped-read"
+        }
+      }
+    }
+  ],
+  "behavior": []
+}

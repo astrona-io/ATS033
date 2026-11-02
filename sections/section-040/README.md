@@ -17,3 +17,14 @@ Read the module goals, teaching and closing summary in order. YAML checks are in
 - Interpret RuntimeDefault, Localhost and unconfined profile choices.
 - Explain node prerequisites and container-level overrides.
 - Diagnose profile failures while preserving the intended boundary.
+
+## Module
+
+**Kernel Hardening With seccomp And AppArmor** has a landing page, four deep-dive parts, a summary and a knowledge check:
+
+- Seccomp: Filtering System Calls
+- AppArmor: Profiles For Files And Capabilities
+- The Restricted Security Context
+- Diagnosing Profile Failures
+- Summary
+- Knowledge check (10 questions)

@@ -9,3 +9,5 @@ YAML knowledge checks are registered separately for future presentation. They fo
 Read the explanations and worked examples to identify the responsible component, intended operation and limits of each claim. No live environment or executed results are required.
 
 The expanded chapters open with a concrete problem and state measurable objectives and the required starting knowledge. Mechanism diagrams connect the responsible components, while worked examples explain the decisions and their limits. Summaries collect the conclusions after each complete topic. These chapters do not require a running environment and do not claim observed command results.
+
+Each active module has a private playground. Graded tasks follow the readings they practise and use separate environments. Complete the task before comparing your result with the solution. Host-level exercises target only disposable node containers.

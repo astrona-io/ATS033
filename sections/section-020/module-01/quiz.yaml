@@ -1,0 +1,243 @@
+# Knowledge check for section 020, module 01. Contract:
+# schemas/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-020-01
+course_id: ATS033
+exam_code: CKS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-020/module-01
+  title: Apply Least Privilege To Identities
+questions:
+  - id: ats033-020-01-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain how Linux chooses which permission bits apply."
+    source_readings:
+      - sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
+    prompt: "A file is owned by `root`, has the group `reports` and the mode `0640`. A user who is not `root` and not in the group `reports` tries to read it. What happens?"
+    options:
+      - id: a
+        text: "The read is denied, because only the 'other' bits apply and they are empty."
+        explanation: "Correct. The user is not the owner and not in the group, so the 'other' bits decide."
+      - id: b
+        text: "The read is allowed, because the owner bits allow reading."
+        explanation: "The owner bits apply only to the owner."
+      - id: c
+        text: "The read is allowed, because the group bits allow reading."
+        explanation: "The group bits apply only to members of the group."
+      - id: d
+        text: "The kernel combines all three triplets and allows the read."
+        explanation: "The kernel applies exactly one triplet."
+    correct_option: a
+    explanation: "Linux uses the owner bits for the owner, else the group bits for group members, else the other bits."
+
+  - id: ats033-020-01-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Add an account to a supplementary group without removing its other groups."
+    source_readings:
+      - sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
+    prompt: "Which command adds `training-reader` to the group `training-readers` and keeps its other supplementary groups?"
+    options:
+      - id: a
+        text: "`usermod --groups training-readers training-reader`"
+        explanation: "Without `--append`, this replaces all supplementary groups."
+      - id: b
+        text: "`usermod --append --groups training-readers training-reader`"
+        explanation: "Correct. `--append` keeps the existing groups."
+      - id: c
+        text: "`usermod --lock training-reader`"
+        explanation: "This locks the password. It changes no groups."
+      - id: d
+        text: "`chmod g+r training-reader`"
+        explanation: "`chmod` changes file modes, not group membership."
+    correct_option: b
+    explanation: "`usermod --append --groups` adds a group. Omitting `--append` replaces the list."
+
+  - id: ats033-020-01-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Grant one file through a group instead of broad access."
+    source_readings:
+      - sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
+    prompt: "A backup account must read `/var/lib/app/report` (owner `root`, mode `0600`). Which change gives the least access that completes the task?"
+    options:
+      - id: a
+        text: "Add the account to the `root` group."
+        explanation: "The account would gain the group rights on every file that group owns."
+      - id: b
+        text: "Run `chmod 0644 /var/lib/app/report`."
+        explanation: "Every account on the node could then read the file."
+      - id: c
+        text: "Create a group for the report, set it on the file with mode `0640`, and add the account to that group."
+        explanation: "Correct. Only the named account and the owner can read the file."
+      - id: d
+        text: "Give the account a `sudo` rule for all commands."
+        explanation: "This gives full root access for a read task."
+    correct_option: c
+    explanation: "A dedicated group makes the grant visible and limited to one file."
+
+  - id: ats033-020-01-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Identify a sudoers rule that is too broad."
+    source_readings:
+      - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+    prompt: "Which sudoers rule follows least privilege for a group that only needs to restart the kubelet?"
+    options:
+      - id: a
+        text: "`%ops ALL=(ALL:ALL) NOPASSWD: ALL`"
+        explanation: "This allows every command as every user."
+      - id: b
+        text: "`%ops ALL=(root) NOPASSWD: /usr/bin/systemctl *`"
+        explanation: "The wildcard allows every `systemctl` action, including stopping other services."
+      - id: c
+        text: "`%ops ALL=(root) /usr/bin/systemctl restart kubelet.service`"
+        explanation: "Correct. It names the exact command and arguments."
+      - id: d
+        text: "`%ops ALL=(root) /usr/bin/vim`"
+        explanation: "An editor can start a shell and edit any file, so this gives full root."
+    correct_option: c
+    explanation: "A least-privilege rule names the exact command, the exact arguments and the target user."
+
+  - id: ats033-020-01-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Turn off an account completely."
+    source_readings:
+      - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+    prompt: "An employee leaves. You run `usermod --lock` on the account. The employee can still log in over SSH with a private key. Why?"
+    options:
+      - id: a
+        text: "The lock marker blocks password authentication only. Key-based login needs an expiry date or a `nologin` shell to stop."
+        explanation: "Correct. Combine the lock with an expiry date and a non-login shell."
+      - id: b
+        text: "`usermod --lock` only works on accounts with a home directory."
+        explanation: "The lock does not depend on the home directory."
+      - id: c
+        text: "SSH ignores all account settings."
+        explanation: "SSH uses the account checks, which is why an expiry date works."
+      - id: d
+        text: "The account must be removed from `/etc/group` first."
+        explanation: "Group membership does not control SSH login."
+    correct_option: a
+    explanation: "A password lock leaves key-based logins open unless the account is also expired or has a `nologin` shell."
+
+  - id: ats033-020-01-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Apply the SSH hardening baseline."
+    source_readings:
+      - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+    prompt: "Which `sshd_config` setting ties every remote administrative action to a named account?"
+    options:
+      - id: a
+        text: "`PermitRootLogin no`"
+        explanation: "Correct. Users must log in as themselves and then use `sudo`, which records each action."
+      - id: b
+        text: "`PermitRootLogin yes`"
+        explanation: "This allows direct root logins, which hide who the person was."
+      - id: c
+        text: "`MaxAuthTries 100`"
+        explanation: "This allows more attempts and does not tie actions to accounts."
+      - id: d
+        text: "`PermitEmptyPasswords yes`"
+        explanation: "This weakens authentication."
+    correct_option: a
+    explanation: "Disabling direct root login forces named accounts and leaves a trail."
+
+  - id: ats033-020-01-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Distinguish authentication from authorization in Kubernetes."
+    source_readings:
+      - sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
+    prompt: "In the Kubernetes API server, which step decides whether the caller `system:serviceaccount:starfleet:probe-reader` may list pods?"
+    options:
+      - id: a
+        text: "Authentication"
+        explanation: "Authentication only identifies the caller."
+      - id: b
+        text: "Authorization, which is RBAC on a standard cluster"
+        explanation: "Correct. Authorization checks the verb and resource against the bindings."
+      - id: c
+        text: "The kubelet"
+        explanation: "The kubelet runs pods. It does not decide API access."
+      - id: d
+        text: "The scheduler"
+        explanation: "The scheduler places pods on nodes."
+    correct_option: b
+    explanation: "Authentication identifies the caller. Authorization checks what the caller may do."
+
+  - id: ats033-020-01-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Verify the permissions of a ServiceAccount with `kubectl auth can-i`."
+    source_readings:
+      - sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
+    prompt: "A Role allows `get` and `list` on pods in `starfleet`. A RoleBinding in `starfleet` binds it to the ServiceAccount `probe-reader`. What does `kubectl auth can-i list pods --as=system:serviceaccount:starfleet:probe-reader -n outpost` print?"
+    options:
+      - id: a
+        text: "`yes`, because the ServiceAccount exists in the cluster."
+        explanation: "Existence alone grants nothing."
+      - id: b
+        text: "`yes`, because Roles apply to all namespaces."
+        explanation: "A Role applies only in its own namespace."
+      - id: c
+        text: "`no`, because the RoleBinding grants the Role in `starfleet` only."
+        explanation: "Correct. A RoleBinding is namespaced."
+      - id: d
+        text: "An error, because `--as` cannot be used with ServiceAccounts."
+        explanation: "`--as` works with ServiceAccount user names."
+    correct_option: c
+    explanation: "RBAC is additive and a RoleBinding grants its Role only in its own namespace."
+
+  - id: ats033-020-01-q09
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Reduce the credentials that reach pods."
+    source_readings:
+      - sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
+    prompt: "A pod serves static pages and never calls the Kubernetes API. Its ServiceAccount has `automountServiceAccountToken` unset. Which change removes the API credential from the pod without changing the application?"
+    options:
+      - id: a
+        text: "Set `automountServiceAccountToken: false` in the pod spec."
+        explanation: "Correct. The kubelet then does not mount the token, and a value on the pod overrides the ServiceAccount."
+      - id: b
+        text: "Delete the Role the ServiceAccount uses."
+        explanation: "The token is still mounted. It only has fewer permissions."
+      - id: c
+        text: "Add a ClusterRoleBinding with no subjects."
+        explanation: "This changes no credentials."
+      - id: d
+        text: "Set `readOnlyRootFilesystem: true`."
+        explanation: "The token mount is a separate volume. This setting does not remove it."
+    correct_option: a
+    explanation: "Turning off the automatic mount removes the token from pods that do not need it."
+
+  - id: ats033-020-01-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Revoke Kubernetes access and choose a safe audit level."
+    source_readings:
+      - sections/section-020/module-01/course-04-revocation-and-audit.md
+    prompt: "A contractor's ServiceAccount must lose all access now, and the audit policy must record requests on Secrets without storing secret values. Which pair of actions is correct?"
+    options:
+      - id: a
+        text: "Delete the RoleBinding; log Secrets at the `Metadata` level."
+        explanation: "Correct. RBAC is evaluated on each request, and `Metadata` records who and when but not the body."
+      - id: b
+        text: "Delete the Role only; log Secrets at `RequestResponse`."
+        explanation: "The binding remains, and `RequestResponse` would store secret values in the log."
+      - id: c
+        text: "Wait for the token to expire; log Secrets at `Request`."
+        explanation: "Waiting leaves access in place, and `Request` stores the request body."
+      - id: d
+        text: "Delete the pod; do not log Secrets."
+        explanation: "Deleting the pod does not remove the identity's permissions, and skipping the log removes the record."
+    correct_option: a
+    explanation: "Removing the binding ends access immediately. The `Metadata` level keeps the trail without secret content."

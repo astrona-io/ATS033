@@ -1,0 +1,32 @@
+{
+  "context": "kind-astro-ats-033-playground-010-01",
+  "resources": [
+    {
+      "kind": "configmap",
+      "name": "host-review",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ConfigMap",
+        "metadata": {
+          "name": "host-review",
+          "namespace": "starfleet"
+        },
+        "data": {
+          "service": "training-extra.service",
+          "result": "disabled"
+        }
+      }
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "--raw=/readyz"
+      ],
+      "equals": "ok"
+    }
+  ]
+}

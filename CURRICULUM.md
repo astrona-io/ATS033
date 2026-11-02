@@ -19,3 +19,14 @@ The [official objectives](https://training.linuxfoundation.org/certification/cer
 | 040 / 01 | Seccomp And AppArmor As Different Kernel Boundaries | Seccomp And AppArmor As Different Kernel Boundaries |
 
 AUTHORING.yaml records measurable goals and adaptation sources. Every objective retains its section ID. All technical readings remain draft. Question banks are separate from the reading manifest and follow their declared summaries. No labs, playgrounds or runtime validation are included.
+
+## Hands-On Coverage
+
+This course has 4 ungraded module playgrounds and 4 draft independent labs. Tasks and solutions are registered around each lab immediately after its teaching reading. Static configuration, shell/Python/YAML, parser, lifecycle and offline grader checks pass. Live execution remains pending because the session cannot access Podman; installed CLI configuration validation is separately blocked by its maintenance lock.
+
+| Module | Labs in teaching order |
+| --- | --- |
+| 010/01 | Disable An Unneeded Node Service |
+| 020/01 | Grant One Host Identity Scoped Read Access |
+| 030/01 | Bind A Host-Network Service To Loopback |
+| 040/01 | Run With A Restricted Security Context |

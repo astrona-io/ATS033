@@ -1,0 +1,108 @@
+{
+  "context": "kind-astro-ats-033-lab-040-01-01",
+  "resources": [
+    {
+      "kind": "pod",
+      "name": "restricted-reader",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "restricted-reader",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "restartPolicy": "Never",
+          "containers": [
+            {
+              "name": "reader",
+              "image": "docker.io/library/busybox:1.37.0",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 3600"
+              ],
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "readOnlyRootFilesystem": true
+              },
+              "volumeMounts": [
+                {
+                  "name": "scratch",
+                  "mountPath": "/scratch"
+                }
+              ]
+            }
+          ],
+          "securityContext": {
+            "runAsNonRoot": true,
+            "runAsUser": 1000,
+            "runAsGroup": 1000,
+            "fsGroup": 1000,
+            "seccompProfile": {
+              "type": "RuntimeDefault"
+            }
+          },
+          "volumes": [
+            {
+              "name": "scratch",
+              "emptyDir": {}
+            }
+          ]
+        }
+      },
+      "state": "pod"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "restricted-reader",
+        "--",
+        "id",
+        "-u"
+      ],
+      "equals": "1000"
+    },
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "restricted-reader",
+        "--",
+        "sh",
+        "-c",
+        "printf allowed > /scratch/result; cat /scratch/result"
+      ],
+      "equals": "allowed"
+    },
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "restricted-reader",
+        "--",
+        "sh",
+        "-c",
+        "printf denied > /root-file"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "read-only file system"
+      ]
+    }
+  ]
+}

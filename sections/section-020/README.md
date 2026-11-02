@@ -17,3 +17,14 @@ Read the module goals, teaching and closing summary in order. YAML checks are in
 - Evaluate file, socket and privilege-elevation authority.
 - Separate routine operational access from exceptional administration.
 - Review credential revocation and auditable privileged actions.
+
+## Module
+
+**Apply Least Privilege To Identities** has a landing page, four deep-dive parts, a summary and a knowledge check:
+
+- Users, Groups And File Permissions
+- Privilege Elevation And Account Locking
+- Kubernetes Identities And RBAC
+- Revocation And Audit
+- Summary
+- Knowledge check (10 questions)

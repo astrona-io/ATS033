@@ -17,3 +17,14 @@ Read the module goals, teaching and closing summary in order. YAML checks are in
 - Distinguish bind addresses, filtering and endpoint authorization.
 - Evaluate ingress and egress rules without breaking dependencies.
 - Account for persistence, address families and alternate traffic paths.
+
+## Module
+
+**Minimize External Access To The Network** has a landing page, four deep-dive parts, a summary and a knowledge check:
+
+- Listeners And Bind Addresses
+- Host Firewalls With iptables And ufw
+- NetworkPolicy For Pod Traffic
+- NodePorts, Control-Plane Ports And API Access
+- Summary
+- Knowledge check (10 questions)

@@ -17,3 +17,14 @@ Read the module goals, teaching and closing summary in order. YAML checks are in
 - Explain why host compromise affects container isolation.
 - Evaluate persistent service configuration and patch ownership.
 - Preserve operational dependencies while removing unnecessary exposure.
+
+## Module
+
+**Reduce The Host Operating-System Attack Surface** has a landing page, four deep-dive parts, a summary and a knowledge check:
+
+- Inventory Services And Listeners
+- Stop, Disable And Mask Services
+- Remove Packages And Keep The Node Working
+- Privileged Host Interfaces
+- Summary
+- Knowledge check (10 questions)

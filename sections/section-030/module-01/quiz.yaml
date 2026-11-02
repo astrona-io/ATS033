@@ -1,0 +1,243 @@
+# Knowledge check for section 030, module 01. Contract:
+# schemas/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-030-01
+course_id: ATS033
+exam_code: CKS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-030/module-01
+  title: Minimize External Access To The Network
+questions:
+  - id: ats033-030-01-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the Local Address column of ss output."
+    source_readings:
+      - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
+    prompt: "`ss -tlnp` on a node shows a service with the local address `127.0.0.1:19090`. Who can connect to it?"
+    options:
+      - id: a
+        text: "Only processes on the same node, including pods that use `hostNetwork: true`."
+        explanation: "Correct. Loopback is not reachable from other machines."
+      - id: b
+        text: "Any machine that can route to the node."
+        explanation: "That describes `0.0.0.0`, not `127.0.0.1`."
+      - id: c
+        text: "Any pod in the cluster."
+        explanation: "A pod outside the host network reaches the node address, not the loopback of the node."
+      - id: d
+        text: "Nobody, because loopback addresses are disabled in containers."
+        explanation: "Loopback works normally for local processes."
+    correct_option: a
+    explanation: "A service bound to loopback accepts connections from processes on the same host only."
+
+  - id: ats033-030-01-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Tell a refused connection from a timeout."
+    source_readings:
+      - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
+    prompt: "A client gets `Connection refused` immediately when it connects to a node port. What does this most likely mean?"
+    options:
+      - id: a
+        text: "A firewall rule silently dropped the packet."
+        explanation: "A drop produces a timeout, not an immediate refusal."
+      - id: b
+        text: "The packet reached the host and no process listens on that address and port."
+        explanation: "Correct. The host answers with a reset."
+      - id: c
+        text: "The route to the node does not exist."
+        explanation: "A missing route usually ends in a timeout or a network-unreachable error."
+      - id: d
+        text: "A NetworkPolicy allowed the traffic."
+        explanation: "An allow decision does not cause a refusal."
+    correct_option: b
+    explanation: "Refused means the host is reachable and nothing listens there. A timeout points to filtering or no route."
+
+  - id: ats033-030-01-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the fix for a host-network service that must stay local."
+    source_readings:
+      - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
+    prompt: "A pod with `hostNetwork: true` runs a management API on `0.0.0.0:19091`. Only processes on the node need it. What is the best fix?"
+    options:
+      - id: a
+        text: "Change the service to bind to `127.0.0.1` and recreate the pod."
+        explanation: "Correct. The service no longer listens on any external interface."
+      - id: b
+        text: "Create a NetworkPolicy that selects the pod."
+        explanation: "Most CNI plugins do not apply pod policies reliably to host-network pods."
+      - id: c
+        text: "Rename the port in the Service."
+        explanation: "The listener is unchanged."
+      - id: d
+        text: "Delete the Service object."
+        explanation: "The pod listens on the node regardless of any Service."
+    correct_option: a
+    explanation: "Narrowing the bind address removes the exposure at its source. A firewall rule is a second layer."
+
+  - id: ats033-030-01-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Place an iptables rule so that it takes effect."
+    source_readings:
+      - sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
+    prompt: "The `INPUT` chain has an `ACCEPT` rule for all TCP traffic at position 1. You append a `DROP` rule for port 19091. Why does traffic to 19091 still arrive?"
+    options:
+      - id: a
+        text: "iptables ignores rules that are added at run time."
+        explanation: "Added rules take effect at once."
+      - id: b
+        text: "Rules are checked from top to bottom and the first match decides, so the earlier ACCEPT wins."
+        explanation: "Correct."
+      - id: c
+        text: "A DROP rule only works for UDP."
+        explanation: "DROP works for any protocol."
+      - id: d
+        text: "The `INPUT` chain applies only to outgoing packets."
+        explanation: "`INPUT` handles packets addressed to the node itself."
+    correct_option: b
+    explanation: "Insert the drop rule above the broader accept, or narrow the accept rule."
+
+  - id: ats033-030-01-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a firewall change is not durable by default."
+    source_readings:
+      - sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
+    prompt: "You add an `iptables` rule by hand on a node. After a reboot the rule is gone. What is the cause?"
+    options:
+      - id: a
+        text: "The kernel rejects rules that were added by hand."
+        explanation: "It accepts them. They live in kernel memory only."
+      - id: b
+        text: "Rules from `iptables` are kept in memory and need a persistence mechanism or a tool such as `ufw` to be restored."
+        explanation: "Correct."
+      - id: c
+        text: "Kubernetes deletes every rule it did not create at start."
+        explanation: "kube-proxy manages its own chains, not the whole rule set."
+      - id: d
+        text: "The rule used the wrong table."
+        explanation: "The table does not decide persistence."
+    correct_option: b
+    explanation: "Save and restore rules, or manage them with a tool that stores them, and put the setup into the node image."
+
+  - id: ats033-030-01-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Apply the NetworkPolicy ingress model."
+    source_readings:
+      - sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+    prompt: "In namespace `starfleet`, a policy has `podSelector: {}` and `policyTypes: [Ingress]` with no ingress rules. What does it do?"
+    options:
+      - id: a
+        text: "It allows all ingress to every pod in the namespace."
+        explanation: "Without rules nothing is allowed."
+      - id: b
+        text: "It denies all ingress to every pod in the namespace, if the CNI plugin enforces policies."
+        explanation: "Correct. This is the standard default deny."
+      - id: c
+        text: "It denies ingress to pods in all namespaces."
+        explanation: "A policy applies to its own namespace."
+      - id: d
+        text: "It blocks egress from the pods as well."
+        explanation: "Egress is affected only when `Egress` is in `policyTypes`."
+    correct_option: b
+    explanation: "An empty selector selects all pods of the namespace, and an empty rule list allows nothing."
+
+  - id: ats033-030-01-q07
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Diagnose a NetworkPolicy that has no effect."
+    source_readings:
+      - sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+    prompt: "You apply a default-deny ingress policy and a client from another namespace still reaches the pods. `kubectl get networkpolicy` lists the policy. What should you check first?"
+    options:
+      - id: a
+        text: "Whether the CNI plugin of the cluster enforces NetworkPolicy."
+        explanation: "Correct. The API server only stores the object."
+      - id: b
+        text: "Whether the namespace has a LimitRange."
+        explanation: "A LimitRange does not affect traffic."
+      - id: c
+        text: "Whether the pods use the `latest` image tag."
+        explanation: "The tag has no effect on policy."
+      - id: d
+        text: "Whether the Service type is `ClusterIP`."
+        explanation: "Policies apply to pod traffic whatever the Service type."
+    correct_option: a
+    explanation: "A policy needs an enforcing network plugin. Without one the object exists and has no effect."
+
+  - id: ats033-030-01-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Write a correct allow rule."
+    source_readings:
+      - sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+    prompt: "A Service exposes port 80 and forwards to container port 8080. Which port goes into the `ports` list of the allow rule?"
+    options:
+      - id: a
+        text: "80, the Service port."
+        explanation: "Policies match the destination pod after Service translation."
+      - id: b
+        text: "8080, the container port."
+        explanation: "Correct."
+      - id: c
+        text: "Both, as a range."
+        explanation: "Only the container port is needed."
+      - id: d
+        text: "The NodePort."
+        explanation: "The NodePort is translated before the policy applies."
+    correct_option: b
+    explanation: "A NetworkPolicy sees the pod port, not the Service port."
+
+  - id: ats033-030-01-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Know how far a NodePort reaches."
+    source_readings:
+      - sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md
+    prompt: "A Service of type `NodePort` with `nodePort: 30080` selects pods that run on one worker node only. On which nodes is port 30080 open?"
+    options:
+      - id: a
+        text: "Only on the worker node that runs the pods."
+        explanation: "kube-proxy opens it on every node."
+      - id: b
+        text: "On every node of the cluster."
+        explanation: "Correct."
+      - id: c
+        text: "Only on the control-plane node."
+        explanation: "No such rule exists."
+      - id: d
+        text: "On no node until a LoadBalancer is added."
+        explanation: "A NodePort works without one."
+    correct_option: b
+    explanation: "Remove unused NodePort Services, because each one opens a port on all nodes."
+
+  - id: ats033-030-01-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Prioritise control-plane ports for restriction."
+    source_readings:
+      - sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md
+    prompt: "A security group review of a cluster lists the ports 6443, 2379, 10250 and 30080. Which port must never be reachable from the internet because it holds all cluster Secrets?"
+    options:
+      - id: a
+        text: "6443, the API server."
+        explanation: "It needs restriction too, but it is the intended entry point behind authentication."
+      - id: b
+        text: "2379, the etcd client port."
+        explanation: "Correct. etcd stores every Secret."
+      - id: c
+        text: "10250, the kubelet API."
+        explanation: "It needs restriction, but it does not store the Secrets."
+      - id: d
+        text: "30080, a NodePort."
+        explanation: "It exposes one application only."
+    correct_option: b
+    explanation: "Restrict 2379 and 2380 to the API servers and etcd members, and restrict 6443 and 10250 to known networks."

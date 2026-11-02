@@ -41,11 +41,14 @@ modules:
     title: Minimize host OS footprint (reduce attack surface)
     path: sections/section-010/README.md
   - type: reading
-    title: Reducing The Host Operating-System Attack Surface
+    title: Reduce The Host Operating-System Attack Surface
     path: sections/section-010/module-01/course.md
   - type: reading
-    title: Reducing The Host Operating-System Attack Surface
-    path: sections/section-010/module-01/course-01-reducing-the-host-operating-system-attack-surface.md
+    title: Inventory Services And Listeners
+    path: sections/section-010/module-01/course-01-inventory-services-and-listeners.md
+  - type: reading
+    title: Stop, Disable And Mask Services
+    path: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
   - type: reading
     title: Disable An Unneeded Node Service — Task
     path: sections/section-010/module-01/labs/lab-01/question.md
@@ -66,11 +69,18 @@ modules:
     title: Disable An Unneeded Node Service — Solution
     path: sections/section-010/module-01/labs/lab-01/solution.md
   - type: reading
-    title: 'Guided Practice: Disable An Unneeded Node Service'
-    path: sections/section-010/module-01/course-02-guided-practice.md
+    title: Remove Packages And Keep The Node Working
+    path: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+  - type: reading
+    title: Privileged Host Interfaces
+    path: sections/section-010/module-01/course-04-privileged-host-interfaces.md
   - type: reading
     title: Summary
-    path: sections/section-010/module-01/course-03-summary.md
+    path: sections/section-010/module-01/course-05-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Minimize The Host OS Footprint'
+    path: sections/section-010/module-01/quiz.yaml
+    question_count: 10
 - id: module-020
   title: Using least-privilege identity and access management
   description: Developed reading and reasoning for Using least-privilege identity
@@ -81,11 +91,11 @@ modules:
     title: Using least-privilege identity and access management
     path: sections/section-020/README.md
   - type: reading
-    title: Least Privilege For Host Identities And Administration
+    title: Apply Least Privilege To Identities
     path: sections/section-020/module-01/course.md
   - type: reading
-    title: Least Privilege For Host Identities And Administration
-    path: sections/section-020/module-01/course-01-least-privilege-for-host-identities-and-administration.md
+    title: Users, Groups And File Permissions
+    path: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
   - type: reading
     title: Grant One Host Identity Scoped Read Access — Task
     path: sections/section-020/module-01/labs/lab-01/question.md
@@ -105,11 +115,21 @@ modules:
     title: Grant One Host Identity Scoped Read Access — Solution
     path: sections/section-020/module-01/labs/lab-01/solution.md
   - type: reading
-    title: 'Guided Practice: Grant One Host Identity Scoped Read Access'
-    path: sections/section-020/module-01/course-02-guided-practice.md
+    title: Privilege Elevation And Account Locking
+    path: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+  - type: reading
+    title: Kubernetes Identities And RBAC
+    path: sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
+  - type: reading
+    title: Revocation And Audit
+    path: sections/section-020/module-01/course-04-revocation-and-audit.md
   - type: reading
     title: Summary
-    path: sections/section-020/module-01/course-03-summary.md
+    path: sections/section-020/module-01/course-05-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Apply Least Privilege To Identities'
+    path: sections/section-020/module-01/quiz.yaml
+    question_count: 10
 - id: module-030
   title: Minimize external access to the network
   description: Developed reading and reasoning for Minimize external access to the
@@ -120,11 +140,11 @@ modules:
     title: Minimize external access to the network
     path: sections/section-030/README.md
   - type: reading
-    title: Minimizing External Access To Host Services
+    title: Minimize External Access To The Network
     path: sections/section-030/module-01/course.md
   - type: reading
-    title: Minimizing External Access To Host Services
-    path: sections/section-030/module-01/course-01-minimizing-external-access-to-host-services.md
+    title: Listeners And Bind Addresses
+    path: sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
   - type: reading
     title: Bind A Host-Network Service To Loopback — Task
     path: sections/section-030/module-01/labs/lab-01/question.md
@@ -145,11 +165,21 @@ modules:
     title: Bind A Host-Network Service To Loopback — Solution
     path: sections/section-030/module-01/labs/lab-01/solution.md
   - type: reading
-    title: 'Guided Practice: Bind A Host-Network Service To Loopback'
-    path: sections/section-030/module-01/course-02-guided-practice.md
+    title: Host Firewalls With iptables And ufw
+    path: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
+  - type: reading
+    title: NetworkPolicy For Pod Traffic
+    path: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+  - type: reading
+    title: NodePorts, Control-Plane Ports And API Access
+    path: sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md
   - type: reading
     title: Summary
-    path: sections/section-030/module-01/course-03-summary.md
+    path: sections/section-030/module-01/course-05-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Minimize External Access To The Network'
+    path: sections/section-030/module-01/quiz.yaml
+    question_count: 10
 - id: module-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
   description: Developed reading and reasoning for Appropriately use kernel hardening
@@ -160,11 +190,17 @@ modules:
     title: Appropriately use kernel hardening tools such as AppArmor, seccomp
     path: sections/section-040/README.md
   - type: reading
-    title: Seccomp And AppArmor As Different Kernel Boundaries
+    title: Kernel Hardening With seccomp And AppArmor
     path: sections/section-040/module-01/course.md
   - type: reading
-    title: Seccomp And AppArmor As Different Kernel Boundaries
-    path: sections/section-040/module-01/course-01-seccomp-and-apparmor-as-different-kernel-boundaries.md
+    title: 'Seccomp: Filtering System Calls'
+    path: sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
+  - type: reading
+    title: 'AppArmor: Profiles For Files And Capabilities'
+    path: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+  - type: reading
+    title: The Restricted Security Context
+    path: sections/section-040/module-01/course-03-the-restricted-security-context.md
   - type: reading
     title: Run With A Restricted Security Context — Task
     path: sections/section-040/module-01/labs/lab-01/question.md
@@ -185,8 +221,12 @@ modules:
     title: Run With A Restricted Security Context — Solution
     path: sections/section-040/module-01/labs/lab-01/solution.md
   - type: reading
-    title: 'Guided Practice: Run With A Restricted Security Context'
-    path: sections/section-040/module-01/course-02-guided-practice.md
+    title: Diagnosing Profile Failures
+    path: sections/section-040/module-01/course-04-diagnosing-profile-failures.md
   - type: reading
     title: Summary
-    path: sections/section-040/module-01/course-03-summary.md
+    path: sections/section-040/module-01/course-05-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Kernel Hardening With seccomp And AppArmor'
+    path: sections/section-040/module-01/quiz.yaml
+    question_count: 10

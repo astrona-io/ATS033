@@ -1,0 +1,5 @@
+node='astro-ats-033-lab-010-01-01-control-plane'
+assert command(['podman','exec',node,'systemctl','show','training-extra.service','--property=ActiveState','--value']).stdout.strip()=='inactive', 'Stop the unnecessary service'
+assert command(['podman','exec',node,'systemctl','show','training-extra.service','--property=UnitFileState','--value']).stdout.strip()=='disabled', 'Disable automatic startup'
+assert command(['podman','exec',node,'systemctl','is-active','kubelet']).stdout.strip()=='active'
+assert command(['podman','exec',node,'systemctl','is-active','containerd']).stdout.strip()=='active'
