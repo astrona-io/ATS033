@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: host-review
+  namespace: starfleet
+data:
+  service: training-extra.service
+  result: disabled
