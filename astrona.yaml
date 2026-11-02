@@ -35,7 +35,7 @@ modules:
   title: Minimize host OS footprint (reduce attack surface)
   description: Developed reading and reasoning for Minimize host OS footprint (reduce
     attack surface).
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Minimize host OS footprint (reduce attack surface)
@@ -75,7 +75,7 @@ modules:
   title: Using least-privilege identity and access management
   description: Developed reading and reasoning for Using least-privilege identity
     and access management.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Using least-privilege identity and access management
@@ -114,7 +114,7 @@ modules:
   title: Minimize external access to the network
   description: Developed reading and reasoning for Minimize external access to the
     network.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Minimize external access to the network
@@ -154,7 +154,7 @@ modules:
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
   description: Developed reading and reasoning for Appropriately use kernel hardening
     tools such as AppArmor, seccomp.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Appropriately use kernel hardening tools such as AppArmor, seccomp
