@@ -1,0 +1,69 @@
+{
+  "context": "kind-astro-ats-033-lab-040-capstone-01",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "cargo",
+      "expected": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "cargo",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "replicas": 1,
+          "template": {
+            "spec": {
+              "securityContext": {
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "runAsGroup": 1000,
+                "fsGroup": 1000,
+                "seccompProfile": {
+                  "type": "Localhost",
+                  "localhostProfile": "profiles/cargo-guard.json"
+                }
+              },
+              "containers": [
+                {
+                  "name": "cargo",
+                  "image": "docker.io/library/busybox:1.37.0",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "sleep 3600"
+                  ],
+                  "securityContext": {
+                    "privileged": false,
+                    "allowPrivilegeEscalation": false,
+                    "readOnlyRootFilesystem": true,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    }
+                  },
+                  "volumeMounts": [
+                    {
+                      "name": "scratch",
+                      "mountPath": "/scratch"
+                    }
+                  ]
+                }
+              ],
+              "volumes": [
+                {
+                  "name": "scratch",
+                  "emptyDir": {}
+                }
+              ]
+            }
+          }
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": []
+}

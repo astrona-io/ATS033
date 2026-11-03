@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: probe-public
+  namespace: starfleet
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  selector:
+    app: probe
+    release: probe
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    nodePort: 30081

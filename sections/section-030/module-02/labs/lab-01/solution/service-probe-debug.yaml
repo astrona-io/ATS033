@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: probe-debug
+  namespace: starfleet
+spec:
+  type: ClusterIP
+  selector:
+    app: probe
+    release: probe
+  ports:
+  - name: http
+    port: 80
+    targetPort: http

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-local-server
+  namespace: starfleet
+spec:
+  restartPolicy: Never
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  nodeSelector:
+    kubernetes.io/hostname: astro-ats-033-lab-030-capstone-01-control-plane
+  tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
+  containers:
+  - name: web
+    image: docker.io/library/python:3.13-alpine
+    command:
+    - python
+    - -m
+    - http.server
+    - '19090'
+    - --bind
+    - 127.0.0.1

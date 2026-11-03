@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: probe-edge
+  namespace: starfleet
+spec:
+  type: LoadBalancer
+  selector:
+    app: probe
+    release: probe
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  externalTrafficPolicy: Local
+  loadBalancerSourceRanges:
+  - 203.0.113.0/24

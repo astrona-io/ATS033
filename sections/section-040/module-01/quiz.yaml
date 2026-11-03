@@ -1,4 +1,4 @@
-# Knowledge check for section 040, module 01. Contract:
+# Knowledge check for section 040. Contract:
 # schemas/question-bank.schema.json. Keep question ids stable once published.
 schema_version: 1
 kind: question_bank
@@ -8,9 +8,12 @@ exam_code: CKS
 status: draft
 provenance: Original practice material written for this course; not official exam questions.
 scope:
-  type: module
-  id: section-040/module-01
-  title: Kernel Hardening With seccomp And AppArmor
+  type: section
+  id: section-040
+  title: Appropriately use kernel hardening tools such as AppArmor, seccomp
+placement:
+  position: after
+  reading: sections/section-040/module-03/course-04-summary.md
 questions:
   - id: ats033-040-01-q01
     type: single_choice
@@ -35,29 +38,6 @@ questions:
     correct_option: a
     explanation: "Seccomp decides on the syscall and its numeric arguments, not on paths."
 
-  - id: ats033-040-01-q02
-    type: single_choice
-    difficulty: beginner
-    learning_objective: "Read the Seccomp line of /proc/PID/status."
-    source_readings:
-      - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-    prompt: "Inside a container, `grep Seccomp /proc/1/status` prints `Seccomp: 2`. What does this show?"
-    options:
-      - id: a
-        text: "A seccomp filter is installed for the process."
-        explanation: "Correct."
-      - id: b
-        text: "Seccomp is disabled."
-        explanation: "Disabled is shown as 0."
-      - id: c
-        text: "The container runs two profiles."
-        explanation: "The number is a mode, not a count."
-      - id: d
-        text: "The process runs with AppArmor in enforce mode."
-        explanation: "AppArmor is reported elsewhere, in /proc/PID/attr/current."
-    correct_option: a
-    explanation: "Mode 2 means filter mode. Mode 0 means no filter."
-
   - id: ats033-040-01-q03
     type: single_choice
     difficulty: beginner
@@ -81,29 +61,6 @@ questions:
     correct_option: b
     explanation: "RuntimeDefault blocks risky syscalls and still suits typical applications."
 
-  - id: ats033-040-01-q04
-    type: single_choice
-    difficulty: intermediate
-    learning_objective: "Write the localhostProfile path correctly."
-    source_readings:
-      - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-    prompt: "A profile file is at `/var/lib/kubelet/seccomp/profiles/audit.json` on the node, and the kubelet uses the default seccomp directory. What is the correct `localhostProfile` value?"
-    options:
-      - id: a
-        text: "`/var/lib/kubelet/seccomp/profiles/audit.json`"
-        explanation: "The value is relative, not an absolute path."
-      - id: b
-        text: "`profiles/audit.json`"
-        explanation: "Correct. The path is relative to the kubelet seccomp directory."
-      - id: c
-        text: "`audit`"
-        explanation: "The file name with its directory is needed."
-      - id: d
-        text: "`/profiles/audit.json`"
-        explanation: "A leading slash makes it an absolute path."
-    correct_option: b
-    explanation: "localhostProfile is resolved under the kubelet seccomp root."
-
   - id: ats033-040-01-q05
     type: single_choice
     difficulty: intermediate
@@ -126,52 +83,6 @@ questions:
         explanation: "It sets group ownership of volumes and does not forbid writes."
     correct_option: b
     explanation: "AppArmor is mandatory access control by resource name, and it also binds root."
-
-  - id: ats033-040-01-q06
-    type: single_choice
-    difficulty: intermediate
-    learning_objective: "Use the current AppArmor field."
-    source_readings:
-      - sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
-    prompt: "On Kubernetes v1.35, how is an AppArmor profile selected for a container?"
-    options:
-      - id: a
-        text: "With the annotation `container.apparmor.security.beta.kubernetes.io/<name>`."
-        explanation: "The annotation is deprecated."
-      - id: b
-        text: "With `securityContext.appArmorProfile` and a `type`."
-        explanation: "Correct."
-      - id: c
-        text: "With a kubelet flag that applies one profile to all pods."
-        explanation: "Profiles are chosen per pod or container."
-      - id: d
-        text: "With a `NetworkPolicy` that names the profile."
-        explanation: "NetworkPolicy has no such field."
-    correct_option: b
-    explanation: "The field is available since v1.30 and takes RuntimeDefault, Localhost or Unconfined."
-
-  - id: ats033-040-01-q07
-    type: single_choice
-    difficulty: advanced
-    learning_objective: "Know the node prerequisites for AppArmor."
-    source_readings:
-      - sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
-    prompt: "A pod uses `appArmorProfile` with type `Localhost`. It stays stuck, and the events say that the profile is not loaded on the node. What is the right fix?"
-    options:
-      - id: a
-        text: "Change the type to `Unconfined`."
-        explanation: "That removes the protection."
-      - id: b
-        text: "Load the profile on that node with `apparmor_parser -r` and recreate the pod."
-        explanation: "Correct."
-      - id: c
-        text: "Add `seccompProfile` to the pod."
-        explanation: "Seccomp is a separate boundary and does not load AppArmor profiles."
-      - id: d
-        text: "Add the profile file to the container image."
-        explanation: "AppArmor profiles load into the node kernel, not into the image."
-    correct_option: b
-    explanation: "The profile must be loaded in the kernel of every node that can run the pod."
 
   - id: ats033-040-01-q08
     type: single_choice
@@ -219,26 +130,117 @@ questions:
     correct_option: a
     explanation: "A missing profile prevents container creation, and the event names the file."
 
-  - id: ats033-040-01-q10
+  - id: ats033-040-01-q11
     type: single_choice
-    difficulty: advanced
-    learning_objective: "Combine Pod Security levels with kernel profiles."
+    difficulty: intermediate
+    learning_objective: "Read the structure of a seccomp profile."
     source_readings:
-      - sections/section-040/module-01/course-03-the-restricted-security-context.md
-      - sections/section-040/module-01/course-04-diagnosing-profile-failures.md
-    prompt: "You plan `pod-security.kubernetes.io/enforce=restricted` for a namespace where existing pods set no seccomp profile. Which approach is safe?"
+      - sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
+    prompt: "A profile has `defaultAction: SCMP_ACT_ALLOW` and one rule with `names: [\"mkdir\", \"mkdirat\"]` and `action: SCMP_ACT_ERRNO`. What happens when the process calls `openat`?"
     options:
       - id: a
-        text: "Apply the label at once; running pods are deleted and recreated correctly."
-        explanation: "Admission does not delete running pods, and the recreated pods would be rejected."
+        text: "The call runs normally, because no rule names it and the default action allows it."
+        explanation: "Correct. The default action decides every syscall that no rule names."
       - id: b
-        text: "Run the label with `--dry-run=server` to list violations, fix the manifests, and then apply the label."
-        explanation: "Correct."
+        text: "The call fails with an error, because the profile has an ERRNO rule."
+        explanation: "The ERRNO rule applies only to the syscalls in its names list."
       - id: c
-        text: "Set every pod to `Unconfined` so that the label passes."
-        explanation: "The restricted level rejects Unconfined."
+        text: "The kernel ends the process."
+        explanation: "No rule uses a kill action."
       - id: d
-        text: "Use the `warn` mode on the nodes."
-        explanation: "The modes are namespace labels, not node settings."
+        text: "The call is logged but blocked."
+        explanation: "Logging needs the SCMP_ACT_LOG action, and nothing here blocks openat."
+    correct_option: a
+    explanation: "A deny list allows by default and blocks only the calls it names."
+
+  - id: ats033-040-01-q12
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Diagnose a denied operation caused by a seccomp profile."
+    source_readings:
+      - sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+    prompt: "A container runs as root and owns a file, but `mv` on it fails with `Operation not permitted`. The pod uses a `Localhost` seccomp profile and keeps running. What is the best next step?"
+    options:
+      - id: a
+        text: "Set `seccompProfile` to `Unconfined` for the pod."
+        explanation: "That removes the filter for every syscall, not only the one needed."
+      - id: b
+        text: "Map the failing action to its syscall names, compare them with the profile rules, and allow only the needed call."
+        explanation: "Correct. The error comes from the filter, not from file permissions."
+      - id: c
+        text: "Change the file owner with `chown`."
+        explanation: "The process already owns the file, so ownership is not the cause."
+      - id: d
+        text: "Increase the memory limit of the container."
+        explanation: "Memory limits do not produce an EPERM error for rename."
     correct_option: b
-    explanation: "A dry run shows the violations first. Pods that violate the level fail when they are next created."
+    explanation: "A root process that is denied on an operation it may normally do is often blocked by a seccomp rule."
+
+  - id: ats033-040-01-q13
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain AppArmor complain mode."
+    source_readings:
+      - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+    prompt: "You are writing an AppArmor profile for a new application and do not yet know every file it needs. Which mode fits the first runs?"
+    options:
+      - id: a
+        text: "Enforce mode, so that missing rules show up as failures."
+        explanation: "Enforce mode blocks the application and makes the first runs hard to read."
+      - id: b
+        text: "Complain mode, which allows the access and logs what the profile would have denied."
+        explanation: "Correct. The log shows which rules to add."
+      - id: c
+        text: "Unconfined, because profiles cannot be tested."
+        explanation: "Profiles can be tested in complain mode."
+      - id: d
+        text: "Remove the profile, because mode is a node setting."
+        explanation: "The mode belongs to the loaded profile."
+    correct_option: b
+    explanation: "Loop in complain mode until the log shows no needed access is missing, then switch to enforce."
+
+  - id: ats033-040-01-q14
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Drop Linux capabilities and read the result."
+    source_readings:
+      - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+    prompt: "A container needs only to listen on port 80 as user 1000. Which securityContext fits the least-privilege rule, and where do you read the result?"
+    options:
+      - id: a
+        text: "`capabilities.drop: [ALL]` and `add: [NET_BIND_SERVICE]`; read `CapBnd` in `/proc/1/status`."
+        explanation: "Correct. CapBnd shows the bounding set of a non-root process."
+      - id: b
+        text: "`capabilities.add: [ALL]`; read the pod events."
+        explanation: "Adding all capabilities is the opposite of least privilege."
+      - id: c
+        text: "`privileged: true`; read `/proc/1/attr/current`."
+        explanation: "Privileged gives every capability, and the AppArmor file does not list capabilities."
+      - id: d
+        text: "`capabilities.drop: [NET_BIND_SERVICE]`; read `Seccomp`."
+        explanation: "That removes the one capability the workload needs."
+    correct_option: a
+    explanation: "Drop everything and add back the single capability that is needed. CapEff is empty for a non-root process, so CapBnd is the line to read."
+
+  - id: ats033-040-01-q15
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Explain why privileged mode defeats other restrictions."
+    source_readings:
+      - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+    prompt: "A container sets `privileged: true` together with `capabilities.drop: [ALL]` and `allowPrivilegeEscalation: false`. What is the best statement about it?"
+    options:
+      - id: a
+        text: "The capability drop works and the container is hardened."
+        explanation: "The privileged flag overrides the restriction."
+      - id: b
+        text: "The privileged flag keeps all capabilities and device access, so the container is not hardened until `privileged` is removed."
+        explanation: "Correct. Remove privileged mode first."
+      - id: c
+        text: "The kubelet rejects the pod because the fields conflict."
+        explanation: "The API server accepts it, and the privileged flag wins."
+      - id: d
+        text: "Only the seccomp profile is disabled."
+        explanation: "Privileged mode removes much more than the seccomp profile."
+    correct_option: b
+    explanation: "Privileged mode gives a container all capabilities and the devices of the node, so other restrictions do not hold."

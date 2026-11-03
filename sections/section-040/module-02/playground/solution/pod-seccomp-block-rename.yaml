@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-rename
+  namespace: starfleet
+spec:
+  restartPolicy: Never
+  securityContext:
+    seccompProfile:
+      type: Localhost
+      localhostProfile: profiles/block-rename.json
+  containers:
+  - name: shell
+    image: docker.io/library/busybox:1.37.0
+    command:
+    - sh
+    - -c
+    - sleep 3600

@@ -1,0 +1,134 @@
+{
+  "context": "kind-astro-ats-033-lab-020-03-01",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "probe",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "probe",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "replicas": 2,
+          "selector": {
+            "matchLabels": {
+              "app": "probe",
+              "release": "probe"
+            }
+          }
+        }
+      },
+      "state": "deployment"
+    },
+    {
+      "kind": "pod",
+      "name": "shuttle",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "shuttle",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "drifter",
+      "namespace": "outpost",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "drifter",
+          "namespace": "outpost"
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "serviceaccount",
+      "name": "monitor",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ServiceAccount",
+        "metadata": {
+          "name": "monitor",
+          "namespace": "starfleet"
+        },
+        "automountServiceAccountToken": false
+      }
+    },
+    {
+      "kind": "deployment",
+      "name": "monitor",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "monitor",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "pods",
+        "--as=system:serviceaccount:starfleet:default",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "secrets",
+        "--as=system:serviceaccount:starfleet:default",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "pods",
+        "--as=system:serviceaccount:starfleet:monitor",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    }
+  ]
+}

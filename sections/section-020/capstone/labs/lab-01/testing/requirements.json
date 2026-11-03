@@ -1,0 +1,261 @@
+{
+  "context": "kind-astro-ats-033-lab-020-capstone-01",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "probe",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "probe",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "replicas": 2,
+          "selector": {
+            "matchLabels": {
+              "app": "probe",
+              "release": "probe"
+            }
+          }
+        }
+      },
+      "state": "deployment"
+    },
+    {
+      "kind": "pod",
+      "name": "shuttle",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "shuttle",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "drifter",
+      "namespace": "outpost",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "drifter",
+          "namespace": "outpost"
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "serviceaccount",
+      "name": "reporter",
+      "namespace": "outpost",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ServiceAccount",
+        "metadata": {
+          "name": "reporter",
+          "namespace": "outpost"
+        },
+        "automountServiceAccountToken": false
+      }
+    },
+    {
+      "kind": "deployment",
+      "name": "reporter",
+      "namespace": "outpost",
+      "expected": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "reporter",
+          "namespace": "outpost"
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "deployments",
+        "--as=system:serviceaccount:outpost:deployer",
+        "-n",
+        "outpost"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "patch",
+        "deployments",
+        "--as=system:serviceaccount:outpost:deployer",
+        "-n",
+        "outpost"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "pods",
+        "--as=system:serviceaccount:outpost:deployer",
+        "-n",
+        "outpost"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "delete",
+        "deployments",
+        "--as=system:serviceaccount:outpost:deployer",
+        "-n",
+        "outpost"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "secrets",
+        "--as=system:serviceaccount:outpost:deployer",
+        "-n",
+        "outpost"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "patch",
+        "deployments",
+        "--as=system:serviceaccount:outpost:deployer",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "nodes",
+        "--as=system:serviceaccount:outpost:deployer"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "create",
+        "pods",
+        "--as=system:serviceaccount:outpost:default",
+        "-n",
+        "outpost"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "pods",
+        "--as=system:serviceaccount:outpost:reporter",
+        "-n",
+        "starfleet"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "pods",
+        "--as=system:serviceaccount:outpost:reporter",
+        "-n",
+        "starfleet"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "pods",
+        "--as=system:serviceaccount:outpost:reporter",
+        "-n",
+        "outpost"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "secrets",
+        "--as=system:serviceaccount:outpost:reporter",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    }
+  ]
+}

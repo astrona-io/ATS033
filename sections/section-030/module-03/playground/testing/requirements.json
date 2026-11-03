@@ -1,0 +1,19 @@
+{
+  "context": "kind-astro-ats-033-playground-030-03",
+  "resources": [
+
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "node",
+        "astro-ats-033-playground-030-03-worker",
+        "-o",
+        "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}"
+      ],
+      "equals": "True"
+    }
+  ]
+}

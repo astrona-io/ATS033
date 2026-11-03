@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reporter
+  namespace: outpost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reporter
+  template:
+    metadata:
+      labels:
+        app: reporter
+    spec:
+      serviceAccountName: reporter
+      automountServiceAccountToken: false
+      containers:
+      - name: reporter
+        image: docker.io/library/busybox:1.37.0
+        command:
+        - sh
+        - -c
+        - sleep 3600
+        volumeMounts:
+        - name: api-token
+          mountPath: /var/run/secrets/tokens
+          readOnly: true
+      volumes:
+      - name: api-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              path: api-token
+              expirationSeconds: 3600

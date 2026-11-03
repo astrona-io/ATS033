@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: section-review
+  namespace: starfleet
+data:
+  node-service: disabled
+  ssh: key-only
+  workload: beacon
+  dedicated-node: ledger

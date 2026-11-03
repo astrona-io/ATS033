@@ -1,0 +1,71 @@
+{
+  "context": "kind-astro-ats-033-playground-040-02",
+  "resources": [
+    {
+      "kind": "pod",
+      "name": "no-rename",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "no-rename",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "restartPolicy": "Never",
+          "securityContext": {
+            "seccompProfile": {
+              "type": "Localhost",
+              "localhostProfile": "profiles/block-rename.json"
+            }
+          },
+          "containers": [
+            {
+              "name": "shell",
+              "image": "docker.io/library/busybox:1.37.0",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 3600"
+              ]
+            }
+          ]
+        }
+      },
+      "state": "pod"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "no-rename",
+        "--",
+        "sh",
+        "-c",
+        "echo data > /tmp/a && cp /tmp/a /tmp/b && cat /tmp/b"
+      ],
+      "equals": "data"
+    },
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "no-rename",
+        "--",
+        "sh",
+        "-c",
+        "mv /tmp/a /tmp/c"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "operation not permitted"
+      ]
+    }
+  ]
+}

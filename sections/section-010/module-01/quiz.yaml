@@ -1,5 +1,5 @@
-# Knowledge check for section 010, module 01. Contract:
-# schemas/question-bank.schema.json. Keep question ids stable once published.
+# Section quiz for section 010. Contract: schemas/question-bank.schema.json.
+# Keep question ids stable once published.
 schema_version: 1
 kind: question_bank
 id: ats033-010-01
@@ -8,79 +8,10 @@ exam_code: CKS
 status: draft
 provenance: Original practice material written for this course; not official exam questions.
 scope:
-  type: module
-  id: section-010/module-01
-  title: Reduce The Host Operating-System Attack Surface
+  type: section
+  id: section-010
+  title: Minimize The Host Operating-System Footprint
 questions:
-  - id: ats033-010-01-q01
-    type: single_choice
-    difficulty: beginner
-    learning_objective: "Explain why the host operating system is part of the cluster security boundary."
-    source_readings:
-      - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
-    prompt: "Why does an unneeded service on a worker node weaken the security of pods that have a strict security context?"
-    options:
-      - id: a
-        text: "Pods share the node's kernel and runtime, so control of the node means control of its pods."
-        explanation: "Correct. A compromise of the host is not limited by the settings of one pod."
-      - id: b
-        text: "Every service on a node adds latency to pod networking."
-        explanation: "Performance is not the security concern here."
-      - id: c
-        text: "Pods copy the node's running services into their own namespaces."
-        explanation: "Pods do not copy host services. They share the host kernel."
-      - id: d
-        text: "The scheduler refuses to start pods on nodes with extra services."
-        explanation: "The scheduler does not look at host services."
-    correct_option: a
-    explanation: "Containers share the host kernel, container runtime and files. A compromised host undermines every pod on it."
-
-  - id: ats033-010-01-q02
-    type: single_choice
-    difficulty: beginner
-    learning_objective: "List the services that start at boot."
-    source_readings:
-      - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
-    prompt: "Which command lists the service unit files that are set to start at boot?"
-    options:
-      - id: a
-        text: "`systemctl list-units --type=service --state=running`"
-        explanation: "This lists services that run now, not the ones set to start at boot."
-      - id: b
-        text: "`systemctl list-unit-files --type=service --state=enabled`"
-        explanation: "Correct. It reads the unit files and filters by the enabled state."
-      - id: c
-        text: "`ss -tlnp`"
-        explanation: "`ss` lists listening sockets, not unit files."
-      - id: d
-        text: "`systemctl daemon-reload`"
-        explanation: "This makes systemd read unit files again. It lists nothing."
-    correct_option: b
-    explanation: "Active state and enabled state are separate. `list-unit-files` with `--state=enabled` shows what a reboot would start."
-
-  - id: ats033-010-01-q03
-    type: single_choice
-    difficulty: beginner
-    learning_objective: "Read the output of `ss -tlnp` to find services reachable from other machines."
-    source_readings:
-      - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
-    prompt: "In the output of `ss -tlnp`, which local address means that a service accepts connections from other machines on every IPv4 interface?"
-    options:
-      - id: a
-        text: "`127.0.0.1:8080`"
-        explanation: "This is loopback. Only processes on the node itself can connect."
-      - id: b
-        text: "`0.0.0.0:8080`"
-        explanation: "Correct. `0.0.0.0` means all IPv4 addresses of the node."
-      - id: c
-        text: "`[::1]:8080`"
-        explanation: "This is the IPv6 loopback address, reachable from the node only."
-      - id: d
-        text: "`127.0.0.53:53`"
-        explanation: "This is also a loopback address."
-    correct_option: b
-    explanation: "A bind address of `0.0.0.0` (or `*`) exposes the listener on all IPv4 interfaces. Loopback addresses limit it to the node."
-
   - id: ats033-010-01-q04
     type: single_choice
     difficulty: intermediate
@@ -127,29 +58,6 @@ questions:
     correct_option: c
     explanation: "`mask` blocks every start of the unit and package updates do not undo it."
 
-  - id: ats033-010-01-q06
-    type: single_choice
-    difficulty: intermediate
-    learning_objective: "Verify that a hardening change did not break the node."
-    source_readings:
-      - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-    prompt: "You disabled `training-extra.service` on the control-plane node. Which set of checks best shows that the node still works?"
-    options:
-      - id: a
-        text: "`systemctl is-enabled training-extra.service` prints `disabled`."
-        explanation: "This confirms the change, but says nothing about the rest of the node."
-      - id: b
-        text: "`kubelet.service` and `containerd.service` are `active`, `/readyz` answers `ok` and the node shows `Ready`."
-        explanation: "Correct. These checks cover the runtime, the node agent, the API server and the node status."
-      - id: c
-        text: "The disabled service is gone from `ss -tlnp`."
-        explanation: "This shows the listener is gone. It does not show that Kubernetes works."
-      - id: d
-        text: "`kubectl get namespaces` lists `starfleet`."
-        explanation: "The API can list namespaces even when a node is `NotReady`."
-    correct_option: b
-    explanation: "A hardening change has two halves: the exposure is reduced, and the required services still work."
-
   - id: ats033-010-01-q07
     type: single_choice
     difficulty: intermediate
@@ -173,71 +81,163 @@ questions:
     correct_option: b
     explanation: "Each extra `Remv` line is another package the removal takes with it. A runtime package in that list means the package must stay."
 
-  - id: ats033-010-01-q08
-    type: single_choice
-    difficulty: advanced
-    learning_objective: "Explain why a file outside the package manager is a patching risk."
-    source_readings:
-      - sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
-    prompt: "`dpkg -S /usr/local/bin/node-agent` reports that no path matches. An advisory announces a flaw in `node-agent`, and the team runs `apt-get upgrade` on all nodes. What is the result for this binary?"
-    options:
-      - id: a
-        text: "It is patched, because `apt-get upgrade` upgrades everything on the node."
-        explanation: "`apt-get upgrade` upgrades installed packages only."
-      - id: b
-        text: "It is patched at the next reboot."
-        explanation: "A reboot restarts processes. It does not replace files."
-      - id: c
-        text: "It stays unpatched, because no package owns the file."
-        explanation: "Correct. Files outside the package system need their own update process or a new node image."
-      - id: d
-        text: "`dpkg` replaces it with the package version automatically."
-        explanation: "`dpkg -S` only reports ownership. It changes nothing."
-    correct_option: c
-    explanation: "The package manager patches only files that belong to packages."
-
-  - id: ats033-010-01-q09
+  - id: ats033-010-01-q11
     type: single_choice
     difficulty: intermediate
-    learning_objective: "Identify the host interface that gives root-equivalent authority."
+    learning_objective: "Predict the effective value of an sshd setting that appears in two files."
     source_readings:
-      - sections/section-010/module-01/course-04-privileged-host-interfaces.md
-    prompt: "A user on a node can write to `/run/containerd/containerd.sock` but has no `sudo` rights. Why is this a problem?"
+      - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+    prompt: "The main file `/etc/ssh/sshd_config` sets `PermitRootLogin yes` after an `Include /etc/ssh/sshd_config.d/*.conf` line. A drop-in file in that directory sets `PermitRootLogin no`. Which value does sshd use?"
     options:
       - id: a
-        text: "The user can fill the node's disk with logs."
-        explanation: "That is a minor concern compared with the real one."
+        text: "`yes`, because the main file is read last and overrides the drop-in."
+        explanation: "sshd keeps the first value it reads for a setting, not the last."
       - id: b
-        text: "The user can ask the runtime to start a privileged container that mounts the host filesystem."
-        explanation: "Correct. That gives root-level access to the node."
+        text: "`no`, because the Include line comes first and the first value wins."
+        explanation: "Correct. The drop-in is read at the Include line, before the later line in the main file."
       - id: c
-        text: "The user can restart the kubelet."
-        explanation: "The socket belongs to the container runtime, not to the kubelet service."
+        text: "`prohibit-password`, because sshd merges conflicting values."
+        explanation: "sshd does not merge values."
       - id: d
-        text: "Nothing. A Unix socket cannot be used without network access."
-        explanation: "A Unix socket works through the filesystem and needs no network."
+        text: "sshd refuses to start because the value is set twice."
+        explanation: "Repeated settings are allowed. The first one is used."
     correct_option: b
-    explanation: "Control of the container runtime equals administrator authority on the node."
+    explanation: "Use `sshd -T` to print the effective values instead of reading the files by eye."
 
-  - id: ats033-010-01-q10
+  - id: ats033-010-01-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain the effect of AllowUsers on SSH login."
+    source_readings:
+      - sections/section-010/module-02/course-02-limit-who-can-log-in.md
+    prompt: "A node has the line `AllowUsers opsadmin` in its sshd configuration. The user `olduser` has a valid key in `authorized_keys`. What happens when `olduser` connects with SSH?"
+    options:
+      - id: a
+        text: "The login works, because the key is valid."
+        explanation: "AllowUsers is checked as well as the key."
+      - id: b
+        text: "The login is refused, because `olduser` is not in the AllowUsers list."
+        explanation: "Correct. Only listed users may log in."
+      - id: c
+        text: "The login works only from the local machine."
+        explanation: "AllowUsers does not depend on the source address unless a pattern says so."
+      - id: d
+        text: "The login works after a password prompt."
+        explanation: "A user outside the list is refused before authentication."
+    correct_option: b
+    explanation: "When AllowUsers is set, a user that does not match it cannot log in with any method."
+
+  - id: ats033-010-01-q13
     type: single_choice
     difficulty: advanced
-    learning_objective: "Apply Pod Security Admission to block `hostPath` volumes."
+    learning_objective: "Separate a locked password from key-based SSH login."
     source_readings:
-      - sections/section-010/module-01/course-04-privileged-host-interfaces.md
-    prompt: "The label `pod-security.kubernetes.io/enforce=baseline` is added to the `starfleet` namespace. A pod with a `hostPath` volume already runs there. A new pod with the same volume is applied. What happens?"
+      - sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+    prompt: "An administrator runs `usermod -L olduser` to retire an account. The account keeps its `authorized_keys` file and its shell is `/bin/bash`. Can an attacker with the private key still start a session?"
     options:
       - id: a
-        text: "The running pod is deleted and the new pod is rejected."
-        explanation: "Enforcement does not delete running pods."
+        text: "No, because locking the account disables every login method."
+        explanation: "The lock affects the password only."
       - id: b
-        text: "The running pod keeps running and the new pod is rejected by the API server."
-        explanation: "Correct. `enforce` is checked when a pod is created or updated."
+        text: "Yes, key-based SSH login can still work, so also set a `nologin` shell or remove the key."
+        explanation: "Correct. Locking the password does not stop public-key authentication on every system setup."
       - id: c
-        text: "Both pods are allowed, because `baseline` permits `hostPath`."
-        explanation: "The `baseline` standard forbids `hostPath` volumes."
+        text: "No, because `usermod -L` deletes the home directory."
+        explanation: "It does not delete anything."
       - id: d
-        text: "The new pod is created, and the kubelet refuses to start it."
-        explanation: "The API server rejects it before it reaches a node."
+        text: "Yes, but only as root."
+        explanation: "The key belongs to `olduser`, so the session runs as that user."
     correct_option: b
-    explanation: "Pod Security Admission runs in the API server on create and update. Existing pods are not removed."
+    explanation: "Retire an account by locking the password, setting the shell to `nologin` and removing its keys."
+
+  - id: ats033-010-01-q14
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "State what hostPID gives a pod."
+    source_readings:
+      - sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
+    prompt: "A pod sets `hostPID: true`. What can a process in the pod do that a normal pod cannot?"
+    options:
+      - id: a
+        text: "See the processes of the node, including the kubelet and the container runtime."
+        explanation: "Correct. The pod joins the PID namespace of the node."
+      - id: b
+        text: "Use the IP address of the node."
+        explanation: "That is `hostNetwork`."
+      - id: c
+        text: "Mount any directory of the node."
+        explanation: "That needs a `hostPath` volume."
+      - id: d
+        text: "Skip the scheduler."
+        explanation: "`hostPID` does not change scheduling."
+    correct_option: a
+    explanation: "Each host field removes one kind of isolation: network, PID, IPC, files or capabilities."
+
+  - id: ats033-010-01-q15
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Find where Pod Security Admission rejects a Deployment with host access."
+    source_readings:
+      - sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+    prompt: "A namespace has the label `pod-security.kubernetes.io/enforce=baseline`. You apply a Deployment whose pod template sets `hostPID: true`. `kubectl apply` succeeds. What do you see next?"
+    options:
+      - id: a
+        text: "The Deployment has no ready replicas, and the ReplicaSet records a `FailedCreate` event."
+        explanation: "Correct. Admission checks the pod, so the rejection appears when the ReplicaSet creates it."
+      - id: b
+        text: "The Deployment is rejected with an error from `kubectl apply`."
+        explanation: "Admission checks pods, not Deployments."
+      - id: c
+        text: "The pod starts, and a warning is printed."
+        explanation: "A warning belongs to the `warn` mode. `enforce` rejects."
+      - id: d
+        text: "The kubelet refuses the pod on the node."
+        explanation: "The API server rejects it before scheduling."
+    correct_option: a
+    explanation: "Read the events of the ReplicaSet when a Deployment shows no ready replicas."
+
+  - id: ats033-010-01-q16
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Combine a taint, a label, a node selector and a toleration to dedicate a node."
+    source_readings:
+      - sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
+    prompt: "A node has the taint `dedicated=ledger:NoSchedule` and the label `node-restriction.kubernetes.io/dedicated=ledger`. A pod has the matching toleration and no `nodeSelector`. Where can the pod run?"
+    options:
+      - id: a
+        text: "Only on the dedicated node."
+        explanation: "A toleration does not send the pod to the node."
+      - id: b
+        text: "On the dedicated node or on any other node that it tolerates."
+        explanation: "Correct. Only the `nodeSelector` limits the pod to the labelled node."
+      - id: c
+        text: "On no node, because it needs a label."
+        explanation: "The pod can run on untainted nodes."
+      - id: d
+        text: "Only on the control-plane node."
+        explanation: "Placement does not depend on the node role here."
+    correct_option: b
+    explanation: "The taint repels other pods. The label with a selector attracts the sensitive pod."
+
+  - id: ats033-010-01-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the kubelet settings that protect its API."
+    source_readings:
+      - sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
+    prompt: "Which kubelet configuration is the secure one?"
+    options:
+      - id: a
+        text: "`anonymous.enabled: true` and `readOnlyPort: 10255`"
+        explanation: "Both settings open the kubelet to unauthenticated callers."
+      - id: b
+        text: "`anonymous.enabled: false`, `authorization.mode: Webhook` and `readOnlyPort: 0`"
+        explanation: "Correct. Callers must authenticate and the API server decides what they may do."
+      - id: c
+        text: "`anonymous.enabled: false` and `authorization.mode: AlwaysAllow`"
+        explanation: "AlwaysAllow accepts every authenticated caller."
+      - id: d
+        text: "`authorization.mode: Webhook` and `readOnlyPort: 10255`"
+        explanation: "The read-only port serves data with no authentication."
+    correct_option: b
+    explanation: "An anonymous request to port 10250 should return 401."

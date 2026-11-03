@@ -1,0 +1,188 @@
+{
+  "context": "kind-astro-ats-033-playground-020-02",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "probe",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "probe",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "replicas": 2,
+          "selector": {
+            "matchLabels": {
+              "app": "probe",
+              "release": "probe"
+            }
+          }
+        }
+      },
+      "state": "deployment"
+    },
+    {
+      "kind": "pod",
+      "name": "shuttle",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "shuttle",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "drifter",
+      "namespace": "outpost",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "drifter",
+          "namespace": "outpost"
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "serviceaccount",
+      "name": "ops-agent",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ServiceAccount",
+        "metadata": {
+          "name": "ops-agent",
+          "namespace": "starfleet"
+        }
+      }
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "pods",
+        "--as=system:serviceaccount:starfleet:ops-agent",
+        "-n",
+        "starfleet"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "pods",
+        "--as=system:serviceaccount:starfleet:ops-agent",
+        "-n",
+        "starfleet"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "pods/log",
+        "--as=system:serviceaccount:starfleet:ops-agent",
+        "-n",
+        "starfleet"
+      ],
+      "equals": "yes"
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "delete",
+        "pods",
+        "--as=system:serviceaccount:starfleet:ops-agent",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "get",
+        "secrets",
+        "--as=system:serviceaccount:starfleet:ops-agent",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "create",
+        "deployments",
+        "--as=system:serviceaccount:starfleet:ops-agent",
+        "-n",
+        "starfleet"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "pods",
+        "--as=system:serviceaccount:starfleet:ops-agent",
+        "-n",
+        "outpost"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    },
+    {
+      "args": [
+        "kubectl",
+        "auth",
+        "can-i",
+        "list",
+        "nodes",
+        "--as=system:serviceaccount:starfleet:ops-agent"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "no"
+      ]
+    }
+  ]
+}

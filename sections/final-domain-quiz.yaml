@@ -1,11 +1,12 @@
-# Final domain knowledge check across all sections.
+---
 schema_version: 1
 kind: question_bank
 id: ats033-final
 course_id: ATS033
 exam_code: CKS
 status: draft
-provenance: Original practice material written for this course; not official exam questions.
+provenance: Original practice material written for this course; not official exam
+  questions.
 scope:
   type: domain
   id: final
@@ -13,234 +14,98 @@ scope:
 questions:
 - id: ats033-final-q01
   type: single_choice
-  difficulty: beginner
-  learning_objective: Explain why the host operating system is part of the cluster security boundary.
-  source_readings:
-  - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
-  prompt: Why does an unneeded service on a worker node weaken the security of pods that have a strict security context?
-  options:
-  - id: a
-    text: Pods share the node's kernel and runtime, so control of the node means control of its pods.
-    explanation: Correct. A compromise of the host is not limited by the settings of one pod.
-  - id: b
-    text: Every service on a node adds latency to pod networking.
-    explanation: Performance is not the security concern here.
-  - id: c
-    text: Pods copy the node's running services into their own namespaces.
-    explanation: Pods do not copy host services. They share the host kernel.
-  - id: d
-    text: The scheduler refuses to start pods on nodes with extra services.
-    explanation: The scheduler does not look at host services.
-  correct_option: a
-  explanation: Containers share the host kernel, container runtime and files. A compromised host undermines every pod on it.
-- id: ats033-final-q02
-  type: single_choice
-  difficulty: beginner
-  learning_objective: List the services that start at boot.
-  source_readings:
-  - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
-  prompt: Which command lists the service unit files that are set to start at boot?
-  options:
-  - id: a
-    text: "`systemctl list-units --type=service --state=running`"
-    explanation: This lists services that run now, not the ones set to start at boot.
-  - id: b
-    text: "`systemctl list-unit-files --type=service --state=enabled`"
-    explanation: Correct. It reads the unit files and filters by the enabled state.
-  - id: c
-    text: "`ss -tlnp`"
-    explanation: "`ss` lists listening sockets, not unit files."
-  - id: d
-    text: "`systemctl daemon-reload`"
-    explanation: This makes systemd read unit files again. It lists nothing.
-  correct_option: b
-  explanation: Active state and enabled state are separate. `list-unit-files` with `--state=enabled` shows what a reboot would start.
-- id: ats033-final-q03
-  type: single_choice
-  difficulty: beginner
-  learning_objective: Read the output of `ss -tlnp` to find services reachable from other machines.
-  source_readings:
-  - sections/section-010/module-01/course-01-inventory-services-and-listeners.md
-  prompt: In the output of `ss -tlnp`, which local address means that a service accepts connections from other machines on every IPv4 interface?
-  options:
-  - id: a
-    text: "`127.0.0.1:8080`"
-    explanation: This is loopback. Only processes on the node itself can connect.
-  - id: b
-    text: "`0.0.0.0:8080`"
-    explanation: Correct. `0.0.0.0` means all IPv4 addresses of the node.
-  - id: c
-    text: "`[::1]:8080`"
-    explanation: This is the IPv6 loopback address, reachable from the node only.
-  - id: d
-    text: "`127.0.0.53:53`"
-    explanation: This is also a loopback address.
-  correct_option: b
-  explanation: A bind address of `0.0.0.0` (or `*`) exposes the listener on all IPv4 interfaces. Loopback addresses limit it to the node.
-- id: ats033-final-q04
-  type: single_choice
-  difficulty: intermediate
-  learning_objective: Choose the action that stops a service now and keeps it off after a reboot.
-  source_readings:
-  - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-  prompt: An administrator runs `systemctl stop training-extra.service` on a node. The service is enabled. What happens at the next reboot?
-  options:
-  - id: a
-    text: The service stays stopped, because it was stopped by an administrator.
-    explanation: systemd does not remember a manual stop across a reboot.
-  - id: b
-    text: The service starts again, because `stop` does not change the enabled state.
-    explanation: Correct. Only `disable` removes the boot behavior.
-  - id: c
-    text: The service is masked and cannot start.
-    explanation: Masking needs `systemctl mask`.
-  - id: d
-    text: systemd deletes the unit file during shutdown.
-    explanation: systemd never deletes unit files on its own.
-  correct_option: b
-  explanation: "`stop` changes the running state. `disable --now` changes the boot behavior and stops the process."
-- id: ats033-final-q05
-  type: single_choice
   difficulty: intermediate
   learning_objective: Distinguish `disable` from `mask`.
   source_readings:
   - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-  prompt: A package ships `legacy-agent.service`. Another package needs the first package installed, so you cannot uninstall it. You must make sure that nothing, not even a dependency, starts the agent. Which command does that?
+  prompt: A package ships `legacy-agent.service`. Another package needs the first
+    package installed, so you cannot uninstall it. You must make sure that nothing,
+    not even a dependency, starts the agent. Which command does that?
   options:
   - id: a
     text: "`systemctl stop legacy-agent.service`"
     explanation: The service can start again at boot or by dependency.
   - id: b
     text: "`systemctl disable legacy-agent.service`"
-    explanation: A disabled unit can still be started by hand or as a dependency of another unit.
+    explanation: A disabled unit can still be started by hand or as a dependency of
+      another unit.
   - id: c
     text: "`systemctl mask --now legacy-agent.service`"
-    explanation: Correct. Masking links the unit to `/dev/null`, so it cannot be started at all, and `--now` stops it.
+    explanation: Correct. Masking links the unit to `/dev/null`, so it cannot be started
+      at all, and `--now` stops it.
   - id: d
     text: "`systemctl daemon-reload`"
     explanation: This reloads unit files. It does not change the state of a service.
   correct_option: c
-  explanation: "`mask` blocks every start of the unit and package updates do not undo it."
-- id: ats033-final-q06
+  explanation: "`mask` blocks every start of the unit and package updates do not undo
+    it."
+- id: ats033-final-q02
   type: single_choice
   difficulty: intermediate
-  learning_objective: Verify that a hardening change did not break the node.
+  learning_objective: Predict the effective value of an sshd setting that appears
+    in two files.
   source_readings:
-  - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-  prompt: You disabled `training-extra.service` on the control-plane node. Which set of checks best shows that the node still works?
+  - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+  prompt: The main file `/etc/ssh/sshd_config` sets `PermitRootLogin yes` after an
+    `Include /etc/ssh/sshd_config.d/*.conf` line. A drop-in file in that directory
+    sets `PermitRootLogin no`. Which value does sshd use?
   options:
   - id: a
-    text: "`systemctl is-enabled training-extra.service` prints `disabled`."
-    explanation: This confirms the change, but says nothing about the rest of the node.
+    text: "`yes`, because the main file is read last and overrides the drop-in."
+    explanation: sshd keeps the first value it reads for a setting, not the last.
   - id: b
-    text: "`kubelet.service` and `containerd.service` are `active`, `/readyz` answers `ok` and the node shows `Ready`."
-    explanation: Correct. These checks cover the runtime, the node agent, the API server and the node status.
+    text: "`no`, because the Include line comes first and the first value wins."
+    explanation: Correct. The drop-in is read at the Include line, before the later
+      line in the main file.
   - id: c
-    text: The disabled service is gone from `ss -tlnp`.
-    explanation: This shows the listener is gone. It does not show that Kubernetes works.
+    text: "`prohibit-password`, because sshd merges conflicting values."
+    explanation: sshd does not merge values.
   - id: d
-    text: "`kubectl get namespaces` lists `starfleet`."
-    explanation: The API can list namespaces even when a node is `NotReady`.
+    text: sshd refuses to start because the value is set twice.
+    explanation: Repeated settings are allowed. The first one is used.
   correct_option: b
-  explanation: 'A hardening change has two halves: the exposure is reduced, and the required services still work.'
-- id: ats033-final-q07
+  explanation: Use `sshd -T` to print the effective values instead of reading the
+    files by eye.
+- id: ats033-final-q03
   type: single_choice
-  difficulty: beginner
-  learning_objective: Explain how Linux chooses which permission bits apply.
+  difficulty: advanced
+  learning_objective: Find where Pod Security Admission rejects a Deployment with
+    host access.
   source_readings:
-  - sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
-  prompt: A file is owned by `root`, has the group `reports` and the mode `0640`. A user who is not `root` and not in the group `reports` tries to read it. What happens?
+  - sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+  prompt: 'A namespace has the label `pod-security.kubernetes.io/enforce=baseline`.
+    You apply a Deployment whose pod template sets `hostPID: true`. `kubectl apply`
+    succeeds. What do you see next?'
   options:
   - id: a
-    text: The read is denied, because only the 'other' bits apply and they are empty.
-    explanation: Correct. The user is not the owner and not in the group, so the 'other' bits decide.
+    text: The Deployment has no ready replicas, and the ReplicaSet records a `FailedCreate`
+      event.
+    explanation: Correct. Admission checks the pod, so the rejection appears when
+      the ReplicaSet creates it.
   - id: b
-    text: The read is allowed, because the owner bits allow reading.
-    explanation: The owner bits apply only to the owner.
+    text: The Deployment is rejected with an error from `kubectl apply`.
+    explanation: Admission checks pods, not Deployments.
   - id: c
-    text: The read is allowed, because the group bits allow reading.
-    explanation: The group bits apply only to members of the group.
+    text: The pod starts, and a warning is printed.
+    explanation: A warning belongs to the `warn` mode. `enforce` rejects.
   - id: d
-    text: The kernel combines all three triplets and allows the read.
-    explanation: The kernel applies exactly one triplet.
+    text: The kubelet refuses the pod on the node.
+    explanation: The API server rejects it before scheduling.
   correct_option: a
-  explanation: Linux uses the owner bits for the owner, else the group bits for group members, else the other bits.
-- id: ats033-final-q08
-  type: single_choice
-  difficulty: beginner
-  learning_objective: Add an account to a supplementary group without removing its other groups.
-  source_readings:
-  - sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
-  prompt: Which command adds `training-reader` to the group `training-readers` and keeps its other supplementary groups?
-  options:
-  - id: a
-    text: "`usermod --groups training-readers training-reader`"
-    explanation: Without `--append`, this replaces all supplementary groups.
-  - id: b
-    text: "`usermod --append --groups training-readers training-reader`"
-    explanation: Correct. `--append` keeps the existing groups.
-  - id: c
-    text: "`usermod --lock training-reader`"
-    explanation: This locks the password. It changes no groups.
-  - id: d
-    text: "`chmod g+r training-reader`"
-    explanation: "`chmod` changes file modes, not group membership."
-  correct_option: b
-  explanation: "`usermod --append --groups` adds a group. Omitting `--append` replaces the list."
-- id: ats033-final-q09
-  type: single_choice
-  difficulty: intermediate
-  learning_objective: Grant one file through a group instead of broad access.
-  source_readings:
-  - sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
-  prompt: A backup account must read `/var/lib/app/report` (owner `root`, mode `0600`). Which change gives the least access that completes the task?
-  options:
-  - id: a
-    text: Add the account to the `root` group.
-    explanation: The account would gain the group rights on every file that group owns.
-  - id: b
-    text: Run `chmod 0644 /var/lib/app/report`.
-    explanation: Every account on the node could then read the file.
-  - id: c
-    text: Create a group for the report, set it on the file with mode `0640`, and add the account to that group.
-    explanation: Correct. Only the named account and the owner can read the file.
-  - id: d
-    text: Give the account a `sudo` rule for all commands.
-    explanation: This gives full root access for a read task.
-  correct_option: c
-  explanation: A dedicated group makes the grant visible and limited to one file.
-- id: ats033-final-q10
-  type: single_choice
-  difficulty: intermediate
-  learning_objective: Identify a sudoers rule that is too broad.
-  source_readings:
-  - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
-  prompt: Which sudoers rule follows least privilege for a group that only needs to restart the kubelet?
-  options:
-  - id: a
-    text: "`%ops ALL=(ALL:ALL) NOPASSWD: ALL`"
-    explanation: This allows every command as every user.
-  - id: b
-    text: "`%ops ALL=(root) NOPASSWD: /usr/bin/systemctl *`"
-    explanation: The wildcard allows every `systemctl` action, including stopping other services.
-  - id: c
-    text: "`%ops ALL=(root) /usr/bin/systemctl restart kubelet.service`"
-    explanation: Correct. It names the exact command and arguments.
-  - id: d
-    text: "`%ops ALL=(root) /usr/bin/vim`"
-    explanation: An editor can start a shell and edit any file, so this gives full root.
-  correct_option: c
-  explanation: A least-privilege rule names the exact command, the exact arguments and the target user.
-- id: ats033-final-q11
+  explanation: Read the events of the ReplicaSet when a Deployment shows no ready
+    replicas.
+- id: ats033-final-q04
   type: single_choice
   difficulty: intermediate
   learning_objective: Turn off an account completely.
   source_readings:
   - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
-  prompt: An employee leaves. You run `usermod --lock` on the account. The employee can still log in over SSH with a private key. Why?
+  prompt: An employee leaves. You run `usermod --lock` on the account. The employee
+    can still log in over SSH with a private key. Why?
   options:
   - id: a
-    text: The lock marker blocks password authentication only. Key-based login needs an expiry date or a `nologin` shell to stop.
+    text: The lock marker blocks password authentication only. Key-based login needs
+      an expiry date or a `nologin` shell to stop.
     explanation: Correct. Combine the lock with an expiry date and a non-login shell.
   - id: b
     text: "`usermod --lock` only works on accounts with a home directory."
@@ -252,58 +117,67 @@ questions:
     text: The account must be removed from `/etc/group` first.
     explanation: Group membership does not control SSH login.
   correct_option: a
-  explanation: A password lock leaves key-based logins open unless the account is also expired or has a `nologin` shell.
-- id: ats033-final-q12
+  explanation: A password lock leaves key-based logins open unless the account is
+    also expired or has a `nologin` shell.
+- id: ats033-final-q05
   type: single_choice
   difficulty: intermediate
-  learning_objective: Apply the SSH hardening baseline.
+  learning_objective: Remove a wide grant completely after adding a narrow one.
   source_readings:
-  - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
-  prompt: Which `sshd_config` setting ties every remote administrative action to a named account?
+  - sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+  prompt: You create a narrow Role and RoleBinding for a ServiceAccount. It can still
+    delete Secrets in every namespace. A ClusterRoleBinding to `cluster-admin` still
+    names it. What fixes this?
   options:
   - id: a
-    text: "`PermitRootLogin no`"
-    explanation: Correct. Users must log in as themselves and then use `sudo`, which records each action.
+    text: Delete the narrow Role, because Kubernetes uses the strictest role.
+    explanation: RBAC has no strictest-role rule. Permissions only add up.
   - id: b
-    text: "`PermitRootLogin yes`"
-    explanation: This allows direct root logins, which hide who the person was.
+    text: Delete the ClusterRoleBinding that names `cluster-admin`.
+    explanation: Correct. RBAC only adds permissions, so the wide binding must be
+      removed.
   - id: c
-    text: "`MaxAuthTries 100`"
-    explanation: This allows more attempts and does not tie actions to accounts.
+    text: Add a deny rule for Secrets to the narrow Role.
+    explanation: RBAC has no deny rule.
   - id: d
-    text: "`PermitEmptyPasswords yes`"
-    explanation: This weakens authentication.
-  correct_option: a
-  explanation: Disabling direct root login forces named accounts and leaves a trail.
-- id: ats033-final-q13
+    text: Restart the API server so it reloads the roles.
+    explanation: The API server already evaluates all bindings on every request.
+  correct_option: b
+  explanation: Access ends only when every binding that grants it is deleted.
+- id: ats033-final-q06
   type: single_choice
-  difficulty: beginner
-  learning_objective: Read the Local Address column of ss output.
+  difficulty: intermediate
+  learning_objective: Explain a bound projected token.
   source_readings:
-  - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
-  prompt: "`ss -tlnp` on a node shows a service with the local address `127.0.0.1:19090`. Who can connect to it?"
+  - sections/section-020/module-03/course-02-bound-projected-tokens.md
+  prompt: Which statement about the token that the kubelet projects into a current
+    pod is correct?
   options:
   - id: a
-    text: 'Only processes on the same node, including pods that use `hostNetwork: true`.'
-    explanation: Correct. Loopback is not reachable from other machines.
+    text: It never expires, and it is stored in a Secret for the ServiceAccount.
+    explanation: This describes the old long-lived token Secret.
   - id: b
-    text: Any machine that can route to the node.
-    explanation: That describes `0.0.0.0`, not `127.0.0.1`.
+    text: It expires, it is tied to the pod, and the API server rejects it after the
+      pod is deleted.
+    explanation: Correct. It is a bound token that the API server issues through the
+      TokenRequest API.
   - id: c
-    text: Any pod in the cluster.
-    explanation: A pod outside the host network reaches the node address, not the loopback of the node.
+    text: It is valid for any audience and any cluster.
+    explanation: A token carries an audience, and a service accepts only tokens meant
+      for it.
   - id: d
-    text: Nobody, because loopback addresses are disabled in containers.
-    explanation: Loopback works normally for local processes.
-  correct_option: a
-  explanation: A service bound to loopback accepts connections from processes on the same host only.
-- id: ats033-final-q14
+    text: It is created once per ServiceAccount and shared by all pods.
+    explanation: The kubelet requests a token for each pod.
+  correct_option: b
+  explanation: Bound tokens have an expiry and are tied to the pod.
+- id: ats033-final-q07
   type: single_choice
   difficulty: beginner
   learning_objective: Tell a refused connection from a timeout.
   source_readings:
   - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
-  prompt: A client gets `Connection refused` immediately when it connects to a node port. What does this most likely mean?
+  prompt: A client gets `Connection refused` immediately when it connects to a node
+    port. What does this most likely mean?
   options:
   - id: a
     text: A firewall rule silently dropped the packet.
@@ -313,195 +187,73 @@ questions:
     explanation: Correct. The host answers with a reset.
   - id: c
     text: The route to the node does not exist.
-    explanation: A missing route usually ends in a timeout or a network-unreachable error.
+    explanation: A missing route usually ends in a timeout or a network-unreachable
+      error.
   - id: d
     text: A NetworkPolicy allowed the traffic.
     explanation: An allow decision does not cause a refusal.
   correct_option: b
-  explanation: Refused means the host is reachable and nothing listens there. A timeout points to filtering or no route.
-- id: ats033-final-q15
+  explanation: Refused means the host is reachable and nothing listens there. A timeout
+    points to filtering or no route.
+- id: ats033-final-q08
   type: single_choice
   difficulty: intermediate
-  learning_objective: Choose the fix for a host-network service that must stay local.
+  learning_objective: Explain what externalTrafficPolicy Local changes.
   source_readings:
-  - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
-  prompt: 'A pod with `hostNetwork: true` runs a management API on `0.0.0.0:19091`. Only processes on the node need it. What is the best fix?'
+  - sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
+  prompt: 'A NodePort Service has `externalTrafficPolicy: Local`. A client sends a
+    request to a node that has no ready pod of the Service. What happens?'
   options:
   - id: a
-    text: Change the service to bind to `127.0.0.1` and recreate the pod.
-    explanation: Correct. The service no longer listens on any external interface.
+    text: The node forwards the request to a pod on another node and replaces the
+      client address.
+    explanation: That describes `Cluster`, the default policy.
   - id: b
-    text: Create a NetworkPolicy that selects the pod.
-    explanation: Most CNI plugins do not apply pod policies reliably to host-network pods.
+    text: The node drops the request, because it forwards only to its own pods.
+    explanation: Correct. A node without a ready local pod does not answer.
   - id: c
-    text: Rename the port in the Service.
-    explanation: The listener is unchanged.
+    text: The node answers with a redirect to a node that has a pod.
+    explanation: Kubernetes does not redirect NodePort traffic.
   - id: d
-    text: Delete the Service object.
-    explanation: The pod listens on the node regardless of any Service.
+    text: The node opens a new pod for the request.
+    explanation: Traffic does not create pods.
+  correct_option: b
+  explanation: With `Local`, only nodes with ready pods answer, and the pods see the
+    real client address.
+- id: ats033-final-q09
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Choose the kubelet settings that close port 10250.
+  source_readings:
+  - sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
+  prompt: 'A kubelet has `authentication.anonymous.enabled: true` and `authorization.mode:
+    AlwaysAllow`. Which change closes the kubelet API to anonymous callers, and what
+    must follow?'
+  options:
+  - id: a
+    text: Set anonymous access to `false` and the mode to `Webhook`, then restart
+      the kubelet.
+    explanation: Correct. The kubelet reads its configuration file at start.
+  - id: b
+    text: Set only the mode to `Webhook`; no restart is needed.
+    explanation: Anonymous access stays on, and the kubelet needs a restart to read
+      the file.
+  - id: c
+    text: Delete the pods on the node.
+    explanation: The pods do not control the kubelet API.
+  - id: d
+    text: Set `readOnlyPort` to 10250.
+    explanation: "`readOnlyPort` is a different, unauthenticated port."
   correct_option: a
-  explanation: Narrowing the bind address removes the exposure at its source. A firewall rule is a second layer.
-- id: ats033-final-q16
-  type: single_choice
-  difficulty: intermediate
-  learning_objective: Place an iptables rule so that it takes effect.
-  source_readings:
-  - sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
-  prompt: The `INPUT` chain has an `ACCEPT` rule for all TCP traffic at position 1. You append a `DROP` rule for port 19091. Why does traffic to 19091 still arrive?
-  options:
-  - id: a
-    text: iptables ignores rules that are added at run time.
-    explanation: Added rules take effect at once.
-  - id: b
-    text: Rules are checked from top to bottom and the first match decides, so the earlier ACCEPT wins.
-    explanation: Correct.
-  - id: c
-    text: A DROP rule only works for UDP.
-    explanation: DROP works for any protocol.
-  - id: d
-    text: The `INPUT` chain applies only to outgoing packets.
-    explanation: "`INPUT` handles packets addressed to the node itself."
-  correct_option: b
-  explanation: Insert the drop rule above the broader accept, or narrow the accept rule.
-- id: ats033-final-q17
-  type: single_choice
-  difficulty: intermediate
-  learning_objective: Explain why a firewall change is not durable by default.
-  source_readings:
-  - sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
-  prompt: You add an `iptables` rule by hand on a node. After a reboot the rule is gone. What is the cause?
-  options:
-  - id: a
-    text: The kernel rejects rules that were added by hand.
-    explanation: It accepts them. They live in kernel memory only.
-  - id: b
-    text: Rules from `iptables` are kept in memory and need a persistence mechanism or a tool such as `ufw` to be restored.
-    explanation: Correct.
-  - id: c
-    text: Kubernetes deletes every rule it did not create at start.
-    explanation: kube-proxy manages its own chains, not the whole rule set.
-  - id: d
-    text: The rule used the wrong table.
-    explanation: The table does not decide persistence.
-  correct_option: b
-  explanation: Save and restore rules, or manage them with a tool that stores them, and put the setup into the node image.
-- id: ats033-final-q18
-  type: single_choice
-  difficulty: intermediate
-  learning_objective: Apply the NetworkPolicy ingress model.
-  source_readings:
-  - sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
-  prompt: 'In namespace `starfleet`, a policy has `podSelector: {}` and `policyTypes: [Ingress]` with no ingress rules. What does it do?'
-  options:
-  - id: a
-    text: It allows all ingress to every pod in the namespace.
-    explanation: Without rules nothing is allowed.
-  - id: b
-    text: It denies all ingress to every pod in the namespace, if the CNI plugin enforces policies.
-    explanation: Correct. This is the standard default deny.
-  - id: c
-    text: It denies ingress to pods in all namespaces.
-    explanation: A policy applies to its own namespace.
-  - id: d
-    text: It blocks egress from the pods as well.
-    explanation: Egress is affected only when `Egress` is in `policyTypes`.
-  correct_option: b
-  explanation: An empty selector selects all pods of the namespace, and an empty rule list allows nothing.
-- id: ats033-final-q19
-  type: single_choice
-  difficulty: beginner
-  learning_objective: Explain what seccomp filters.
-  source_readings:
-  - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-  prompt: What does a seccomp profile restrict?
-  options:
-  - id: a
-    text: The system calls a process can make.
-    explanation: Correct.
-  - id: b
-    text: The files a process can open, by path.
-    explanation: Path-based rules belong to AppArmor.
-  - id: c
-    text: The CPU and memory a container may use.
-    explanation: That is the job of cgroup limits.
-  - id: d
-    text: The images a node may pull.
-    explanation: Admission and registry policy control images.
-  correct_option: a
-  explanation: Seccomp decides on the syscall and its numeric arguments, not on paths.
-- id: ats033-final-q20
-  type: single_choice
-  difficulty: beginner
-  learning_objective: Read the Seccomp line of /proc/PID/status.
-  source_readings:
-  - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-  prompt: 'Inside a container, `grep Seccomp /proc/1/status` prints `Seccomp: 2`. What does this show?'
-  options:
-  - id: a
-    text: A seccomp filter is installed for the process.
-    explanation: Correct.
-  - id: b
-    text: Seccomp is disabled.
-    explanation: Disabled is shown as 0.
-  - id: c
-    text: The container runs two profiles.
-    explanation: The number is a mode, not a count.
-  - id: d
-    text: The process runs with AppArmor in enforce mode.
-    explanation: AppArmor is reported elsewhere, in /proc/PID/attr/current.
-  correct_option: a
-  explanation: Mode 2 means filter mode. Mode 0 means no filter.
-- id: ats033-final-q21
-  type: single_choice
-  difficulty: beginner
-  learning_objective: Choose the safe default seccomp profile.
-  source_readings:
-  - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-  prompt: Which `seccompProfile` type should most workloads use when they have no special syscall needs?
-  options:
-  - id: a
-    text: "`Unconfined`"
-    explanation: It installs no filter.
-  - id: b
-    text: "`RuntimeDefault`"
-    explanation: Correct. It uses the default filter of the container runtime.
-  - id: c
-    text: "`Localhost` with an empty file"
-    explanation: An empty or missing file is an error, not a safe default.
-  - id: d
-    text: No field, on every Kubernetes version
-    explanation: Without the field and without kubelet seccompDefault, the pod runs unfiltered.
-  correct_option: b
-  explanation: RuntimeDefault blocks risky syscalls and still suits typical applications.
-- id: ats033-final-q22
-  type: single_choice
-  difficulty: intermediate
-  learning_objective: Write the localhostProfile path correctly.
-  source_readings:
-  - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-  prompt: A profile file is at `/var/lib/kubelet/seccomp/profiles/audit.json` on the node, and the kubelet uses the default seccomp directory. What is the correct `localhostProfile` value?
-  options:
-  - id: a
-    text: "`/var/lib/kubelet/seccomp/profiles/audit.json`"
-    explanation: The value is relative, not an absolute path.
-  - id: b
-    text: "`profiles/audit.json`"
-    explanation: Correct. The path is relative to the kubelet seccomp directory.
-  - id: c
-    text: "`audit`"
-    explanation: The file name with its directory is needed.
-  - id: d
-    text: "`/profiles/audit.json`"
-    explanation: A leading slash makes it an absolute path.
-  correct_option: b
-  explanation: localhostProfile is resolved under the kubelet seccomp root.
-- id: ats033-final-q23
+  explanation: Both settings must change, and the kubelet must restart.
+- id: ats033-final-q10
   type: single_choice
   difficulty: intermediate
   learning_objective: Contrast AppArmor with seccomp.
   source_readings:
   - sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
-  prompt: A root process in a container must not write under `/tmp`, although `/tmp` is writable by file mode. Which control fits?
+  prompt: A root process in a container must not write under `/tmp`, although `/tmp`
+    is writable by file mode. Which control fits?
   options:
   - id: a
     text: A seccomp profile that blocks `openat`
@@ -516,26 +268,57 @@ questions:
     text: "`fsGroup: 1000`"
     explanation: It sets group ownership of volumes and does not forbid writes.
   correct_option: b
-  explanation: AppArmor is mandatory access control by resource name, and it also binds root.
-- id: ats033-final-q24
+  explanation: AppArmor is mandatory access control by resource name, and it also
+    binds root.
+- id: ats033-final-q11
   type: single_choice
-  difficulty: intermediate
-  learning_objective: Use the current AppArmor field.
+  difficulty: advanced
+  learning_objective: Diagnose a denied operation caused by a seccomp profile.
   source_readings:
-  - sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
-  prompt: On Kubernetes v1.35, how is an AppArmor profile selected for a container?
+  - sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+  prompt: A container runs as root and owns a file, but `mv` on it fails with `Operation
+    not permitted`. The pod uses a `Localhost` seccomp profile and keeps running.
+    What is the best next step?
   options:
   - id: a
-    text: With the annotation `container.apparmor.security.beta.kubernetes.io/<name>`.
-    explanation: The annotation is deprecated.
+    text: Set `seccompProfile` to `Unconfined` for the pod.
+    explanation: That removes the filter for every syscall, not only the one needed.
   - id: b
-    text: With `securityContext.appArmorProfile` and a `type`.
-    explanation: Correct.
+    text: Map the failing action to its syscall names, compare them with the profile
+      rules, and allow only the needed call.
+    explanation: Correct. The error comes from the filter, not from file permissions.
   - id: c
-    text: With a kubelet flag that applies one profile to all pods.
-    explanation: Profiles are chosen per pod or container.
+    text: Change the file owner with `chown`.
+    explanation: The process already owns the file, so ownership is not the cause.
   - id: d
-    text: With a `NetworkPolicy` that names the profile.
-    explanation: NetworkPolicy has no such field.
+    text: Increase the memory limit of the container.
+    explanation: Memory limits do not produce an EPERM error for rename.
   correct_option: b
-  explanation: The field is available since v1.30 and takes RuntimeDefault, Localhost or Unconfined.
+  explanation: A root process that is denied on an operation it may normally do is
+    often blocked by a seccomp rule.
+- id: ats033-final-q12
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Drop Linux capabilities and read the result.
+  source_readings:
+  - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+  prompt: A container needs only to listen on port 80 as user 1000. Which securityContext
+    fits the least-privilege rule, and where do you read the result?
+  options:
+  - id: a
+    text: "`capabilities.drop: [ALL]` and `add: [NET_BIND_SERVICE]`; read `CapBnd`
+      in `/proc/1/status`."
+    explanation: Correct. CapBnd shows the bounding set of a non-root process.
+  - id: b
+    text: "`capabilities.add: [ALL]`; read the pod events."
+    explanation: Adding all capabilities is the opposite of least privilege.
+  - id: c
+    text: "`privileged: true`; read `/proc/1/attr/current`."
+    explanation: Privileged gives every capability, and the AppArmor file does not
+      list capabilities.
+  - id: d
+    text: "`capabilities.drop: [NET_BIND_SERVICE]`; read `Seccomp`."
+    explanation: That removes the one capability the workload needs.
+  correct_option: a
+  explanation: Drop everything and add back the single capability that is needed.
+    CapEff is empty for a non-root process, so CapBnd is the line to read.

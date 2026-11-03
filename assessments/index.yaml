@@ -1,15 +1,9 @@
+---
 schema_version: 1
 course_id: ATS033
 status: draft
 banks:
-- id: ats033-domain-review
-  path: assessments/domain-review.yaml
+- id: ats033-final
+  path: sections/final-domain-quiz.yaml
   question_count: 12
-  placement:
-    position: after
-    reading: sections/section-040/module-01/course-05-summary.md
-  covered_sections:
-  - section-010
-  - section-020
-  - section-030
-  - section-040
+  covered_sections: []

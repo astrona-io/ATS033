@@ -1,0 +1,33 @@
+{
+  "context": "kind-astro-ats-033-lab-010-02-01",
+  "resources": [
+    {
+      "kind": "configmap",
+      "name": "node-access-review",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ConfigMap",
+        "metadata": {
+          "name": "node-access-review",
+          "namespace": "starfleet"
+        },
+        "data": {
+          "ssh": "key-only",
+          "account": "olduser",
+          "result": "hardened"
+        }
+      }
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "--raw=/readyz"
+      ],
+      "equals": "ok"
+    }
+  ]
+}

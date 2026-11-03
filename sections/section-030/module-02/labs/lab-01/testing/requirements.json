@@ -1,0 +1,66 @@
+{
+  "context": "kind-astro-ats-033-lab-030-02-01",
+  "resources": [
+    {
+      "kind": "service",
+      "name": "probe-debug",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Service",
+        "metadata": {
+          "name": "probe-debug",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "type": "ClusterIP",
+          "selector": {
+            "app": "probe",
+            "release": "probe"
+          }
+        }
+      }
+    },
+    {
+      "kind": "service",
+      "name": "probe-public",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Service",
+        "metadata": {
+          "name": "probe-public",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "type": "NodePort",
+          "selector": {
+            "app": "probe",
+            "release": "probe"
+          },
+          "externalTrafficPolicy": "Local"
+        }
+      }
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "shuttle",
+        "--",
+        "wget",
+        "-qO-",
+        "-T",
+        "3",
+        "http://probe-debug.starfleet/"
+      ],
+      "contains": [
+        "version=v1"
+      ]
+    }
+  ]
+}

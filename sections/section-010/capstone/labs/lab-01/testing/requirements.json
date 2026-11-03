@@ -1,0 +1,70 @@
+{
+  "context": "kind-astro-ats-033-lab-010-capstone-01",
+  "resources": [
+    {
+      "kind": "configmap",
+      "name": "section-review",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ConfigMap",
+        "metadata": {
+          "name": "section-review",
+          "namespace": "starfleet"
+        },
+        "data": {
+          "node-service": "disabled",
+          "ssh": "key-only",
+          "workload": "beacon",
+          "dedicated-node": "ledger"
+        }
+      }
+    },
+    {
+      "kind": "deployment",
+      "name": "beacon",
+      "namespace": "starfleet",
+      "expected": {
+        "metadata": {
+          "name": "beacon",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "deployment"
+    },
+    {
+      "kind": "deployment",
+      "name": "ledger",
+      "namespace": "starfleet",
+      "expected": {
+        "metadata": {
+          "name": "ledger",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "deployment"
+    },
+    {
+      "kind": "deployment",
+      "name": "probe",
+      "namespace": "starfleet",
+      "expected": {
+        "metadata": {
+          "name": "probe",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "--raw=/readyz"
+      ],
+      "equals": "ok"
+    }
+  ]
+}

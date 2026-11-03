@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workload-review
+  namespace: starfleet
+data:
+  workload: beacon
+  result: hardened

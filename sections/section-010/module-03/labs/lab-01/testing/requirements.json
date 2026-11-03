@@ -1,0 +1,44 @@
+{
+  "context": "kind-astro-ats-033-lab-010-03-01",
+  "resources": [
+    {
+      "kind": "configmap",
+      "name": "workload-review",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "ConfigMap",
+        "metadata": {
+          "name": "workload-review",
+          "namespace": "starfleet"
+        },
+        "data": {
+          "workload": "beacon",
+          "result": "hardened"
+        }
+      }
+    },
+    {
+      "kind": "deployment",
+      "name": "beacon",
+      "namespace": "starfleet",
+      "expected": {
+        "metadata": {
+          "name": "beacon",
+          "namespace": "starfleet"
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "--raw=/readyz"
+      ],
+      "equals": "ok"
+    }
+  ]
+}

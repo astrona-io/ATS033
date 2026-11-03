@@ -1,0 +1,69 @@
+{
+  "context": "kind-astro-ats-033-playground-030-02",
+  "resources": [
+    {
+      "kind": "service",
+      "name": "probe-admin",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Service",
+        "metadata": {
+          "name": "probe-admin",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "type": "ClusterIP",
+          "selector": {
+            "app": "probe",
+            "release": "probe"
+          }
+        }
+      }
+    },
+    {
+      "kind": "service",
+      "name": "probe-edge",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Service",
+        "metadata": {
+          "name": "probe-edge",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "type": "LoadBalancer",
+          "selector": {
+            "app": "probe",
+            "release": "probe"
+          },
+          "externalTrafficPolicy": "Local",
+          "loadBalancerSourceRanges": [
+            "203.0.113.0/24"
+          ]
+        }
+      }
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "shuttle",
+        "--",
+        "wget",
+        "-qO-",
+        "-T",
+        "3",
+        "http://probe-admin.starfleet/"
+      ],
+      "contains": [
+        "version=v1"
+      ]
+    }
+  ]
+}
