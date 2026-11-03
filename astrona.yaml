@@ -81,6 +81,7 @@ modules:
     title: 'Knowledge Check: Minimize The Host OS Footprint'
     path: sections/section-010/module-01/quiz.yaml
     question_count: 10
+    pass_score: 70
 - id: module-020
   title: Using least-privilege identity and access management
   description: Developed reading and reasoning for Using least-privilege identity
@@ -130,6 +131,7 @@ modules:
     title: 'Knowledge Check: Apply Least Privilege To Identities'
     path: sections/section-020/module-01/quiz.yaml
     question_count: 10
+    pass_score: 70
 - id: module-030
   title: Minimize external access to the network
   description: Developed reading and reasoning for Minimize external access to the
@@ -180,6 +182,7 @@ modules:
     title: 'Knowledge Check: Minimize External Access To The Network'
     path: sections/section-030/module-01/quiz.yaml
     question_count: 10
+    pass_score: 70
 - id: module-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
   description: Developed reading and reasoning for Appropriately use kernel hardening
@@ -230,3 +233,8 @@ modules:
     title: 'Knowledge Check: Kernel Hardening With seccomp And AppArmor'
     path: sections/section-040/module-01/quiz.yaml
     question_count: 10
+    pass_score: 70
+  - type: quiz
+    title: Final Domain Quiz
+    path: sections/final-domain-quiz.yaml
+    pass_score: 70
