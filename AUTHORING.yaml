@@ -59,7 +59,7 @@ sections:
       after_reading: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
       objective: Remove a seeded extra service from active and enabled node services
         while preserving Kubernetes.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
@@ -88,7 +88,7 @@ sections:
       after_reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
       objective: Set key-only SSH for one administrator account and remove the login
         paths of an unused account.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-03
@@ -118,7 +118,7 @@ sections:
       after_reading: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
       objective: Rewrite a Deployment without host access and enforce the baseline
         standard on its namespace.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
@@ -126,7 +126,7 @@ sections:
     path: sections/section-010/capstone/labs/lab-01
     objective: Combine a disabled node service, key-only SSH, a hardened workload
       with a Pod Security label and a dedicated node.
-    status: draft
+    status: alpha
     runtime_verification: pending
 - id: section-020
   title: Using least-privilege identity and access management
@@ -164,7 +164,7 @@ sections:
       after_reading: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
       objective: Grant a dedicated host identity access to one report without granting
         root access.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
@@ -194,7 +194,7 @@ sections:
       after_reading: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
       objective: Replace a wildcard Role and a cluster-admin binding of one ServiceAccount
         with a narrow Role.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-03
@@ -224,7 +224,7 @@ sections:
       after_reading: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
       objective: Move a workload to a dedicated ServiceAccount without a mounted token,
         and remove the unused token paths.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
@@ -233,7 +233,7 @@ sections:
     objective: Harden RBAC and ServiceAccounts across two namespaces by combining
       narrow Roles, a closed default ServiceAccount, a bound projected token and the
       removal of long-lived tokens.
-    status: draft
+    status: alpha
     runtime_verification: pending
 - id: section-030
   title: Minimize external access to the network
@@ -271,7 +271,7 @@ sections:
       after_reading: sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
       objective: Keep a node-local management-style service reachable locally while
         closing its node-address listener.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
@@ -302,7 +302,7 @@ sections:
       after_reading: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
       objective: Change an accidental NodePort Service to ClusterIP and set externalTrafficPolicy
         Local on the one that stays published.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-03
@@ -335,7 +335,7 @@ sections:
       after_reading: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
       objective: Turn off anonymous access and AlwaysAllow authorization on a kubelet
         and restart it.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
@@ -343,7 +343,7 @@ sections:
     path: sections/section-030/capstone/labs/lab-01
     objective: Close a listener, a NodePort and a kubelet API in one cluster without
       breaking the application.
-    status: draft
+    status: alpha
     runtime_verification: pending
 - id: section-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
@@ -381,7 +381,7 @@ sections:
       after_reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
       objective: Keep a non-root workload functional with a read-only root filesystem
         and a writable scratch volume.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
@@ -414,7 +414,7 @@ sections:
       after_reading: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
       objective: Write a seccomp profile, place it on the node and run a pod that
         cannot delete files.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-03
@@ -446,7 +446,7 @@ sections:
       after_reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
       objective: Remove privileged mode from a Deployment, drop all capabilities and
         keep only the one it needs.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
@@ -454,5 +454,5 @@ sections:
     path: sections/section-040/capstone/labs/lab-01
     objective: Combine a Localhost seccomp profile, dropped capabilities, blocked
       escalation and a read-only filesystem on one Deployment.
-    status: draft
+    status: alpha
     runtime_verification: pending
