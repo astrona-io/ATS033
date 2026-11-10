@@ -1,5 +1,7 @@
 # Material expansion review
 
+> Historical design record. Counts and execution claims below describe the original expansion. For current labs, preparation and practical limits, use [LAB-COVERAGE.md](LAB-COVERAGE.md) and [COVERAGE-REVIEW.md](COVERAGE-REVIEW.md).
+
 Applied astrona-course-expand-material with this repository's CLAUDE.md writing rules, following maintainer authorization on 2026-10-12. Chapters remain standalone reading material with no runtime or fabricated output. Each adds a concrete opening, measurable objectives, prerequisites and a worked mechanism with a diagram. Introductions and summaries match those explanations.
 
 | Section/module | Expanded readings | Playground | Checkpoints | Skill validator |

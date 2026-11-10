@@ -76,3 +76,22 @@ To resume in a new session, say:
 > latest Actions failures, preserve the existing work, and finish the required
 > checks. Keep one PR for this repository, push separate commits, and leave it
 > unmerged for manual review.
+
+## Teaching and assessment coverage
+
+Maintain explicit preparation in [TEACHING-COVERAGE.yaml](TEACHING-COVERAGE.yaml).
+Every lab needs earlier preparation in its own module, or its section for a
+capstone. List technical readings without a module assessment in
+`additional_readings`. Regenerate [LAB-COVERAGE.md](LAB-COVERAGE.md) and review
+both directions. A link does not prove that the whole lesson is assessed;
+record remaining practical gaps in [COVERAGE-REVIEW.md](COVERAGE-REVIEW.md).
+
+Use kind for Kubernetes behavior supported by the installed controllers and
+network plugin. Use QEMU when the student needs an independent kernel, host
+service or mandatory access control. Check real behavior: a RuntimeClass name,
+stored rule or encryption setting alone does not prove isolation, detection or
+encrypted traffic. Teach every required submission field before asking for it.
+
+Run `python3 scripts/ci/test-teaching-coverage.py` alongside the structure tests.
+Preserve the existing branch and PR, push logical commits, and leave the merge
+for manual review.
