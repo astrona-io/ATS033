@@ -245,3 +245,8 @@ Primary author sources are recorded in `SOURCES.md`. The objective list was
 verified on 2026-10-11. Detailed reading expansions were written on 2026-10-11.
 Validate manifest paths, summary ordering, curriculum coverage and question
 contracts. Do not claim live verification until the actual runtime result has been recorded.
+
+### Focused lab maintenance
+
+Follow `AUTHORING.md` for lesson/lab boundaries, lifecycle checks and PR review.
+Use `LAB-COVERAGE.md` to trace preparation lessons to assessed outcomes.
