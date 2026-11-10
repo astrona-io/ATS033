@@ -9,11 +9,13 @@ trap 'rm -f "$output"' EXIT
 for grader in "$lab_dir"/validation/validate-*.sh; do
   outcome=$(basename "$grader" .sh)
   outcome=${outcome#validate-}
-  if bash "$grader" >"$output" 2>&1; then
+  status=0
+  bash "$grader" >"$output" 2>&1 || status=$?
+  if [ "$status" -eq 0 ]; then
     cat "$output"
     fail "$outcome passed on the unfinished lab"
   fi
-  if ! grep -q '^FAIL:' "$output" || grep -q '^FAIL: Unknown outcome' "$output"; then
+  if [ "$status" -ne 1 ] || ! grep -q '^FAIL:' "$output" || grep -q '^FAIL: Unknown outcome' "$output"; then
     cat "$output"
     fail "$outcome failed without a grading result"
   fi
