@@ -9,7 +9,7 @@ A process in a container often runs as root inside its own namespaces. Root ther
 
 Keep one sentence in mind for this module: **AppArmor says what a program may touch, capabilities say which root powers it keeps, and the securityContext selects both.** You will learn the two AppArmor modes and how to load a profile on a node, select the profile in a pod, and then drop capabilities and block privilege escalation in a pod that runs without `privileged`.
 
-The module has three parts. **AppArmor Modes And Loading Profiles** covers enforce and complain mode, `apparmor_parser` and the need to load a profile on every node. **Select A Profile With appArmorProfile** covers the pod fields and how to verify them. **Drop Capabilities And Block Privilege Escalation** covers capabilities, `allowPrivilegeEscalation: false` and `privileged: false`.
+The module includes a separate QEMU exercise that proves AppArmor file enforcement on an Ubuntu kernel. The Kubernetes readings use the kind playground. **AppArmor Modes And Loading Profiles** covers enforce and complain mode, `apparmor_parser` and the need to load a profile on every node. **Select A Profile With appArmorProfile** covers the pod fields and how to verify them. **Drop Capabilities And Block Privilege Escalation** covers capabilities, `allowPrivilegeEscalation: false` and `privileged: false`.
 
 ## Learning objectives
 

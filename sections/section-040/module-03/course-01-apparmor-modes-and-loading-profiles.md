@@ -37,8 +37,8 @@ The word after `profile` is the profile name. This name, and not the file name, 
 
 A loaded profile runs in one of two modes.
 
-- In **enforce** mode, the kernel blocks every operation the profile does not allow and writes an audit message for it. This is the mode for production.
-- In **complain** mode, the kernel allows the operation and only writes the audit message. This is the mode for writing a profile: you run the application, read what the profile would have denied and add rules until the log is quiet.
+- In **enforce** mode, the kernel blocks operations the profile does not allow. Logging depends on the rule and audit settings. This is the mode for production.
+- In **complain** mode, the kernel permits and logs operations missing from the allow rules. Explicit `deny` rules still block access; their messages can also be suppressed unless auditing is requested. This is the mode for writing a profile: you run the application, read what the profile would have denied and add rules until the log is quiet.
 
 The mode is a property of the loaded profile. You can set it in the file with `flags=(complain)`, or switch it later with the tools below. The same file can be loaded in either mode, so a profile in complain mode can move to enforce mode without a rewrite.
 
@@ -104,7 +104,7 @@ Then read the list of loaded profiles. The profile `k8s-deny-tmp-write` appears 
 run_on_node grep k8s-deny-tmp-write /sys/kernel/security/apparmor/profiles
 ```
 
-Reload the same file in complain mode with `-C`, and read the list again. The mode in parentheses changes to `complain`, and the same file is now only logged, not blocked:
+Reload the same file in complain mode with `-C`, and read the list again. The mode in parentheses changes to `complain`. Its explicit `deny` rule still blocks writes, so use the mode listing to distinguish the two modes:
 
 ```sh
 run_on_node apparmor_parser -r -C /etc/apparmor.d/k8s-deny-tmp-write

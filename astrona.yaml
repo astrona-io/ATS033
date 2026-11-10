@@ -548,6 +548,25 @@ modules:
     title: Select A Profile With appArmorProfile
     path: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
   - type: reading
+    title: Prove AppArmor Enforcement In A Linux VM
+    path: sections/section-040/module-03/course-02a-prove-apparmor-in-a-linux-vm.md
+  - type: reading
+    title: Enforce An AppArmor File Boundary — Task
+    path: sections/section-040/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Enforce An AppArmor File Boundary
+    path: sections/section-040/module-03/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: apparmor
+    task_kind: build
+    learning_goals:
+    - Load an enforcing AppArmor profile and prove allowed and denied file access.
+    tags: [cks, apparmor, qemu]
+  - type: reading
+    title: Enforce An AppArmor File Boundary — Solution
+    path: sections/section-040/module-03/labs/lab-02/solution.md
+  - type: reading
     title: Drop Capabilities And Block Privilege Escalation
     path: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
   - type: reading
