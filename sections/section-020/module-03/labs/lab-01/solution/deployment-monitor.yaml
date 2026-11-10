@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: monitor
-  namespace: starfleet
+  namespace: starfleet-033-020-03-01
 spec:
   replicas: 1
   selector:

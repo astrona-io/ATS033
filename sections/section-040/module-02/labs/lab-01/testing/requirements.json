@@ -1,5 +1,7 @@
 {
   "context": "kind-astro-ats-033-lab-040-02-01",
+  "cluster": "astro-ats-033-lab-040-02-01",
+  "namespace": "starfleet-033-040-02-01",
   "resources": [
     {
       "kind": "pod",
@@ -9,7 +11,7 @@
         "kind": "Pod",
         "metadata": {
           "name": "no-delete",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-040-02-01"
         },
         "spec": {
           "restartPolicy": "Never",
@@ -32,7 +34,8 @@
           ]
         }
       },
-      "state": "pod"
+      "state": "pod",
+      "outcome": "no-delete-pod"
     }
   ],
   "behavior": [
@@ -40,7 +43,7 @@
       "args": [
         "kubectl",
         "-n",
-        "starfleet",
+        "starfleet-033-040-02-01",
         "exec",
         "no-delete",
         "--",
@@ -48,13 +51,14 @@
         "-c",
         "echo kept > /tmp/keep; cat /tmp/keep"
       ],
-      "equals": "kept"
+      "equals": "kept",
+      "outcome": "no-delete-pod"
     },
     {
       "args": [
         "kubectl",
         "-n",
-        "starfleet",
+        "starfleet-033-040-02-01",
         "exec",
         "no-delete",
         "--",
@@ -65,7 +69,8 @@
       "denied": true,
       "failure_markers": [
         "operation not permitted"
-      ]
+      ],
+      "outcome": "delete-blocked"
     }
   ]
 }

@@ -1,16 +1,18 @@
 {
   "context": "kind-astro-ats-033-lab-030-02-01",
+  "cluster": "astro-ats-033-lab-030-02-01",
+  "namespace": "starfleet-033-030-02-01",
   "resources": [
     {
       "kind": "service",
       "name": "probe-debug",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-030-02-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "Service",
         "metadata": {
           "name": "probe-debug",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-030-02-01"
         },
         "spec": {
           "type": "ClusterIP",
@@ -19,18 +21,19 @@
             "release": "probe"
           }
         }
-      }
+      },
+      "outcome": "debug-node-port-closed"
     },
     {
       "kind": "service",
       "name": "probe-public",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-030-02-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "Service",
         "metadata": {
           "name": "probe-public",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-030-02-01"
         },
         "spec": {
           "type": "NodePort",
@@ -40,7 +43,8 @@
           },
           "externalTrafficPolicy": "Local"
         }
-      }
+      },
+      "outcome": "public-local-traffic"
     }
   ],
   "behavior": [
@@ -48,7 +52,7 @@
       "args": [
         "kubectl",
         "-n",
-        "starfleet",
+        "starfleet-033-030-02-01",
         "exec",
         "shuttle",
         "--",
@@ -56,11 +60,12 @@
         "-qO-",
         "-T",
         "3",
-        "http://probe-debug.starfleet/"
+        "http://probe-debug.starfleet-033-030-02-01/"
       ],
       "contains": [
         "version=v1"
-      ]
+      ],
+      "outcome": "debug-node-port-closed"
     }
   ]
 }

@@ -3,13 +3,11 @@ draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
-# Disable An Unneeded Node Service
+# Question
 
-Remove a seeded extra service from active and enabled node services while preserving Kubernetes.
+Solve this question on: `terminal`
 
-## Starting state
-
-The isolated environment has two healthy probe replicas, an internal Service and two client Pods. The required result has not been configured.
+The control-plane node container of this environment runs an extra systemd service, `training-extra.service`, that Kubernetes does not need. It is active and enabled. The `starfleet-033-010-01-01` namespace runs two healthy `probe` replicas, an internal Service and two client pods.
 
 Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
 
@@ -22,10 +20,22 @@ worker_name="astro-ats-033-lab-010-01-01-worker"
 
 Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
 
-## Required result
+Allow about 5 minutes for the tasks. Cluster startup adds time.
 
-Disable and stop only training-extra.service on this private control-plane container. Record host-review with service training-extra.service and result disabled. The extra service must be inactive and disabled, while kubelet and containerd remain active and API readiness succeeds. This is a scoped host-service exercise, not a full host hardening assessment.
+## Tasks
 
-## Verify The Result
+1. On the control-plane node, stop `training-extra.service`.
+2. Disable `training-extra.service` so that it does not start at boot.
+3. Record the change: create the ConfigMap `host-review` in the namespace `starfleet-033-010-01-01` with the data `service: training-extra.service` and `result: disabled`.
 
-The grader checks the required object fields and actual observations. Wait for controller convergence before submitting. Preserve the task's namespace, workload names and unrelated components.
+## Constraints
+
+- Change only `training-extra.service` on the control-plane node container. This is a scoped host-service exercise, not a full host hardening assessment.
+- The `kubelet` and `containerd` services must stay active, and the API readiness endpoint must answer.
+- Preserve the namespace, the workload names and every unrelated component.
+
+## How the answer is checked
+
+The grader runs three checks: `training-extra.service` is inactive; it is disabled; and the ConfigMap `host-review` has the required data. Every check also confirms that `kubelet` and `containerd` are active and that the API answers `/readyz`.
+
+Hint: run `systemctl` inside the node container, for example `podman exec "$node_name" systemctl status training-extra.service`.

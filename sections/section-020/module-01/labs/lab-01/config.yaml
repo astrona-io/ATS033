@@ -24,11 +24,26 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: scoped-group-read
+    description: training-reader reads public-report through the training-readers group only
+    type: file
+    source: validation/validate-scoped-group-read.sh
+    points: 1
+  - name: identity-review-record
+    description: ConfigMap identity-review records the scoped read
+    type: file
+    source: validation/validate-identity-review-record.sh
+    points: 1

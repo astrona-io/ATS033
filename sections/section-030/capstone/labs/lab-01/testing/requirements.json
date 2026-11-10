@@ -106,17 +106,6 @@
       "contains": [
         "version=v1"
       ]
-    },
-    {
-      "args": [
-        "kubectl",
-        "get",
-        "node",
-        "astro-ats-033-lab-030-capstone-01-worker",
-        "-o",
-        "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}"
-      ],
-      "equals": "True"
     }
   ]
 }

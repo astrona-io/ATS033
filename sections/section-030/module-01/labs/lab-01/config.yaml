@@ -24,11 +24,26 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: node-local-server
+    description: node-local-server runs on the control-plane host network and answers on loopback
+    type: file
+    source: validation/validate-node-local-server.sh
+    points: 1
+  - name: loopback-only
+    description: node-local-server listens on 127.0.0.1 only, so pods get connection refused
+    type: file
+    source: validation/validate-loopback-only.sh
+    points: 1

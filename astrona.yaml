@@ -56,6 +56,7 @@ modules:
   - type: lab
     title: Disable An Unneeded Node Service
     path: sections/section-010/module-01/labs/lab-01
+    examScope: cluster
     difficulty: intermediate
     estimated_duration: 25m
     topic: host-service-footprint
@@ -96,6 +97,7 @@ modules:
   - type: lab
     title: Harden SSH Access And Unused Accounts
     path: sections/section-010/module-02/labs/lab-01
+    examScope: cluster
     difficulty: intermediate
     estimated_duration: 25m
     topic: ssh-host-login
@@ -127,6 +129,7 @@ modules:
   - type: lab
     title: Remove Host Access From A Workload
     path: sections/section-010/module-03/labs/lab-01
+    examScope: namespace
     difficulty: intermediate
     estimated_duration: 25m
     topic: workload-host-access
@@ -191,6 +194,7 @@ modules:
   - type: lab
     title: Grant One Host Identity Scoped Read Access
     path: sections/section-020/module-01/labs/lab-01
+    examScope: cluster
     difficulty: intermediate
     estimated_duration: 25m
     topic: host-identity
@@ -230,6 +234,7 @@ modules:
   - type: lab
     title: Replace A Wildcard Role And cluster-admin Binding
     path: sections/section-020/module-02/labs/lab-01
+    examScope: cluster
     difficulty: intermediate
     estimated_duration: 25m
     topic: rbac-least-privilege
@@ -267,6 +272,7 @@ modules:
   - type: lab
     title: Give A Workload Its Own ServiceAccount And Remove Its Tokens
     path: sections/section-020/module-03/labs/lab-01
+    examScope: namespace
     difficulty: intermediate
     estimated_duration: 25m
     topic: serviceaccount-tokens
@@ -328,6 +334,7 @@ modules:
   - type: lab
     title: Bind A Host-Network Service To Loopback
     path: sections/section-030/module-01/labs/lab-01
+    examScope: cluster
     difficulty: intermediate
     estimated_duration: 25m
     topic: host-network-exposure
@@ -368,6 +375,7 @@ modules:
   - type: lab
     title: Close An Accidental NodePort And Keep One Local
     path: sections/section-030/module-02/labs/lab-01
+    examScope: cluster
     difficulty: intermediate
     estimated_duration: 25m
     topic: service-exposure
@@ -405,6 +413,7 @@ modules:
   - type: lab
     title: Close The Kubelet API To Anonymous Callers
     path: sections/section-030/module-03/labs/lab-01
+    examScope: cluster
     difficulty: intermediate
     estimated_duration: 25m
     topic: kubelet-api
@@ -475,6 +484,7 @@ modules:
   - type: lab
     title: Run With A Restricted Security Context
     path: sections/section-040/module-01/labs/lab-01
+    examScope: namespace
     difficulty: intermediate
     estimated_duration: 25m
     topic: security-context
@@ -546,6 +556,7 @@ modules:
   - type: lab
     title: Remove Privileged Mode And Keep One Capability
     path: sections/section-040/module-03/labs/lab-01
+    examScope: namespace
     difficulty: intermediate
     estimated_duration: 25m
     topic: capabilities

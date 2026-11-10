@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: probe-public
-  namespace: starfleet
+  namespace: starfleet-033-030-02-01
 spec:
   type: NodePort
   externalTrafficPolicy: Local

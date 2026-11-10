@@ -22,11 +22,26 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-contract-and-behavior
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: no-delete-pod
+    description: no-delete runs with the Localhost profile profiles/block-delete.json and can write files
+    type: file
+    source: validation/validate-no-delete-pod.sh
+    points: 1
+  - name: delete-blocked
+    description: rm fails with Operation not permitted inside no-delete
+    type: file
+    source: validation/validate-delete-blocked.sh
+    points: 1

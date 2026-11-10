@@ -24,11 +24,31 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: cluster-admin-removed
+    description: ops-agent has no binding to cluster-admin and no cluster-wide access
+    type: file
+    source: validation/validate-cluster-admin-removed.sh
+    points: 1
+  - name: wildcard-binding-removed
+    description: ops-agent has no RoleBinding to a wildcard Role
+    type: file
+    source: validation/validate-wildcard-binding-removed.sh
+    points: 1
+  - name: least-privilege-reader
+    description: ops-agent can read pods and logs in its namespace through ops-agent-reader and nothing more
+    type: file
+    source: validation/validate-least-privilege-reader.sh
+    points: 2

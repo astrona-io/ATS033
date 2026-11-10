@@ -29,7 +29,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: probe-debug
-  namespace: starfleet
+  namespace: starfleet-033-030-02-01
 spec:
   type: ClusterIP
   selector:
@@ -54,7 +54,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: probe-public
-  namespace: starfleet
+  namespace: starfleet-033-030-02-01
 spec:
   type: NodePort
   externalTrafficPolicy: Local
@@ -77,10 +77,10 @@ kubectl apply -f service-probe-public.yaml
 Then check the result. The request from `drifter` is expected to fail, so run it on its own:
 
 ```sh
-kubectl get services -n starfleet
-kubectl -n starfleet exec shuttle -- wget -qO- -T 3 http://probe-debug.starfleet/
+kubectl get services -n starfleet-033-030-02-01
+kubectl -n starfleet-033-030-02-01 exec shuttle -- wget -qO- -T 3 http://probe-debug.starfleet-033-030-02-01/
 NODE_IP="$(kubectl get node "$node_name" -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}')"
-kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$NODE_IP:30080/"
+kubectl -n outpost-033-030-02-01 exec drifter -- wget -qO- -T 3 "http://$NODE_IP:30080/"
 ```
 
 The first request prints a line that starts with `version=v1`. The request to port 30080 fails, because no Service opens that node port any more.

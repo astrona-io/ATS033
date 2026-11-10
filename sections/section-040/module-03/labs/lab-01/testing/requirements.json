@@ -1,27 +1,24 @@
 {
   "context": "kind-astro-ats-033-lab-040-03-01",
+  "cluster": "astro-ats-033-lab-040-03-01",
+  "namespace": "starfleet-033-040-03-01",
   "resources": [
     {
       "kind": "deployment",
       "name": "relay",
+      "namespace": "starfleet-033-040-03-01",
+      "state": "deployment",
       "expected": {
         "apiVersion": "apps/v1",
         "kind": "Deployment",
         "metadata": {
           "name": "relay",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-040-03-01"
         },
         "spec": {
           "replicas": 1,
           "template": {
             "spec": {
-              "securityContext": {
-                "runAsNonRoot": true,
-                "runAsUser": 1000,
-                "seccompProfile": {
-                  "type": "RuntimeDefault"
-                }
-              },
               "containers": [
                 {
                   "name": "relay",
@@ -30,10 +27,100 @@
                     "sh",
                     "-c",
                     "sleep 3600"
-                  ],
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "kind": "deployment",
+      "name": "relay",
+      "namespace": "starfleet-033-040-03-01",
+      "expected": {
+        "metadata": {
+          "name": "relay",
+          "namespace": "starfleet-033-040-03-01"
+        },
+        "spec": {
+          "template": {
+            "spec": {
+              "securityContext": {
+                "runAsNonRoot": true,
+                "runAsUser": 1000
+              }
+            }
+          }
+        }
+      },
+      "outcome": "relay-non-root"
+    },
+    {
+      "kind": "deployment",
+      "name": "relay",
+      "namespace": "starfleet-033-040-03-01",
+      "expected": {
+        "metadata": {
+          "name": "relay",
+          "namespace": "starfleet-033-040-03-01"
+        },
+        "spec": {
+          "template": {
+            "spec": {
+              "securityContext": {
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          }
+        }
+      },
+      "outcome": "relay-seccomp"
+    },
+    {
+      "kind": "deployment",
+      "name": "relay",
+      "namespace": "starfleet-033-040-03-01",
+      "expected": {
+        "metadata": {
+          "name": "relay",
+          "namespace": "starfleet-033-040-03-01"
+        },
+        "spec": {
+          "template": {
+            "spec": {
+              "containers": [
+                {
                   "securityContext": {
                     "privileged": false,
-                    "allowPrivilegeEscalation": false,
+                    "allowPrivilegeEscalation": false
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "outcome": "relay-no-escalation"
+    },
+    {
+      "kind": "deployment",
+      "name": "relay",
+      "namespace": "starfleet-033-040-03-01",
+      "expected": {
+        "metadata": {
+          "name": "relay",
+          "namespace": "starfleet-033-040-03-01"
+        },
+        "spec": {
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "securityContext": {
                     "capabilities": {
                       "drop": [
                         "ALL"
@@ -49,7 +136,7 @@
           }
         }
       },
-      "state": "deployment"
+      "outcome": "relay-capabilities"
     }
   ],
   "behavior": []

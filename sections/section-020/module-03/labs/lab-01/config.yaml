@@ -24,11 +24,31 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: monitor-without-token
+    description: The monitor pod runs as the monitor ServiceAccount with no mounted token
+    type: file
+    source: validation/validate-monitor-without-token.sh
+    points: 2
+  - name: default-account-closed
+    description: The default ServiceAccount mounts no token and has no binding
+    type: file
+    source: validation/validate-default-account-closed.sh
+    points: 1
+  - name: legacy-token-deleted
+    description: The long-lived token Secret legacy-monitor-token is gone
+    type: file
+    source: validation/validate-legacy-token-deleted.sh
+    points: 1

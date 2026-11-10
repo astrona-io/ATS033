@@ -3,13 +3,11 @@ draft: true
 exam_objectives:
 - Minimize external access to the network
 ---
-# Bind A Host-Network Service To Loopback
+# Question
 
-Keep a node-local management-style service reachable locally while closing its node-address listener.
+Solve this question on: `terminal`
 
-## Starting state
-
-The isolated environment has two healthy probe replicas, an internal Service and two client Pods. The required result has not been configured.
+A node-local, management-style HTTP server must run on the control-plane node and be reachable only from that node itself. The namespace `starfleet-033-030-01-01` runs two healthy `probe` replicas, an internal Service and the client pods `shuttle` and `drifter`. The server does not exist yet.
 
 Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
 
@@ -22,10 +20,22 @@ worker_name="astro-ats-033-lab-030-01-01-worker"
 
 Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
 
-## Required result
+Allow about 8 minutes for the tasks. Cluster startup adds time.
 
-Create node-local-server on the control-plane container network, listening on 127.0.0.1:19090 only. A request from that server container to loopback must succeed. A request from the ordinary shuttle Pod to the node InternalIP on port 19090 must fail specifically with Connection refused. Keep the private node service and cluster available. This practices listener scope, not a host firewall implementation.
+## Tasks
 
-## Verify The Result
+1. Create the pod `node-local-server` in `starfleet-033-030-01-01` on the control-plane node's network: `hostNetwork: true` with `dnsPolicy: ClusterFirstWithHostNet`, a `nodeSelector` on the control-plane node's `kubernetes.io/hostname` and a toleration for the `node-role.kubernetes.io/control-plane` taint. Use `restartPolicy: Never` and one container `web` with the image `docker.io/library/python:3.13-alpine` and the command `python -m http.server 19090 --bind 127.0.0.1`.
+2. Confirm that a request from the server container to `http://127.0.0.1:19090/` succeeds.
+3. Confirm that a request from the `shuttle` pod to the node InternalIP on port 19090 fails with `Connection refused`.
 
-The grader checks the required object fields and actual observations. Wait for controller convergence before submitting. Preserve the task's namespace, workload names and unrelated components.
+## Constraints
+
+- Listen on loopback only. This practices listener scope, not a host firewall implementation.
+- Keep the node service and the cluster available.
+- Preserve the namespace, the workload names and every unrelated component.
+
+## How the answer is checked
+
+The grader runs two checks: `node-local-server` is running on the control-plane node with the host network and answers on loopback with status 200; and its command binds `127.0.0.1`, so a request from `shuttle` to the node InternalIP on port 19090 is refused.
+
+Hint: `kubectl get node -o wide` shows each node's InternalIP.

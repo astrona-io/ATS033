@@ -3,13 +3,11 @@ draft: true
 exam_objectives:
 - Using least-privilege identity and access management
 ---
-# Replace A Wildcard Role And cluster-admin Binding
+# Question
 
-Replace a wildcard Role and a cluster-admin binding with a narrow Role.
+Solve this question on: `terminal`
 
-## Starting state
-
-The isolated environment has two healthy `probe` replicas, an internal Service and two client pods. The `ops-agent` ServiceAccount in `starfleet` is bound to a Role `ops-wide` that allows every verb on every resource, and to `cluster-admin` through the ClusterRoleBinding `ops-agent-admin`. The agent only needs to read pods and their logs in `starfleet`.
+The `ops-agent` ServiceAccount in `starfleet-033-020-02-01` is bound to a Role `ops-wide` that allows every verb on every resource, and to `cluster-admin` through the ClusterRoleBinding `ops-agent-admin`. The agent only needs to read pods and their logs in `starfleet-033-020-02-01`. The namespace also runs two healthy `probe` replicas, an internal Service and two client pods.
 
 Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
 
@@ -20,12 +18,21 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-02-01" ||
 
 Keep this connection selected. Every script supplied by the lab refuses a different context.
 
-## Required result
+Allow about 8 minutes for the tasks. Cluster startup adds time.
 
-Remove every route by which the `ops-agent` ServiceAccount in `starfleet` has wildcard or cluster-wide authority. Then give it exactly this access in the `starfleet` namespace: `get` and `list` on `pods`, and `get` on `pods/log`. Name the new Role `ops-agent-reader` and its RoleBinding `ops-agent-reader`.
+## Tasks
 
-After the change, `kubectl auth can-i` as the ServiceAccount must answer `yes` for listing pods, getting pods and getting pod logs in `starfleet`. It must answer `no` for deleting pods, getting secrets and creating deployments in `starfleet`, for listing pods in `outpost`, and for listing nodes. The old Role `ops-wide`, the old RoleBinding `ops-wide` and the ClusterRoleBinding `ops-agent-admin` must no longer exist. Do not change the workloads.
+1. Remove the cluster-wide authority: delete the ClusterRoleBinding `ops-agent-admin`.
+2. Remove the wildcard authority: delete the RoleBinding `ops-wide` and the Role `ops-wide`.
+3. Give `ops-agent` exactly this access in `starfleet-033-020-02-01`: `get` and `list` on `pods`, and `get` on `pods/log`. Name the new Role `ops-agent-reader` and its RoleBinding `ops-agent-reader`.
+4. Prove the result with `kubectl auth can-i` as the ServiceAccount: `yes` for listing pods, getting pods and getting pod logs in `starfleet-033-020-02-01`; `no` for deleting pods, getting secrets and creating deployments there, for listing pods in `outpost-033-020-02-01`, and for listing nodes.
 
-## Verify The Result
+## Constraints
 
-The grader checks the required object fields and the answers of `kubectl auth can-i`. Wait for the rollout to finish before you submit. Preserve the namespaces, workload names and unrelated components.
+- Remove every route by which `ops-agent` has wildcard or cluster-wide authority.
+- Do not change the workloads or the ServiceAccount itself.
+- Preserve the namespaces, the workload names and every unrelated component.
+
+## How the answer is checked
+
+The grader runs three checks: `ops-agent` has no binding to `cluster-admin` and cannot list nodes or pods in `outpost-033-020-02-01`; the RoleBinding `ops-wide` is gone and no Role bound to `ops-agent` has a wildcard; and the RoleBinding `ops-agent-reader` gives exactly the read access above, with `kubectl auth can-i` answering `no` for the other requests.

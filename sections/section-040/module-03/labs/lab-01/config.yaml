@@ -13,6 +13,8 @@ runtime:
     preloadImages:
     - docker.io/library/python:3.13-alpine
     - docker.io/library/busybox:1.37.0
+    nodes:
+      workers: 1
 bootstrap:
   init:
   - name: seed-lab
@@ -22,11 +24,36 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-contract-and-behavior
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: relay-non-root
+    description: The relay pod runs as user 1000 and requires a non-root user
+    type: file
+    source: validation/validate-relay-non-root.sh
+    points: 1
+  - name: relay-seccomp
+    description: The relay pod runs with the RuntimeDefault seccomp filter
+    type: file
+    source: validation/validate-relay-seccomp.sh
+    points: 1
+  - name: relay-no-escalation
+    description: The relay container is not privileged and blocks privilege escalation
+    type: file
+    source: validation/validate-relay-no-escalation.sh
+    points: 1
+  - name: relay-capabilities
+    description: The relay container keeps only NET_BIND_SERVICE
+    type: file
+    source: validation/validate-relay-capabilities.sh
+    points: 1

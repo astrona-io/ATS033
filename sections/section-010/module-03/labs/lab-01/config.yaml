@@ -24,11 +24,41 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: no-host-namespaces
+    description: The beacon pod shares no host namespace
+    type: file
+    source: validation/validate-no-host-namespaces.sh
+    points: 1
+  - name: no-host-path
+    description: The beacon pod mounts no hostPath volume
+    type: file
+    source: validation/validate-no-host-path.sh
+    points: 1
+  - name: unprivileged-container
+    description: The beacon container runs without privilege, escalation or capabilities as a non-root user
+    type: file
+    source: validation/validate-unprivileged-container.sh
+    points: 2
+  - name: baseline-enforced
+    description: The namespace enforces the baseline Pod Security Standard
+    type: file
+    source: validation/validate-baseline-enforced.sh
+    points: 1
+  - name: workload-review-record
+    description: ConfigMap workload-review records the hardened workload
+    type: file
+    source: validation/validate-workload-review-record.sh
+    points: 1

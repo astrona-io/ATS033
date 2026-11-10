@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: beacon
-  namespace: starfleet
+  namespace: starfleet-033-010-03-01
 spec:
   replicas: 1
   selector:

@@ -24,11 +24,31 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: service-stopped
+    description: training-extra.service is inactive
+    type: file
+    source: validation/validate-service-stopped.sh
+    points: 1
+  - name: service-disabled
+    description: training-extra.service does not start at boot
+    type: file
+    source: validation/validate-service-disabled.sh
+    points: 1
+  - name: host-review-record
+    description: ConfigMap host-review records the disabled service
+    type: file
+    source: validation/validate-host-review-record.sh
+    points: 1

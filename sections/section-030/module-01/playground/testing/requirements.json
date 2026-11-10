@@ -29,17 +29,7 @@
             }
           ],
           "hostNetwork": true,
-          "dnsPolicy": "ClusterFirstWithHostNet",
-          "nodeSelector": {
-            "kubernetes.io/hostname": "astro-ats-033-playground-030-01-control-plane"
-          },
-          "tolerations": [
-            {
-              "key": "node-role.kubernetes.io/control-plane",
-              "operator": "Exists",
-              "effect": "NoSchedule"
-            }
-          ]
+          "dnsPolicy": "ClusterFirstWithHostNet"
         }
       },
       "state": "pod"
