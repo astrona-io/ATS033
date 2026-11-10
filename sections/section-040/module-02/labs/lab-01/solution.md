@@ -21,7 +21,7 @@ Check what exists on the node. The seccomp directory has no profile for this tas
 ```sh
 node_name="astro-ats-033-lab-040-02-01-control-plane"
 podman exec "$node_name" ls -R /var/lib/kubelet/seccomp
-kubectl -n starfleet get pods
+kubectl -n starfleet-033-040-02-01 get pods
 ```
 
 A seccomp filter decides on the syscall, so the profile must name every variant that removes a file or a directory. `rm` calls `unlinkat` or `unlink`, and `rmdir` removes directories. The default action stays `SCMP_ACT_ALLOW`, because the pod must keep creating and reading files.
@@ -55,7 +55,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: no-delete
-  namespace: starfleet
+  namespace: starfleet-033-040-02-01
 spec:
   restartPolicy: Never
   securityContext:
@@ -82,13 +82,13 @@ kubectl apply -f pod-seccomp-block-delete.yaml
 Observe the actual result. A denied operation returns a nonzero status when the control works. Run denial checks separately from a shell sequence that stops on the first nonzero status.
 
 ```sh
-kubectl -n starfleet wait --for=condition=Ready pod/no-delete --timeout=180s
-kubectl -n starfleet exec no-delete -- grep Seccomp: /proc/1/status
-kubectl -n starfleet exec no-delete -- sh -c 'echo kept > /tmp/keep; cat /tmp/keep'
-kubectl -n starfleet exec no-delete -- rm /tmp/keep
+kubectl -n starfleet-033-040-02-01 wait --for=condition=Ready pod/no-delete --timeout=180s
+kubectl -n starfleet-033-040-02-01 exec no-delete -- grep Seccomp: /proc/1/status
+kubectl -n starfleet-033-040-02-01 exec no-delete -- sh -c 'echo kept > /tmp/keep; cat /tmp/keep'
+kubectl -n starfleet-033-040-02-01 exec no-delete -- rm /tmp/keep
 ```
 
-Write a seccomp profile `block-delete.json` with `defaultAction` `SCMP_ACT_ALLOW` and one rule that returns `SCMP_ACT_ERRNO` for the syscalls `unlink`, `unlinkat` and `rmdir`. Place it on the node at `/var/lib/kubelet/seccomp/profiles/block-delete.json`. The node is the container `astro-ats-033-lab-040-02-01-control-plane`, and `podman cp` copies a file into it. Create Pod `no-delete` in `starfleet` that runs BusyBox with `seccompProfile` type `Localhost` and `localhostProfile` `profiles/block-delete.json`. Writing a file must work and deleting it with `rm` must fail with `Operation not permitted`. Keep the sleeping process running.
+Write a seccomp profile `block-delete.json` with `defaultAction` `SCMP_ACT_ALLOW` and one rule that returns `SCMP_ACT_ERRNO` for the syscalls `unlink`, `unlinkat` and `rmdir`. Place it on the node at `/var/lib/kubelet/seccomp/profiles/block-delete.json`. The node is the container `astro-ats-033-lab-040-02-01-control-plane`, and `podman cp` copies a file into it. Create Pod `no-delete` in `starfleet-033-040-02-01` that runs BusyBox with `seccompProfile` type `Localhost` and `localhostProfile` `profiles/block-delete.json`. Writing a file must work and deleting it with `rm` must fail with `Operation not permitted`. Keep the sleeping process running.
 
 After recording the result, remove this independent lab with `astrona destroy ats-033-lab-040-02-01`.
 

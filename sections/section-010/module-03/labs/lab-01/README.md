@@ -7,4 +7,4 @@ exam_objectives:
 
 Rewrite a Deployment that shares the host namespaces, mounts a host directory and runs privileged, then enforce the baseline Pod Security Standard on its namespace.
 
-The task and solution use a separate pinned kind cluster. Run `testing/smoke.sh` with its private kubeconfig to verify initial rejection and reference success. Static validation is not live evidence. Runtime verification remains pending.
+The task and solution use a separate pinned kind cluster. Run `astrona test` on this folder: `testing/verify-start.sh` checks that every outcome fails on the starting state, then the reference solution is applied and every outcome must pass. Static validation is not live evidence. Runtime verification remains pending.

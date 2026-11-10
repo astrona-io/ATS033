@@ -1,31 +1,34 @@
 {
   "context": "kind-astro-ats-033-lab-010-03-01",
+  "cluster": "astro-ats-033-lab-010-03-01",
+  "namespace": "starfleet-033-010-03-01",
   "resources": [
     {
       "kind": "configmap",
       "name": "workload-review",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-010-03-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "ConfigMap",
         "metadata": {
           "name": "workload-review",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-010-03-01"
         },
         "data": {
           "workload": "beacon",
           "result": "hardened"
         }
-      }
+      },
+      "outcome": "workload-review-record"
     },
     {
       "kind": "deployment",
       "name": "beacon",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-010-03-01",
       "expected": {
         "metadata": {
           "name": "beacon",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-010-03-01"
         }
       },
       "state": "deployment"

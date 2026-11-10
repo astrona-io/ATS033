@@ -1,15 +1,16 @@
 {
   "context": "kind-astro-ats-033-lab-040-01-01",
+  "cluster": "astro-ats-033-lab-040-01-01",
+  "namespace": "starfleet-033-040-01-01",
   "resources": [
     {
       "kind": "pod",
       "name": "restricted-reader",
+      "namespace": "starfleet-033-040-01-01",
       "expected": {
-        "apiVersion": "v1",
-        "kind": "Pod",
         "metadata": {
           "name": "restricted-reader",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-040-01-01"
         },
         "spec": {
           "restartPolicy": "Never",
@@ -21,7 +22,64 @@
                 "sh",
                 "-c",
                 "sleep 3600"
-              ],
+              ]
+            }
+          ]
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "restricted-reader",
+      "namespace": "starfleet-033-040-01-01",
+      "expected": {
+        "metadata": {
+          "name": "restricted-reader",
+          "namespace": "starfleet-033-040-01-01"
+        },
+        "spec": {
+          "securityContext": {
+            "runAsNonRoot": true,
+            "runAsUser": 1000,
+            "runAsGroup": 1000,
+            "fsGroup": 1000
+          }
+        }
+      },
+      "outcome": "reader-identity"
+    },
+    {
+      "kind": "pod",
+      "name": "restricted-reader",
+      "namespace": "starfleet-033-040-01-01",
+      "expected": {
+        "metadata": {
+          "name": "restricted-reader",
+          "namespace": "starfleet-033-040-01-01"
+        },
+        "spec": {
+          "securityContext": {
+            "seccompProfile": {
+              "type": "RuntimeDefault"
+            }
+          }
+        }
+      },
+      "outcome": "reader-seccomp"
+    },
+    {
+      "kind": "pod",
+      "name": "restricted-reader",
+      "namespace": "starfleet-033-040-01-01",
+      "expected": {
+        "metadata": {
+          "name": "restricted-reader",
+          "namespace": "starfleet-033-040-01-01"
+        },
+        "spec": {
+          "containers": [
+            {
               "securityContext": {
                 "allowPrivilegeEscalation": false,
                 "capabilities": {
@@ -30,33 +88,24 @@
                   ]
                 },
                 "readOnlyRootFilesystem": true
-              },
-              "volumeMounts": [
-                {
-                  "name": "scratch",
-                  "mountPath": "/scratch"
-                }
-              ]
-            }
-          ],
-          "securityContext": {
-            "runAsNonRoot": true,
-            "runAsUser": 1000,
-            "runAsGroup": 1000,
-            "fsGroup": 1000,
-            "seccompProfile": {
-              "type": "RuntimeDefault"
-            }
-          },
-          "volumes": [
-            {
-              "name": "scratch",
-              "emptyDir": {}
+              }
             }
           ]
         }
       },
-      "state": "pod"
+      "outcome": "reader-container-hardening"
+    },
+    {
+      "kind": "pod",
+      "name": "restricted-reader",
+      "namespace": "starfleet-033-040-01-01",
+      "expected": {
+        "metadata": {
+          "name": "restricted-reader",
+          "namespace": "starfleet-033-040-01-01"
+        }
+      },
+      "outcome": "reader-scratch-volume"
     }
   ],
   "behavior": [
@@ -64,20 +113,21 @@
       "args": [
         "kubectl",
         "-n",
-        "starfleet",
+        "starfleet-033-040-01-01",
         "exec",
         "restricted-reader",
         "--",
         "id",
         "-u"
       ],
-      "equals": "1000"
+      "equals": "1000",
+      "outcome": "reader-identity"
     },
     {
       "args": [
         "kubectl",
         "-n",
-        "starfleet",
+        "starfleet-033-040-01-01",
         "exec",
         "restricted-reader",
         "--",
@@ -85,13 +135,14 @@
         "-c",
         "printf allowed > /scratch/result; cat /scratch/result"
       ],
-      "equals": "allowed"
+      "equals": "allowed",
+      "outcome": "reader-scratch-volume"
     },
     {
       "args": [
         "kubectl",
         "-n",
-        "starfleet",
+        "starfleet-033-040-01-01",
         "exec",
         "restricted-reader",
         "--",
@@ -102,7 +153,8 @@
       "denied": true,
       "failure_markers": [
         "read-only file system"
-      ]
+      ],
+      "outcome": "reader-container-hardening"
     }
   ]
 }

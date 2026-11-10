@@ -23,7 +23,7 @@ The isolated environment has two healthy probe replicas, an internal Service and
 Inspect the current objects before changing them:
 
 ```sh
-kubectl -n starfleet get pods -o wide
+kubectl -n starfleet-033-030-01-01 get pods -o wide
 kubectl get nodes -o wide
 ```
 
@@ -36,7 +36,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: node-local-server
-  namespace: starfleet
+  namespace: starfleet-033-030-01-01
 spec:
   restartPolicy: Never
   containers:
@@ -70,8 +70,8 @@ kubectl apply -f pod-node-local-server.yaml
 Observe the actual result. A denied request returns a nonzero status when the denial works, so run it separately from a shell sequence that stops on error. Status convergence and a successful request establish different parts of the result.
 
 ```sh
-kubectl -n starfleet wait --for=condition=Ready pod/node-local-server --timeout=180s
-kubectl -n starfleet exec node-local-server -- python -c 'import urllib.request; print(urllib.request.urlopen('"'"'http://127.0.0.1:19090/'"'"',timeout=3).status)'
+kubectl -n starfleet-033-030-01-01 wait --for=condition=Ready pod/node-local-server --timeout=180s
+kubectl -n starfleet-033-030-01-01 exec node-local-server -- python -c 'import urllib.request; print(urllib.request.urlopen('"'"'http://127.0.0.1:19090/'"'"',timeout=3).status)'
 ```
 
 Keep a node-local management-style service reachable locally while closing its node-address listener. The commands above deliberately target one environment. Keep its remaining components available so an unrelated failure cannot stand in for the required denial or correction. No example command output is presented as evidence of a completed run. A matching field alone does not establish that a process used it or that a controller reconciled it.

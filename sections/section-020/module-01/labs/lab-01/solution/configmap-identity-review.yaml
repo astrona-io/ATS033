@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: identity-review
-  namespace: starfleet
+  namespace: starfleet-033-020-01-01
 data:
   identity: training-reader
   result: scoped-read

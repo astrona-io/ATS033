@@ -3,17 +3,11 @@ draft: true
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
-# Run With A Restricted Security Context
+# Question
 
-Keep a non-root workload functional with a read-only root filesystem and a writable scratch volume. Use the isolated `starfleet` environment to verify the result.
+Solve this question on: `terminal`
 
-## Objective
-
-Keep a non-root workload functional with a read-only root filesystem and a writable scratch volume.
-
-## Starting state
-
-The application and client fixtures are healthy. Complete the required change without replacing unrelated resources.
+A reader workload must run with the smallest set of rights that still lets it work: no root, no extra privileges and no writes outside one scratch directory. The namespace `starfleet-033-040-01-01` has healthy application and client fixtures. The pod does not exist yet.
 
 Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
 
@@ -24,13 +18,20 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-01-01" ||
 
 Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
 
+Allow about 8 minutes for the tasks. Cluster startup adds time.
 
-## Required result
+## Tasks
 
-Create Pod `restricted-reader` running BusyBox as user and group 1000, with `runAsNonRoot: true`, RuntimeDefault seccomp and group-writable emptyDir `scratch` mounted at `/scratch`. Its container must disable privilege escalation, drop all capabilities and use a read-only root filesystem. Writing in scratch must work; writing `/root-file` must fail. Keep the sleeping process running.
+1. Create the pod `restricted-reader` in `starfleet-033-040-01-01` with `restartPolicy: Never` and one container `reader` that runs `docker.io/library/busybox:1.37.0` with the command `sh -c "sleep 3600"`. At pod level, run as user and group 1000 with `runAsNonRoot: true`, `fsGroup: 1000` and the `RuntimeDefault` seccomp profile.
+2. Harden the `reader` container: disable privilege escalation, drop all capabilities and use a read-only root filesystem.
+3. Mount an `emptyDir` volume named `scratch` at `/scratch`. Writing in `/scratch` must work; writing `/root-file` must fail.
+4. Confirm that `/proc/1/status` in the running container reports `Seccomp: 2` and `NoNewPrivs: 1`.
 
-## Verify The Result
+## Constraints
 
-The grader checks the stated resource fields and live evidence. Wait for controller convergence before submitting. Inspect actual results rather than relying on a sample transcript.
+- Keep the sleeping process running.
+- Complete the change without replacing unrelated resources.
 
-Verify `/proc/1/status` reports `Seccomp: 2` and `NoNewPrivs: 1` in the running reader. This confirms an installed seccomp filter. AppArmor requires a separately available kernel implementation and profile; this exercise does not claim AppArmor coverage.
+## How the answer is checked
+
+The grader runs four checks: the pod runs as user and group 1000 and requires a non-root user; it runs with the `RuntimeDefault` seccomp filter (`Seccomp: 2`); the container blocks escalation (`NoNewPrivs: 1`), drops all capabilities and cannot write `/root-file`; and the `scratch` volume is mounted and writable. `Seccomp: 2` confirms an installed seccomp filter. AppArmor requires a separately available kernel implementation and profile; this exercise does not claim AppArmor coverage.

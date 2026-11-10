@@ -24,11 +24,26 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: anonymous-auth-disabled
+    description: The worker kubelet rejects anonymous requests with 401
+    type: file
+    source: validation/validate-anonymous-auth-disabled.sh
+    points: 1
+  - name: webhook-authorization
+    description: The worker kubelet authorization mode is Webhook
+    type: file
+    source: validation/validate-webhook-authorization.sh
+    points: 1

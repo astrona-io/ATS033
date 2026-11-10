@@ -1,12 +1,16 @@
-import json,subprocess,tempfile
+import json,os,subprocess,sys,tempfile
 from pathlib import Path
-CONTEXT="kind-astro-ats-033-lab-020-01-01"
-NODE="astro-ats-033-lab-020-01-01-control-plane"
+CONTEXT = os.environ.get('ASTRONA_KUBE_CONTEXT') or 'kind-astro-ats-033-lab-020-01-01'
+CLUSTER = os.environ.get('ASTRONA_KIND_CLUSTER') or 'astro-ats-033-lab-020-01-01'
+ENGINE = os.environ.get('ASTRONA_CONTAINER_ENGINE') or 'podman'
+NODE = CLUSTER + '-control-plane'
 def run(*args):
     result=subprocess.run(args,check=True,text=True,capture_output=True,timeout=30)
     return result.stdout.strip()
-assert run('kubectl','config','current-context')==CONTEXT, 'Select the private environment'
-assert run('podman','inspect',NODE,'--format','{{index .Config.Labels "io.x-k8s.kind.cluster"}}')=='astro-ats-033-lab-020-01-01', 'Refusing an unrelated node container'
-def node(*args):return run('podman','exec',NODE,*args)
+if run('kubectl', 'config', 'current-context') != CONTEXT:
+    sys.exit('Refusing to operate on another Kubernetes context')
+if run(ENGINE, 'inspect', NODE, '--format', '{{index .Config.Labels "io.x-k8s.kind.cluster"}}') != CLUSTER:
+    sys.exit('Refusing an unrelated node container')
+def node(*args):return run(ENGINE,'exec',NODE,*args)
 
 node('usermod','--append','--groups','training-readers','training-reader')

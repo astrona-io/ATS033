@@ -13,6 +13,8 @@ runtime:
     preloadImages:
     - docker.io/library/python:3.13-alpine
     - docker.io/library/busybox:1.37.0
+    nodes:
+      workers: 1
 bootstrap:
   init:
   - name: seed-lab
@@ -22,11 +24,36 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-contract-and-behavior
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: reader-identity
+    description: restricted-reader runs as user and group 1000 and requires a non-root user
+    type: file
+    source: validation/validate-reader-identity.sh
+    points: 1
+  - name: reader-seccomp
+    description: restricted-reader runs with the RuntimeDefault seccomp filter
+    type: file
+    source: validation/validate-reader-seccomp.sh
+    points: 1
+  - name: reader-container-hardening
+    description: The reader container blocks escalation, drops all capabilities and has a read-only root filesystem
+    type: file
+    source: validation/validate-reader-container-hardening.sh
+    points: 1
+  - name: reader-scratch-volume
+    description: restricted-reader can write to the emptyDir scratch at /scratch
+    type: file
+    source: validation/validate-reader-scratch-volume.sh
+    points: 1

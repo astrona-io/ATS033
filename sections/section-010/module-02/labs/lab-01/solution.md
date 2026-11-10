@@ -33,7 +33,7 @@ Change only the control-plane node of this environment.
 2. Make the first `PasswordAuthentication` value that sshd reads `no`. Keep `PubkeyAuthentication` set to `yes`.
 3. Allow only the account `opsadmin` with an `AllowUsers` line.
 4. Give `olduser` the login shell `/usr/sbin/nologin` and lock its password. Do not delete the account and do not change `opsadmin`.
-5. Create the ConfigMap `node-access-review` in the `starfleet` namespace with the data `ssh: key-only`, `account: olduser` and `result: hardened`.
+5. Create the ConfigMap `node-access-review` in the `starfleet-033-010-02-01` namespace with the data `ssh: key-only`, `account: olduser` and `result: hardened`.
 
 The `kubelet` and `containerd` services must stay active and the API readiness endpoint must answer.
 
@@ -64,7 +64,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: node-access-review
-  namespace: starfleet
+  namespace: starfleet-033-010-02-01
 data:
   ssh: key-only
   account: olduser

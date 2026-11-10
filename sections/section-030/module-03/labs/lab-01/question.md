@@ -3,13 +3,11 @@ draft: true
 exam_objectives:
 - Minimize external access to the network
 ---
-# Close The Kubelet API To Anonymous Callers
+# Question
 
-A node was set up for debugging. Its kubelet accepts anonymous requests and allows every request it receives. Anyone who can reach port 10250 of that node can list its pods.
+Solve this question on: `terminal`
 
-## Starting state
-
-The cluster has one control-plane node and one worker node. The kubelet on the worker node has `authentication.anonymous.enabled` set to `true` and `authorization.mode` set to `AlwaysAllow` in `/var/lib/kubelet/config.yaml`. The node is `Ready`.
+A node was set up for debugging. Its kubelet accepts anonymous requests and allows every request it receives, so anyone who can reach port 10250 of that node can list its pods. The cluster has one control-plane node and one worker node. The kubelet on the worker node has `authentication.anonymous.enabled` set to `true` and `authorization.mode` set to `AlwaysAllow` in `/var/lib/kubelet/config.yaml`. The node is `Ready`.
 
 Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
 
@@ -22,10 +20,21 @@ worker_name="astro-ats-033-lab-030-03-01-worker"
 
 Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
 
-## Required result
+Allow about 8 minutes for the tasks. Cluster startup adds time.
 
-On the worker node, set `authentication.anonymous.enabled` to `false` and `authorization.mode` to `Webhook` in `/var/lib/kubelet/config.yaml`, and restart the kubelet. Keep `authentication.webhook.enabled` as it is. The worker node must be `Ready`, and an unauthenticated request to `https://127.0.0.1:10250/pods` from inside the worker container must return status 401.
+## Tasks
 
-## Verify The Result
+1. On the worker node, set `authentication.anonymous.enabled` to `false` in `/var/lib/kubelet/config.yaml`.
+2. In the same file, set `authorization.mode` to `Webhook`.
+3. Restart the kubelet, and confirm that an unauthenticated request to `https://127.0.0.1:10250/pods` from inside the worker container returns status 401.
 
-The grader checks the resource fields and live requests. Wait for the changes to settle, then repeat your own test requests before you submit.
+## Constraints
+
+- Change only the kubelet configuration of the worker node. Keep `authentication.webhook.enabled` as it is.
+- The worker node must be `Ready`.
+
+## How the answer is checked
+
+The grader runs two checks: the worker kubelet configuration disables anonymous authentication and an unauthenticated request returns 401; and its authorization mode is `Webhook`. Every check also needs the worker node to be `Ready`.
+
+Hint: `podman exec "$worker_name" systemctl restart kubelet` restarts the kubelet inside the worker container.

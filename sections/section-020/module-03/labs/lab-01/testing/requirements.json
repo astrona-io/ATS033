@@ -1,16 +1,18 @@
 {
   "context": "kind-astro-ats-033-lab-020-03-01",
+  "cluster": "astro-ats-033-lab-020-03-01",
+  "namespace": "starfleet-033-020-03-01",
   "resources": [
     {
       "kind": "deployment",
       "name": "probe",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-020-03-01",
       "expected": {
         "apiVersion": "apps/v1",
         "kind": "Deployment",
         "metadata": {
           "name": "probe",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-020-03-01"
         },
         "spec": {
           "replicas": 2,
@@ -27,13 +29,13 @@
     {
       "kind": "pod",
       "name": "shuttle",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-020-03-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "Pod",
         "metadata": {
           "name": "shuttle",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-020-03-01"
         }
       },
       "state": "pod"
@@ -41,13 +43,13 @@
     {
       "kind": "pod",
       "name": "drifter",
-      "namespace": "outpost",
+      "namespace": "outpost-033-020-03-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "Pod",
         "metadata": {
           "name": "drifter",
-          "namespace": "outpost"
+          "namespace": "outpost-033-020-03-01"
         }
       },
       "state": "pod"
@@ -55,27 +57,28 @@
     {
       "kind": "serviceaccount",
       "name": "monitor",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-020-03-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "ServiceAccount",
         "metadata": {
           "name": "monitor",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-020-03-01"
         },
         "automountServiceAccountToken": false
-      }
+      },
+      "outcome": "monitor-without-token"
     },
     {
       "kind": "deployment",
       "name": "monitor",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-020-03-01",
       "expected": {
         "apiVersion": "apps/v1",
         "kind": "Deployment",
         "metadata": {
           "name": "monitor",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-020-03-01"
         }
       },
       "state": "deployment"
@@ -89,14 +92,15 @@
         "can-i",
         "list",
         "pods",
-        "--as=system:serviceaccount:starfleet:default",
+        "--as=system:serviceaccount:starfleet-033-020-03-01:default",
         "-n",
-        "starfleet"
+        "starfleet-033-020-03-01"
       ],
       "denied": true,
       "failure_markers": [
         "no"
-      ]
+      ],
+      "outcome": "default-account-closed"
     },
     {
       "args": [
@@ -105,14 +109,15 @@
         "can-i",
         "get",
         "secrets",
-        "--as=system:serviceaccount:starfleet:default",
+        "--as=system:serviceaccount:starfleet-033-020-03-01:default",
         "-n",
-        "starfleet"
+        "starfleet-033-020-03-01"
       ],
       "denied": true,
       "failure_markers": [
         "no"
-      ]
+      ],
+      "outcome": "default-account-closed"
     },
     {
       "args": [
@@ -121,14 +126,15 @@
         "can-i",
         "list",
         "pods",
-        "--as=system:serviceaccount:starfleet:monitor",
+        "--as=system:serviceaccount:starfleet-033-020-03-01:monitor",
         "-n",
-        "starfleet"
+        "starfleet-033-020-03-01"
       ],
       "denied": true,
       "failure_markers": [
         "no"
-      ]
+      ],
+      "outcome": "monitor-without-token"
     }
   ]
 }

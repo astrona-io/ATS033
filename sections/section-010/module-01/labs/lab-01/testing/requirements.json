@@ -1,22 +1,25 @@
 {
   "context": "kind-astro-ats-033-lab-010-01-01",
+  "cluster": "astro-ats-033-lab-010-01-01",
+  "namespace": "starfleet-033-010-01-01",
   "resources": [
     {
       "kind": "configmap",
       "name": "host-review",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-010-01-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "ConfigMap",
         "metadata": {
           "name": "host-review",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-010-01-01"
         },
         "data": {
           "service": "training-extra.service",
           "result": "disabled"
         }
-      }
+      },
+      "outcome": "host-review-record"
     }
   ],
   "behavior": [

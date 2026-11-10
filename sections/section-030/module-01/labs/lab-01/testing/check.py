@@ -1,11 +1,48 @@
 #!/usr/bin/env python3
-"""Read resource contracts and run bounded behavior checks in one lab context."""
+"""Grade a lab: resource contracts, bounded behavior checks and live.py.
+
+Run with no argument to grade the whole lab, or with an outcome id to grade
+one outcome. Each entry in requirements.json and each `if wants(...)` block
+in live.py belongs to one outcome; an entry without an outcome is a guard
+and runs for every outcome. config.yaml lists one validation script per
+outcome (validation/validate-<id>.sh), each with its points. Like ATS020's
+graders it prints one `PASS:` or `FAIL:` line.
+
+Every run first checks that kubectl's current context is the lab's own:
+ASTRONA_KUBE_CONTEXT when astrona sets it (an exam cluster sets its own),
+otherwise the lab mode context in requirements.json. The node containers'
+names and the container engine come from the environment astrona sets too,
+so the same checks run on the lab's own cluster and on an exam cluster.
+"""
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 
 DIRECTORY = Path(__file__).resolve().parent
+REQUIREMENTS = json.loads((DIRECTORY / 'requirements.json').read_text())
+CONTEXT = os.environ.get('ASTRONA_KUBE_CONTEXT') or REQUIREMENTS['context']
+CLUSTER = os.environ.get('ASTRONA_KIND_CLUSTER') or REQUIREMENTS['cluster']
+ENGINE = os.environ.get('ASTRONA_CONTAINER_ENGINE') or 'podman'
+NAMESPACE = REQUIREMENTS['namespace']
+NODE = CLUSTER + '-control-plane'
+WORKER = CLUSTER + '-worker'
+SELECTED = sys.argv[1] if len(sys.argv) > 1 else None
+MATCHED = set()
+
+
+def wants(outcome):
+    """True when this outcome is being graded (or the whole lab is)."""
+    if SELECTED is None or SELECTED == outcome:
+        MATCHED.add(outcome)
+        return True
+    return False
+
+
+def selected(check):
+    outcome = check.get('outcome')
+    return outcome is None or wants(outcome)
 
 
 def command(args, *, success=True):
@@ -19,9 +56,16 @@ def kubectl(*args):
     return command(['kubectl', *args]).stdout.strip()
 
 
-def get(kind, name, namespace='starfleet'):
+def node_exec(node, *args, success=True):
+    """Run a command inside a node container (NODE or WORKER)."""
+    return command([ENGINE, 'exec', node, *args], success=success)
+
+
+def get(kind, name, namespace=NAMESPACE):
     scope = ['-n', namespace] if namespace else []
-    return json.loads(kubectl(*scope, 'get', kind, name, '-o', 'json'))
+    result = command(['kubectl', *scope, 'get', kind, name, '-o', 'json'], success=False)
+    assert result.returncode == 0, f'Missing {kind} {name}' + (f' in namespace {namespace}' if namespace else '')
+    return json.loads(result.stdout)
 
 
 def contains(actual, expected):
@@ -34,7 +78,7 @@ def contains(actual, expected):
 
 
 def resource_check(check):
-    resource = get(check['kind'], check['name'], check.get('namespace', 'starfleet'))
+    resource = get(check['kind'], check['name'], check.get('namespace', NAMESPACE))
     assert contains(resource, check['expected']), 'Required resource fields differ: ' + check['name']
     state = check.get('state')
     status = resource.get('status', {})
@@ -71,21 +115,24 @@ def behavior_check(check):
 
 
 def main():
-    requirements = json.loads((DIRECTORY / 'requirements.json').read_text())
-    assert kubectl('config', 'current-context') == requirements['context'], 'Refusing to operate on another Kubernetes context'
-    for check in requirements['resources']:
-        resource_check(check)
-    for check in requirements.get('behavior', []):
-        behavior_check(check)
+    if kubectl('config', 'current-context') != CONTEXT:
+        sys.exit('Refusing to operate on another Kubernetes context')
+    for check in REQUIREMENTS.get('resources', []):
+        if selected(check):
+            resource_check(check)
+    for check in REQUIREMENTS.get('behavior', []):
+        if selected(check):
+            behavior_check(check)
     extra = DIRECTORY / 'live.py'
     if extra.exists():
         exec(compile(extra.read_text(), str(extra), 'exec'), globals())
-    print('Required resource contract and behavior verified')
+    assert SELECTED is None or SELECTED in MATCHED, 'Unknown outcome: ' + SELECTED
+    print('PASS: ' + (SELECTED or 'every outcome'))
 
 
 if __name__ == '__main__':
     try:
         main()
     except (AssertionError, KeyError, ValueError, subprocess.SubprocessError) as error:
-        print(str(error), file=sys.stderr)
+        print('FAIL: ' + str(error))
         sys.exit(1)

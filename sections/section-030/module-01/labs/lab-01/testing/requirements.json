@@ -1,16 +1,33 @@
 {
   "context": "kind-astro-ats-033-lab-030-01-01",
+  "cluster": "astro-ats-033-lab-030-01-01",
+  "namespace": "starfleet-033-030-01-01",
   "resources": [
     {
       "kind": "pod",
       "name": "node-local-server",
-      "namespace": "starfleet",
+      "namespace": "starfleet-033-030-01-01",
+      "expected": {
+        "metadata": {
+          "name": "node-local-server"
+        },
+        "spec": {
+          "hostNetwork": true
+        }
+      },
+      "state": "pod",
+      "outcome": "node-local-server"
+    },
+    {
+      "kind": "pod",
+      "name": "node-local-server",
+      "namespace": "starfleet-033-030-01-01",
       "expected": {
         "apiVersion": "v1",
         "kind": "Pod",
         "metadata": {
           "name": "node-local-server",
-          "namespace": "starfleet"
+          "namespace": "starfleet-033-030-01-01"
         },
         "spec": {
           "restartPolicy": "Never",
@@ -29,20 +46,11 @@
             }
           ],
           "hostNetwork": true,
-          "dnsPolicy": "ClusterFirstWithHostNet",
-          "nodeSelector": {
-            "kubernetes.io/hostname": "astro-ats-033-lab-030-01-01-control-plane"
-          },
-          "tolerations": [
-            {
-              "key": "node-role.kubernetes.io/control-plane",
-              "operator": "Exists",
-              "effect": "NoSchedule"
-            }
-          ]
+          "dnsPolicy": "ClusterFirstWithHostNet"
         }
       },
-      "state": "pod"
+      "state": "pod",
+      "outcome": "loopback-only"
     }
   ],
   "behavior": [
@@ -50,7 +58,7 @@
       "args": [
         "kubectl",
         "-n",
-        "starfleet",
+        "starfleet-033-030-01-01",
         "exec",
         "node-local-server",
         "--",
@@ -58,7 +66,8 @@
         "-c",
         "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:19090/',timeout=3).status)"
       ],
-      "equals": "200"
+      "equals": "200",
+      "outcome": "node-local-server"
     }
   ]
 }

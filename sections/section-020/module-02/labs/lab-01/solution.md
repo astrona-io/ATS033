@@ -19,11 +19,11 @@ Keep this connection selected. Every script supplied by the lab refuses a differ
 Start with the identity and the objects that bind it. Look at the Role, the RoleBinding and the ClusterRoleBinding, and ask the API server what the ServiceAccount may do.
 
 ```sh
-account=system:serviceaccount:starfleet:ops-agent
-kubectl -n starfleet get role ops-wide -o yaml
-kubectl -n starfleet get rolebinding ops-wide -o wide
+account=system:serviceaccount:starfleet-033-020-02-01:ops-agent
+kubectl -n starfleet-033-020-02-01 get role ops-wide -o yaml
+kubectl -n starfleet-033-020-02-01 get rolebinding ops-wide -o wide
 kubectl get clusterrolebinding ops-agent-admin -o wide
-kubectl auth can-i delete secrets --as="$account" -n outpost
+kubectl auth can-i delete secrets --as="$account" -n outpost-033-020-02-01
 ```
 
 The last command answers `yes`, because the ClusterRoleBinding to `cluster-admin` applies in every namespace. Deleting only the Role would leave that path open.
@@ -37,7 +37,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: ops-agent-reader
-  namespace: starfleet
+  namespace: starfleet-033-020-02-01
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -54,11 +54,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: ops-agent-reader
-  namespace: starfleet
+  namespace: starfleet-033-020-02-01
 subjects:
 - kind: ServiceAccount
   name: ops-agent
-  namespace: starfleet
+  namespace: starfleet-033-020-02-01
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -77,8 +77,8 @@ RBAC only adds permissions, so the wide access stays until you delete the bindin
 
 ```sh
 kubectl delete clusterrolebinding ops-agent-admin
-kubectl -n starfleet delete rolebinding ops-wide
-kubectl -n starfleet delete role ops-wide
+kubectl -n starfleet-033-020-02-01 delete rolebinding ops-wide
+kubectl -n starfleet-033-020-02-01 delete role ops-wide
 ```
 
 ## Verify the result
@@ -86,13 +86,13 @@ kubectl -n starfleet delete role ops-wide
 Ask the questions as the ServiceAccount. The first three must answer `yes`. The last five must answer `no`, and `kubectl auth can-i` ends with a nonzero status when the answer is `no`, so run the commands one at a time.
 
 ```sh
-kubectl auth can-i list pods --as="$account" -n starfleet
-kubectl auth can-i get pods --as="$account" -n starfleet
-kubectl auth can-i get pods/log --as="$account" -n starfleet
-kubectl auth can-i delete pods --as="$account" -n starfleet
-kubectl auth can-i get secrets --as="$account" -n starfleet
-kubectl auth can-i create deployments --as="$account" -n starfleet
-kubectl auth can-i list pods --as="$account" -n outpost
+kubectl auth can-i list pods --as="$account" -n starfleet-033-020-02-01
+kubectl auth can-i get pods --as="$account" -n starfleet-033-020-02-01
+kubectl auth can-i get pods/log --as="$account" -n starfleet-033-020-02-01
+kubectl auth can-i delete pods --as="$account" -n starfleet-033-020-02-01
+kubectl auth can-i get secrets --as="$account" -n starfleet-033-020-02-01
+kubectl auth can-i create deployments --as="$account" -n starfleet-033-020-02-01
+kubectl auth can-i list pods --as="$account" -n outpost-033-020-02-01
 kubectl auth can-i list nodes --as="$account"
 ```
 

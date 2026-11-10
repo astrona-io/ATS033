@@ -21,8 +21,8 @@ The application and client fixtures are healthy. Complete the required change wi
 Inspect the relevant evidence:
 
 ```sh
-kubectl -n starfleet get pods
-kubectl -n starfleet get deployment probe -o yaml
+kubectl -n starfleet-033-040-01-01 get pods
+kubectl -n starfleet-033-040-01-01 get deployment probe -o yaml
 ```
 
 Container security settings control process privileges and filesystem writes. A read-only root filesystem does not make a mounted emptyDir read-only. The Pod group setting lets the non-root process use that volume. Verify both the allowed scratch write and the denied root filesystem write.
@@ -35,7 +35,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restricted-reader
-  namespace: starfleet
+  namespace: starfleet-033-040-01-01
 spec:
   restartPolicy: Never
   containers:
@@ -77,10 +77,10 @@ kubectl apply -f pod-restricted-reader.yaml
 Observe the actual result. A denied-request command returns a nonzero status when the denial works. Run denial checks separately from a shell sequence that stops on the first nonzero status.
 
 ```sh
-kubectl -n starfleet wait --for=condition=Ready pod/restricted-reader --timeout=180s
-kubectl -n starfleet exec restricted-reader -- id -u
-kubectl -n starfleet exec restricted-reader -- sh -c 'printf allowed > /scratch/result; cat /scratch/result'
-kubectl -n starfleet exec restricted-reader -- sh -c 'printf denied > /root-file'
+kubectl -n starfleet-033-040-01-01 wait --for=condition=Ready pod/restricted-reader --timeout=180s
+kubectl -n starfleet-033-040-01-01 exec restricted-reader -- id -u
+kubectl -n starfleet-033-040-01-01 exec restricted-reader -- sh -c 'printf allowed > /scratch/result; cat /scratch/result'
+kubectl -n starfleet-033-040-01-01 exec restricted-reader -- sh -c 'printf denied > /root-file'
 ```
 
 Create Pod `restricted-reader` running BusyBox as user and group 1000, with `runAsNonRoot: true`, RuntimeDefault seccomp and group-writable emptyDir `scratch` mounted at `/scratch`. Its container must disable privilege escalation, drop all capabilities and use a read-only root filesystem. Writing in scratch must work; writing `/root-file` must fail. Keep the sleeping process running.

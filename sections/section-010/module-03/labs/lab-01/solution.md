@@ -19,19 +19,19 @@ Keep this connection selected. Every script supplied with this task refuses a di
 Read what the Deployment asks for before you change it. The first command prints the pod template fields that give host access. The second shows the node address next to the pod address; a pod on the host network has the same address as its node.
 
 ```sh
-kubectl -n starfleet get deployment beacon -o jsonpath='{.spec.template.spec.hostNetwork} {.spec.template.spec.hostPID} {.spec.template.spec.containers[0].securityContext.privileged}{"\n"}'
-kubectl -n starfleet get pods -l app=beacon -o wide
+kubectl -n starfleet-033-010-03-01 get deployment beacon -o jsonpath='{.spec.template.spec.hostNetwork} {.spec.template.spec.hostPID} {.spec.template.spec.containers[0].securityContext.privileged}{"\n"}'
+kubectl -n starfleet-033-010-03-01 get pods -l app=beacon -o wide
 ```
 
 Do not label the namespace first. The `baseline` standard rejects the pods of the current template, so a replacement pod would never be created after the label. Fix the template first.
 
-Change only the `beacon` Deployment and the `starfleet` namespace.
+Change only the `beacon` Deployment and the `starfleet-033-010-03-01` namespace.
 
 1. Remove `hostNetwork`, `hostPID` and `hostIPC` from the pod template.
 2. Replace the `hostPath` volume with an `emptyDir` volume named `scratch`, mounted at `/scratch`.
 3. Make the container run without privilege: `privileged: false`, `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem: true`, `runAsNonRoot: true` with `runAsUser: 10001`, and all capabilities dropped.
-4. After the new pod runs, label the `starfleet` namespace `pod-security.kubernetes.io/enforce=baseline`.
-5. Create the ConfigMap `workload-review` in the `starfleet` namespace with the data `workload: beacon` and `result: hardened`.
+4. After the new pod runs, label the `starfleet-033-010-03-01` namespace `pod-security.kubernetes.io/enforce=baseline`.
+5. Create the ConfigMap `workload-review` in the `starfleet-033-010-03-01` namespace with the data `workload: beacon` and `result: hardened`.
 
 Keep the Deployment name, the label `app: beacon`, the container name `beacon`, the image and the command. One replica must be ready.
 
@@ -42,7 +42,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: beacon
-  namespace: starfleet
+  namespace: starfleet-033-010-03-01
 spec:
   replicas: 1
   selector:
@@ -84,7 +84,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: workload-review
-  namespace: starfleet
+  namespace: starfleet-033-010-03-01
 data:
   workload: beacon
   result: hardened
@@ -94,8 +94,8 @@ Apply the Deployment, wait for the rollout, then label the namespace and record 
 
 ```sh
 kubectl apply -f deployment-beacon.yaml
-kubectl -n starfleet rollout status deployment/beacon --timeout=120s
-kubectl label namespace starfleet pod-security.kubernetes.io/enforce=baseline --overwrite
+kubectl -n starfleet-033-010-03-01 rollout status deployment/beacon --timeout=120s
+kubectl label namespace starfleet-033-010-03-01 pod-security.kubernetes.io/enforce=baseline --overwrite
 kubectl apply -f configmap-workload-review.yaml
 ```
 
@@ -104,9 +104,9 @@ kubectl apply -f configmap-workload-review.yaml
 Check the template, the running pod and the label. A server-side dry run of the same label shows whether any pod in the namespace would still violate the standard.
 
 ```sh
-kubectl -n starfleet get deployment beacon -o jsonpath='{.spec.template.spec.hostNetwork} {.spec.template.spec.volumes}{"\n"}'
-kubectl -n starfleet get pods -l app=beacon -o wide
-kubectl label namespace starfleet pod-security.kubernetes.io/enforce=baseline --overwrite --dry-run=server
+kubectl -n starfleet-033-010-03-01 get deployment beacon -o jsonpath='{.spec.template.spec.hostNetwork} {.spec.template.spec.volumes}{"\n"}'
+kubectl -n starfleet-033-010-03-01 get pods -l app=beacon -o wide
+kubectl label namespace starfleet-033-010-03-01 pod-security.kubernetes.io/enforce=baseline --overwrite --dry-run=server
 kubectl get --raw=/readyz
 ```
 

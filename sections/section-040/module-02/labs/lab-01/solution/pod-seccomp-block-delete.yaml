@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: no-delete
-  namespace: starfleet
+  namespace: starfleet-033-040-02-01
 spec:
   restartPolicy: Never
   securityContext:

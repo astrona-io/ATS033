@@ -23,7 +23,7 @@ The isolated environment has two healthy probe replicas, an internal Service and
 Inspect the current objects before changing them:
 
 ```sh
-kubectl -n starfleet get pods -o wide
+kubectl -n starfleet-033-010-01-01 get pods -o wide
 kubectl get nodes -o wide
 ```
 
@@ -36,7 +36,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: host-review
-  namespace: starfleet
+  namespace: starfleet-033-010-01-01
 data:
   service: training-extra.service
   result: disabled

@@ -19,10 +19,10 @@ Keep this connection selected. Every script supplied by the lab refuses a differ
 Look at what the pod receives today and which bindings the `default` ServiceAccount holds.
 
 ```sh
-kubectl -n starfleet get deployment monitor -o jsonpath='{.spec.template.spec.serviceAccountName}{"\n"}'
-kubectl -n starfleet exec deploy/monitor -- ls /var/run/secrets/kubernetes.io/serviceaccount
-kubectl -n starfleet get rolebinding default-pod-lister -o wide
-kubectl -n starfleet get secrets --field-selector type=kubernetes.io/service-account-token
+kubectl -n starfleet-033-020-03-01 get deployment monitor -o jsonpath='{.spec.template.spec.serviceAccountName}{"\n"}'
+kubectl -n starfleet-033-020-03-01 exec deploy/monitor -- ls /var/run/secrets/kubernetes.io/serviceaccount
+kubectl -n starfleet-033-020-03-01 get rolebinding default-pod-lister -o wide
+kubectl -n starfleet-033-020-03-01 get secrets --field-selector type=kubernetes.io/service-account-token
 ```
 
 The first command prints nothing, because the pod template names no ServiceAccount and the pod falls back to `default`. The directory holds `ca.crt`, `namespace` and `token`. The Secret `legacy-monitor-token` never expires.
@@ -36,7 +36,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: monitor
-  namespace: starfleet
+  namespace: starfleet-033-020-03-01
 automountServiceAccountToken: false
 ```
 
@@ -47,7 +47,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: monitor
-  namespace: starfleet
+  namespace: starfleet-033-020-03-01
 spec:
   replicas: 1
   selector:
@@ -74,7 +74,7 @@ Apply both and wait for the new pod:
 ```sh
 kubectl apply -f serviceaccount-monitor.yaml
 kubectl apply -f deployment-monitor.yaml
-kubectl -n starfleet rollout status deployment/monitor --timeout=180s
+kubectl -n starfleet-033-020-03-01 rollout status deployment/monitor --timeout=180s
 ```
 
 ## Close the default ServiceAccount and the old token
@@ -86,7 +86,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: default
-  namespace: starfleet
+  namespace: starfleet-033-020-03-01
 automountServiceAccountToken: false
 ```
 
@@ -94,8 +94,8 @@ Apply it, then delete the binding and the Secret:
 
 ```sh
 kubectl apply -f serviceaccount-default.yaml
-kubectl -n starfleet delete rolebinding default-pod-lister
-kubectl -n starfleet delete secret legacy-monitor-token
+kubectl -n starfleet-033-020-03-01 delete rolebinding default-pod-lister
+kubectl -n starfleet-033-020-03-01 delete secret legacy-monitor-token
 ```
 
 ## Verify the result
@@ -103,10 +103,10 @@ kubectl -n starfleet delete secret legacy-monitor-token
 The new pod must have no token directory, and the two ServiceAccounts must be unable to read pods or Secrets.
 
 ```sh
-kubectl -n starfleet exec deploy/monitor -- sh -c 'test -e /var/run/secrets/kubernetes.io/serviceaccount/token && echo mounted || echo absent'
-kubectl auth can-i list pods --as=system:serviceaccount:starfleet:default -n starfleet
-kubectl auth can-i get secrets --as=system:serviceaccount:starfleet:default -n starfleet
-kubectl auth can-i list pods --as=system:serviceaccount:starfleet:monitor -n starfleet
+kubectl -n starfleet-033-020-03-01 exec deploy/monitor -- sh -c 'test -e /var/run/secrets/kubernetes.io/serviceaccount/token && echo mounted || echo absent'
+kubectl auth can-i list pods --as=system:serviceaccount:starfleet-033-020-03-01:default -n starfleet-033-020-03-01
+kubectl auth can-i get secrets --as=system:serviceaccount:starfleet-033-020-03-01:default -n starfleet-033-020-03-01
+kubectl auth can-i list pods --as=system:serviceaccount:starfleet-033-020-03-01:monitor -n starfleet-033-020-03-01
 ```
 
 The first command prints `absent`. The three `can-i` commands print `no`.

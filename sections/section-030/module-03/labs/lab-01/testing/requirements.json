@@ -1,19 +1,7 @@
 {
   "context": "kind-astro-ats-033-lab-030-03-01",
-  "resources": [
-
-  ],
-  "behavior": [
-    {
-      "args": [
-        "kubectl",
-        "get",
-        "node",
-        "astro-ats-033-lab-030-03-01-worker",
-        "-o",
-        "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}"
-      ],
-      "equals": "True"
-    }
-  ]
+  "cluster": "astro-ats-033-lab-030-03-01",
+  "namespace": "starfleet-033-030-03-01",
+  "resources": [],
+  "behavior": []
 }

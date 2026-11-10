@@ -19,8 +19,8 @@ Keep this connection selected throughout the task. Every script supplied by the 
 Look at the current Deployment and the capabilities of its pod:
 
 ```sh
-kubectl -n starfleet get deployment relay -o yaml
-kubectl -n starfleet exec deploy/relay -- grep -E 'CapBnd|NoNewPrivs|Seccomp:' /proc/1/status
+kubectl -n starfleet-033-040-03-01 get deployment relay -o yaml
+kubectl -n starfleet-033-040-03-01 exec deploy/relay -- grep -E 'CapBnd|NoNewPrivs|Seccomp:' /proc/1/status
 ```
 
 The pod is privileged, so it holds every capability and runs without a seccomp filter. Setting `privileged: false` is the first step, because the privileged flag overrides every other restriction. Then drop `ALL` capabilities and add back the single one the workload needs. A non-root user, `allowPrivilegeEscalation: false` and `RuntimeDefault` seccomp finish the change.
@@ -32,7 +32,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: relay
-  namespace: starfleet
+  namespace: starfleet-033-040-03-01
 spec:
   replicas: 1
   selector:
@@ -76,12 +76,12 @@ kubectl apply -f deployment-relay.yaml
 Observe the actual result. A denied operation returns a nonzero status when the control works. Run denial checks separately from a shell sequence that stops on the first nonzero status.
 
 ```sh
-kubectl -n starfleet rollout status deployment/relay --timeout=180s
-kubectl -n starfleet exec deploy/relay -- id -u
-kubectl -n starfleet exec deploy/relay -- grep -E 'CapBnd|NoNewPrivs|Seccomp:' /proc/1/status
+kubectl -n starfleet-033-040-03-01 rollout status deployment/relay --timeout=180s
+kubectl -n starfleet-033-040-03-01 exec deploy/relay -- id -u
+kubectl -n starfleet-033-040-03-01 exec deploy/relay -- grep -E 'CapBnd|NoNewPrivs|Seccomp:' /proc/1/status
 ```
 
-Change Deployment `relay` in `starfleet` and keep its name, selector, image and command. Its pod must set `runAsNonRoot: true`, `runAsUser: 1000` and `RuntimeDefault` seccomp. Its container `relay` must set `privileged: false` and `allowPrivilegeEscalation: false`, drop `ALL` capabilities and add back only `NET_BIND_SERVICE`. The running pod must show `CapBnd` as `0000000000000400`, `NoNewPrivs: 1` and `Seccomp: 2` in `/proc/1/status`, and the Deployment rollout must be complete.
+Change Deployment `relay` in `starfleet-033-040-03-01` and keep its name, selector, image and command. Its pod must set `runAsNonRoot: true`, `runAsUser: 1000` and `RuntimeDefault` seccomp. Its container `relay` must set `privileged: false` and `allowPrivilegeEscalation: false`, drop `ALL` capabilities and add back only `NET_BIND_SERVICE`. The running pod must show `CapBnd` as `0000000000000400`, `NoNewPrivs: 1` and `Seccomp: 2` in `/proc/1/status`, and the Deployment rollout must be complete.
 
 After recording the result, remove this independent lab with `astrona destroy ats-033-lab-040-03-01`.
 

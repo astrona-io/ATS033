@@ -24,11 +24,26 @@ teardown:
   keepCluster: false
 testing:
   init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
   - name: reference-result
     type: file
     source: solution/apply.sh
-validation:
-  script:
-    name: verify-fields-and-live-evidence
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: validate.sh
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: debug-node-port-closed
+    description: probe-debug is a ClusterIP Service and node port 30080 is closed
+    type: file
+    source: validation/validate-debug-node-port-closed.sh
+    points: 1
+  - name: public-local-traffic
+    description: probe-public keeps node port 30081 with externalTrafficPolicy Local
+    type: file
+    source: validation/validate-public-local-traffic.sh
+    points: 1

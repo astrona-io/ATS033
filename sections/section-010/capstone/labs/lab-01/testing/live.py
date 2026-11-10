@@ -1,11 +1,11 @@
-control = 'astro-ats-033-lab-010-capstone-01-control-plane'
-worker = 'astro-ats-033-lab-010-capstone-01-worker'
-assert command(['podman','exec',control,'systemctl','show','training-extra.service','--property=ActiveState','--value']).stdout.strip() == 'inactive', 'Stop the unnecessary service'
-assert command(['podman','exec',control,'systemctl','show','training-extra.service','--property=UnitFileState','--value']).stdout.strip() == 'disabled', 'Disable automatic startup'
+control = NODE
+worker = WORKER
+assert command([ENGINE,'exec',control,'systemctl','show','training-extra.service','--property=ActiveState','--value']).stdout.strip() == 'inactive', 'Stop the unnecessary service'
+assert command([ENGINE,'exec',control,'systemctl','show','training-extra.service','--property=UnitFileState','--value']).stdout.strip() == 'disabled', 'Disable automatic startup'
 for host in (control, worker):
-    assert command(['podman','exec',host,'systemctl','is-active','kubelet']).stdout.strip() == 'active'
-    assert command(['podman','exec',host,'systemctl','is-active','containerd']).stdout.strip() == 'active'
-ssh_text = command(['podman','exec',worker,'sh','-c','cat /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config']).stdout
+    assert command([ENGINE,'exec',host,'systemctl','is-active','kubelet']).stdout.strip() == 'active'
+    assert command([ENGINE,'exec',host,'systemctl','is-active','containerd']).stdout.strip() == 'active'
+ssh_text = command([ENGINE,'exec',worker,'sh','-c','cat /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config']).stdout
 effective = {}
 for line in ssh_text.splitlines():
     fields = line.split(None, 1)
@@ -15,13 +15,13 @@ assert effective.get('permitrootlogin') == 'no', 'Root login over SSH must be re
 assert effective.get('passwordauthentication') == 'no', 'Password logins must be refused by the first value sshd reads'
 assert effective.get('pubkeyauthentication') == 'yes', 'Key logins must stay on'
 assert effective.get('allowusers') == 'opsadmin', 'Only opsadmin may log in'
-old_user = command(['podman','exec',worker,'getent','passwd','olduser']).stdout.strip().split(':')
+old_user = command([ENGINE,'exec',worker,'getent','passwd','olduser']).stdout.strip().split(':')
 assert old_user[6] == '/usr/sbin/nologin', 'Give olduser a shell that refuses logins'
-assert command(['podman','exec',worker,'passwd','-S','olduser']).stdout.split()[1] == 'L', 'Lock the password of olduser'
-ops_user = command(['podman','exec',worker,'getent','passwd','opsadmin']).stdout.strip().split(':')
+assert command([ENGINE,'exec',worker,'passwd','-S','olduser']).stdout.split()[1] == 'L', 'Lock the password of olduser'
+ops_user = command([ENGINE,'exec',worker,'getent','passwd','opsadmin']).stdout.strip().split(':')
 assert ops_user[6] == '/bin/bash', 'opsadmin must keep its login shell'
-assert command(['podman','exec',worker,'systemctl','is-active','kubelet']).stdout.strip() == 'active'
-assert command(['podman','exec',worker,'systemctl','is-active','containerd']).stdout.strip() == 'active'
+assert command([ENGINE,'exec',worker,'systemctl','is-active','kubelet']).stdout.strip() == 'active'
+assert command([ENGINE,'exec',worker,'systemctl','is-active','containerd']).stdout.strip() == 'active'
 beacon = get('deployment', 'beacon')
 pod_spec = beacon['spec']['template']['spec']
 assert not pod_spec.get('hostNetwork') and not pod_spec.get('hostPID') and not pod_spec.get('hostIPC'), 'Remove the host namespaces'
