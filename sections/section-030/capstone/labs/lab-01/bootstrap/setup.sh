@@ -10,7 +10,7 @@ fi
 lab_directory="$(cd "$(dirname "$0")/.." && pwd)"
 node_name="$cluster-control-plane"
 worker_name="$cluster-worker"
-kubectl apply -f "$lab_directory/bootstrap/manifests/start.yaml"
+sed "s/astro-ats-033-lab-030-capstone-01-control-plane/$cluster-control-plane/" "$lab_directory/bootstrap/manifests/start.yaml" | kubectl apply -f -
 kubectl -n starfleet rollout status deployment/probe --timeout=180s
 kubectl -n starfleet wait --for=condition=Ready pod/shuttle --timeout=120s
 kubectl -n outpost wait --for=condition=Ready pod/drifter --timeout=120s

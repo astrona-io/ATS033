@@ -13,7 +13,7 @@ node_name="$cluster-control-plane"
 worker_name="$cluster-worker"
 
 kubectl -n starfleet delete pod node-local-server --ignore-not-found --wait=true
-kubectl apply -f "$solution_directory/pod-node-local-server.yaml"
+sed "s/astro-ats-033-lab-030-capstone-01-control-plane/$cluster-control-plane/" "$solution_directory/pod-node-local-server.yaml" | kubectl apply -f -
 kubectl -n starfleet wait --for=condition=Ready pod/node-local-server --timeout=180s
 kubectl apply -f "$solution_directory/service-probe-debug.yaml"
 kubectl apply -f "$solution_directory/service-probe-public.yaml"
