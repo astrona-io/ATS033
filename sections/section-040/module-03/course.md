@@ -9,7 +9,7 @@ A process in a container often runs as root inside its own namespaces. Root ther
 
 Keep one sentence in mind for this module: **AppArmor says what a program may touch, capabilities say which root powers it keeps, and the securityContext selects both.** You will learn the two AppArmor modes and how to load a profile on a node, select the profile in a pod, and then drop capabilities and block privilege escalation in a pod that runs without `privileged`.
 
-The module has three parts. **AppArmor Modes And Loading Profiles** covers enforce and complain mode, `apparmor_parser` and the need to load a profile on every node. **Select A Profile With appArmorProfile** covers the pod fields and how to verify them. **Drop Capabilities And Block Privilege Escalation** covers capabilities, `allowPrivilegeEscalation: false` and `privileged: false`.
+The module includes a separate QEMU exercise that proves AppArmor file enforcement on an Ubuntu kernel. The Kubernetes readings use the kind playground. **AppArmor Modes And Loading Profiles** covers enforce and complain mode, `apparmor_parser` and the need to load a profile on every node. **Select A Profile With appArmorProfile** covers the pod fields and how to verify them. **Drop Capabilities And Block Privilege Escalation** covers capabilities, `allowPrivilegeEscalation: false` and `privileged: false`.
 
 ## Learning objectives
 
@@ -35,3 +35,7 @@ Your playground is a `kind` cluster running Kubernetes 1.35 with a single contro
 Launch your playground now, and keep it running next to you while you read the parts:
 
 <!-- astrona:playground -->
+
+## Independent live assessment
+
+Prepare with [Prove AppArmor Enforcement In A Linux VM](course-02a-prove-apparmor-in-a-linux-vm.md). [Enforce An AppArmor File Boundary](labs/lab-02/question.md) uses its own qemu environment. Load an enforcing AppArmor profile and prove allowed and denied file access.. [Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem](labs/lab-01/question.md) uses its own kind environment. Combine a Localhost seccomp profile, dropped capabilities, blocked escalation and a read-only filesystem on one Deployment..

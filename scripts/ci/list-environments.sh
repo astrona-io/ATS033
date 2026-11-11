@@ -39,6 +39,9 @@ find "${paths[@]}" -name config.yaml \( -path '*/labs/lab-*/config.yaml' -o -pat
       */playground) kind=playground ;;
       *) kind=lab ;;
     esac
-    printf '{"kind":"%s","path":"%s"}\n' "$kind" "$dir"
+    runtime=$(sed -n 's/^  type: //p' "$config" | head -n 1 | tr -d '"')
+    runtime=${runtime:-kind}
+    case "$runtime" in kind|qemu) ;; *) echo "Unsupported runtime: $runtime" >&2; exit 1 ;; esac
+    printf '{"kind":"%s","path":"%s","runtime":"%s"}\n' "$kind" "$dir" "$runtime"
   done |
   jq -cs .

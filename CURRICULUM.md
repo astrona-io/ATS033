@@ -1,5 +1,7 @@
 # Curriculum Coverage
 
+> Historical design record. Counts and execution claims below describe the original expansion. For current labs, preparation and practical limits, use [LAB-COVERAGE.md](LAB-COVERAGE.md) and [COVERAGE-REVIEW.md](COVERAGE-REVIEW.md).
+
 Exam: Certified Kubernetes Security Specialist (CKS). Domain: System Hardening (10%).
 
 The [official objectives](https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/) were checked on 2026-10-11. Teaching structure is independently authored and does not add official requirements.

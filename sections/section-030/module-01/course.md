@@ -35,3 +35,7 @@ Your playground is a `kind` cluster running Kubernetes 1.35 with one control-pla
 Both client pods run BusyBox, which provides `wget` for test requests. Launch your playground now, and keep it running next to you while you read the parts:
 
 <!-- astrona:playground -->
+
+## Independent live assessment
+
+Prepare with [Test A Host Firewall With Two Clients](course-04a-test-a-host-firewall.md). [Enforce A Host Firewall Boundary](labs/lab-02/question.md) uses its own qemu environment. The host firewall permits the trusted client and rejects the untrusted client; Both clients retain access to the public service while the restricted service stays healthy.

@@ -4,7 +4,7 @@
 #     solution, graders, teardown) must pass;
 #   - each playground: `astrona run` must finish with every readiness check,
 #     and its testing/smoke.sh (if any) must pass.
-# Each environment runs on its own runner with its own kind cluster.
+# Each environment runs on its own runner with its declared kind or QEMU runtime.
 #
 # Which environments (scripts/ci/list-environments.sh):
 #   - pull request: the sections with a changed file; every section when
@@ -60,8 +60,14 @@ jobs:
         run: python3 -m pip install -r scripts/ci/requirements.txt
       - name: Test course validation failure cases
         run: python3 scripts/ci/test-course-structure.py
+      - name: Test grader error handling
+        run: python3 scripts/ci/test-grading-runtime.py
       - name: Check lesson and lab structure
         run: python3 scripts/ci/check-course-structure.py
+      - name: Test teaching coverage failure cases
+        run: python3 scripts/ci/test-teaching-coverage.py
+      - name: Check lab coverage map
+        run: python3 scripts/ci/lab-coverage.py
       - id: list
         name: List the environments to test
         env:
@@ -116,6 +122,7 @@ jobs:
       # Docker on a hosted runner sometimes answers slowly right after the job
       # starts, and `astrona check` then fails with "context deadline exceeded".
       - name: Wait for Docker
+        if: matrix.env.runtime == 'kind'
         run: |
           timeout 180 bash -c 'until docker info >/dev/null 2>&1; do echo "waiting for Docker..."; sleep 5; done'
           docker version --format 'Docker {{.Server.Version}}'
@@ -125,7 +132,19 @@ jobs:
       # where the address does not answer, so no lab can reach the runner's
       # cloud credentials.
       - name: Block the cloud metadata address for containers
+        if: matrix.env.runtime == 'kind'
         run: sudo iptables -I DOCKER-USER -d 169.254.169.254 -j REJECT
+
+      - name: Install QEMU and enable native acceleration
+        if: matrix.env.runtime == 'qemu'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y qemu-system-x86 qemu-utils genisoimage acl
+          test -c /dev/kvm
+          sudo setfacl -m "u:$(id -un):rw" /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
+          # QEMU user-mode networking originates traffic from the runner.
+          sudo iptables -I OUTPUT -d 169.254.169.254 -j REJECT
 
       - name: Check the runner
         run: |
@@ -157,8 +176,8 @@ jobs:
           DIAGNOSTICS_DIR: ${{ runner.temp }}/diagnostics
         run: scripts/ci/test-playground.sh "${{ matrix.env.path }}"
 
-      - name: Upload diagnostics
-        if: failure()
+      - name: Upload test evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: diagnostics-${{ strategy.job-index }}

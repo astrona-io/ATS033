@@ -1,0 +1,48 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-033-lab-040-03-02
+  docs:
+    prerequisites: docs/prerequisites.md
+    examQuestion: question.md
+    caseStudy: docs/case-study.md
+    guide: solution.md
+runtime:
+  type: qemu
+  qemu:
+  - image:
+      type: url
+      source: https://cloud-images.ubuntu.com/releases/noble/release-20261017/ubuntu-24.04-server-cloudimg-{ARCH}.img
+      checksums:
+        amd64: sha256:04e8f2461a16a44e78a370284471f29616cdd9baf1893df25807b71f985b6c94
+        arm64: sha256:50e24e1fb79e89116e939d90aa7738f7af48c442fa1bc2510131e0b39c50348e
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 12
+bootstrap:
+  init:
+  - name: prepare-apparmor
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: verify-start
+    type: file
+    source: testing/verify-start.sh
+  - name: reference-profile
+    type: file
+    source: solution/apply.sh
+  - name: reject-invalid-solutions
+    description: Exercise incorrect solutions against the live grader and restore
+      the reference
+    type: file
+    source: testing/regression.sh
+validation:
+  scripts:
+  - name: live-apparmor-boundary
+    description: An enforcing AppArmor profile rejects writes while preserving permitted
+      access
+    type: file
+    source: validation/validate-profile.sh
+    points: 1
+teardown:
+  keepCluster: false

@@ -21,4 +21,10 @@ Key facts:
 - A NodePort exists on every node of the cluster.
 - etcd holds all Secrets, so its ports are restricted to the API servers and etcd members.
 
+
+
+## Independent live assessment
+
+Prepare with [Test A Host Firewall With Two Clients](course-04a-test-a-host-firewall.md). [Enforce A Host Firewall Boundary](labs/lab-02/question.md) uses its own qemu environment. The host firewall permits the trusted client and rejects the untrusted client; Both clients retain access to the public service while the restricted service stays healthy.
+
 <!-- astrona:playground:destroy -->

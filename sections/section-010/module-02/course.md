@@ -38,3 +38,7 @@ The setup script writes the SSH files itself, so the exercises read and change r
 Launch your playground now, and keep it running next to you while you read the parts:
 
 <!-- astrona:playground -->
+
+## Independent live assessment
+
+Prepare with [Verify SSH Authentication After A Reload](course-03a-test-live-ssh-authentication.md). [Harden A Running SSH Service](labs/lab-01/question.md) uses its own qemu environment. The running SSH service rejects a fresh root key login; The running SSH service rejects a fresh password login and permits the administrator key; Only opsadmin can log in and olduser has a locked password and nologin shell.

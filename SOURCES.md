@@ -28,3 +28,10 @@ Applied the local astrona-course-expand-material skill with CLAUDE.md plain-Engl
 - https://kubernetes.io/docs/tutorials/security/seccomp/
 - https://kubernetes.io/docs/tutorials/security/apparmor/
 - https://falco.org/docs/concepts/
+
+## Live assessment review — 2026-11-11
+
+Ubuntu 24.04 supplies OpenSSH and nftables. QEMU fixtures pin the Ubuntu image and verify architecture-specific downloads where supplied. Package repositories and vulnerability data remain time-dependent.
+
+- [OpenSSH server configuration](https://man.openbsd.org/sshd_config)
+- [nftables documentation](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page)
