@@ -23,4 +23,10 @@ Key facts:
 - `deny` rules in an AppArmor profile win over allow rules.
 - A node without AppArmor in its kernel cannot run a pod that needs an AppArmor profile.
 
+
+
+## Independent live assessment
+
+Prepare with [Prove AppArmor Enforcement In A Linux VM](course-02a-prove-apparmor-in-a-linux-vm.md). [Enforce An AppArmor File Boundary](labs/lab-02/question.md) uses its own qemu environment. Load an enforcing AppArmor profile and prove allowed and denied file access.. [Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem](labs/lab-01/question.md) uses its own kind environment. Combine a Localhost seccomp profile, dropped capabilities, blocked escalation and a read-only filesystem on one Deployment..
+
 <!-- astrona:playground:destroy -->

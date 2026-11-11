@@ -1,10 +1,8 @@
 ---
 draft: true
-exam_objectives:
-- Minimize host OS footprint (reduce attack surface)
 ---
-# Harden SSH Access And Unused Accounts
+# Harden A Running SSH Service
 
-Make key-only SSH access for one administrator account on a node and remove login paths of an unused account.
+Use the independent QEMU VM to reload a separate sshd listener on port 2222, preserve administrator key access and reject root, password and unused-account logins. The management listener on port 22 stays available.
 
-The task and solution use a separate pinned kind cluster. Run `astrona test` on this folder: `testing/verify-start.sh` checks that every outcome fails on the starting state, then the reference solution is applied and every outcome must pass. Static validation is not live evidence. Runtime verification remains pending.
+`astrona test -c .` verifies the broken starting state, applies the reference solution, checks deliberately reopened authentication paths and runs the final graders.

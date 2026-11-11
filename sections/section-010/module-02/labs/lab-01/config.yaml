@@ -7,58 +7,50 @@ metadata:
     caseStudy: docs/case-study.md
     guide: solution.md
 runtime:
-  type: kind
-  kind:
-    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
-    nodes:
-      workers: 1
+  type: qemu
+  qemu:
+  - image:
+      type: url
+      source: https://cloud-images.ubuntu.com/releases/noble/release-20261017/ubuntu-24.04-server-cloudimg-{ARCH}.img
+      checksums:
+        amd64: sha256:04e8f2461a16a44e78a370284471f29616cdd9baf1893df25807b71f985b6c94
+        arm64: sha256:50e24e1fb79e89116e939d90aa7738f7af48c442fa1bc2510131e0b39c50348e
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 12
 bootstrap:
   init:
-  - name: seed-private-environment
+  - name: prepare-environment
     type: file
     source: bootstrap/setup.sh
-teardown:
-  keepCluster: false
 testing:
   init:
   - name: verify-start
-    description: Verify the starting state and reject the unfinished lab
     type: file
     source: testing/verify-start.sh
-  - name: reference-result
+  - name: reference-solution
     type: file
     source: solution/apply.sh
-  - name: wait-solved
-    description: Wait until the reference solution settles and every outcome passes
+  - name: negative-cases
     type: file
-    source: testing/wait-solved.sh
+    source: testing/regression.sh
 validation:
   scripts:
-  - name: root-login-refused
-    description: sshd refuses root logins
+  - name: root-login
+    description: The running SSH service rejects a fresh root key login
     type: file
-    source: validation/validate-root-login-refused.sh
+    source: validation/validate-root-login.sh
     points: 1
-  - name: password-login-refused
-    description: The first PasswordAuthentication value sshd reads is no and key logins stay on
+  - name: password-login
+    description: The running SSH service rejects a fresh password login and permits the administrator
+      key
     type: file
-    source: validation/validate-password-login-refused.sh
+    source: validation/validate-password-login.sh
     points: 1
-  - name: allow-only-opsadmin
-    description: AllowUsers allows only opsadmin
+  - name: account-access
+    description: Only opsadmin can log in and olduser has a locked password and nologin shell
     type: file
-    source: validation/validate-allow-only-opsadmin.sh
+    source: validation/validate-account-access.sh
     points: 1
-  - name: olduser-locked
-    description: olduser has the nologin shell and a locked password
-    type: file
-    source: validation/validate-olduser-locked.sh
-    points: 1
-  - name: node-access-review-record
-    description: ConfigMap node-access-review records the hardening
-    type: file
-    source: validation/validate-node-access-review-record.sh
-    points: 1
+teardown:
+  keepCluster: false

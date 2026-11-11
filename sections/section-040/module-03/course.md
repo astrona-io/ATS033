@@ -35,3 +35,7 @@ Your playground is a `kind` cluster running Kubernetes 1.35 with a single contro
 Launch your playground now, and keep it running next to you while you read the parts:
 
 <!-- astrona:playground -->
+
+## Independent live assessment
+
+Prepare with [Prove AppArmor Enforcement In A Linux VM](course-02a-prove-apparmor-in-a-linux-vm.md). [Enforce An AppArmor File Boundary](labs/lab-02/question.md) uses its own qemu environment. Load an enforcing AppArmor profile and prove allowed and denied file access.. [Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem](labs/lab-01/question.md) uses its own kind environment. Combine a Localhost seccomp profile, dropped capabilities, blocked escalation and a read-only filesystem on one Deployment..

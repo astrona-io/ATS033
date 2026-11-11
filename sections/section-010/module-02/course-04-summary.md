@@ -20,4 +20,10 @@ Key facts:
 - `AllowUsers` limits SSH logins only; it does not change the account.
 - Reload the daemon instead of restarting it, and test from a second session.
 
+
+
+## Independent live assessment
+
+Prepare with [Verify SSH Authentication After A Reload](course-03a-test-live-ssh-authentication.md). [Harden A Running SSH Service](labs/lab-01/question.md) uses its own qemu environment. The running SSH service rejects a fresh root key login; The running SSH service rejects a fresh password login and permits the administrator key; Only opsadmin can log in and olduser has a locked password and nologin shell.
+
 <!-- astrona:playground:destroy -->

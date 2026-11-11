@@ -6,9 +6,7 @@ labs:
     - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
   sections/section-010/module-02/labs/lab-01:
     preparation:
-    - sections/section-010/module-02/course-01-read-the-sshd-settings.md
-    - sections/section-010/module-02/course-02-limit-who-can-log-in.md
-    - sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+    - sections/section-010/module-02/course-03a-test-live-ssh-authentication.md
   sections/section-010/module-03/labs/lab-01:
     preparation:
     - sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
@@ -102,9 +100,15 @@ labs:
     - sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
     - sections/section-040/module-03/course-02a-prove-apparmor-in-a-linux-vm.md
     - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+  sections/section-030/module-01/labs/lab-02:
+    preparation:
+    - sections/section-030/module-01/course-04a-test-a-host-firewall.md
 additional_readings:
 - sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
 - sections/section-010/module-01/course-04-privileged-host-interfaces.md
+- sections/section-010/module-02/course-01-read-the-sshd-settings.md
+- sections/section-010/module-02/course-02-limit-who-can-log-in.md
+- sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
 - sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
 - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
 - sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md

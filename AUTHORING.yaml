@@ -1,7 +1,6 @@
----
 version: 1
-approval: Maintainer requested CKA and CKS playgrounds and graded labs on 2026-10-13,
-  superseding the earlier reading-only scope.
+approval: Maintainer requested CKA and CKS playgrounds and graded labs on 2026-10-13, superseding the
+  earlier reading-only scope.
 course:
   id: ATS033
   certification:
@@ -46,19 +45,19 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-010/module-01/course-01-inventory-services-and-listeners.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-010/module-01/course-04-privileged-host-interfaces.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-010/module-01/labs/lab-01
       after_reading: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-      objective: Remove a seeded extra service from active and enabled node services
-        while preserving Kubernetes.
+      objective: Remove a seeded extra service from active and enabled node services while preserving
+        Kubernetes.
       status: alpha
       runtime_verification: pending
     practice_readings: []
@@ -68,26 +67,33 @@ sections:
     - Read the effective sshd settings with first-value-wins rules.
     - Disable root login and password authentication and limit users with AllowUsers.
     - Remove login shells and locked paths of unused accounts.
+    - The running SSH service rejects a fresh root key login; The running SSH service rejects a fresh
+      password login and permits the administrator key; Only opsadmin can log in and olduser has a locked
+      password and nologin shell
     outline:
     - Read The sshd Settings That Decide Who Gets In
     - Limit Who Can Log In
     - Login Shells And Unused Accounts
     - Summary
+    - Verify SSH Authentication After A Reload
     playground: true
     module_lab: true
     sources:
     - reading: sections/section-010/module-02/course-01-read-the-sshd-settings.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-010/module-02/course-02-limit-who-can-log-in.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
-      adapted_from: 
+      adapted_from: null
+    - reading: sections/section-010/module-02/course-03a-test-live-ssh-authentication.md
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-010/module-02/labs/lab-01
-      after_reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
-      objective: Set key-only SSH for one administrator account and remove the login
-        paths of an unused account.
+      after_reading: sections/section-010/module-02/course-03a-test-live-ssh-authentication.md
+      objective: The running SSH service rejects a fresh root key login; The running SSH service rejects
+        a fresh password login and permits the administrator key; Only opsadmin can log in and olduser
+        has a locked password and nologin shell
       status: alpha
       runtime_verification: pending
     practice_readings: []
@@ -96,8 +102,7 @@ sections:
     objectives:
     - Name what hostNetwork, hostPID, hostIPC, hostPath and privileged give a pod.
     - Enforce Pod Security Standards with namespace labels and read the rejection.
-    - Check kubelet anonymous access and the read-only port, and dedicate a node with
-      a taint and a label.
+    - Check kubelet anonymous access and the read-only port, and dedicate a node with a taint and a label.
     outline:
     - Host Namespaces, hostPath And Privileged Containers
     - Enforce Limits With Pod Security Admission
@@ -107,25 +112,24 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-010/module-03/labs/lab-01
       after_reading: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
-      objective: Rewrite a Deployment without host access and enforce the baseline
-        standard on its namespace.
+      objective: Rewrite a Deployment without host access and enforce the baseline standard on its namespace.
       status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
     id: lab-01
     path: sections/section-010/capstone/labs/lab-01
-    objective: Combine a disabled node service, key-only SSH, a hardened workload
-      with a Pod Security label and a dedicated node.
+    objective: Combine a disabled node service, key-only SSH, a hardened workload with a Pod Security
+      label and a dedicated node.
     status: alpha
     runtime_verification: pending
 - id: section-020
@@ -151,19 +155,18 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-020/module-01/course-04-revocation-and-audit.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-020/module-01/labs/lab-01
       after_reading: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
-      objective: Grant a dedicated host identity access to one report without granting
-        root access.
+      objective: Grant a dedicated host identity access to one report without granting root access.
       status: alpha
       runtime_verification: pending
     practice_readings: []
@@ -183,17 +186,17 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-020/module-02/labs/lab-01
       after_reading: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
-      objective: Replace a wildcard Role and a cluster-admin binding of one ServiceAccount
-        with a narrow Role.
+      objective: Replace a wildcard Role and a cluster-admin binding of one ServiceAccount with a narrow
+        Role.
       status: alpha
       runtime_verification: pending
     practice_readings: []
@@ -213,26 +216,25 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-020/module-03/course-01-dedicated-serviceaccounts-and-automount.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-020/module-03/course-02-bound-projected-tokens.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-020/module-03/labs/lab-01
       after_reading: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
-      objective: Move a workload to a dedicated ServiceAccount without a mounted token,
-        and remove the unused token paths.
+      objective: Move a workload to a dedicated ServiceAccount without a mounted token, and remove the
+        unused token paths.
       status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
     id: lab-01
     path: sections/section-020/capstone/labs/lab-01
-    objective: Harden RBAC and ServiceAccounts across two namespaces by combining
-      narrow Roles, a closed default ServiceAccount, a bound projected token and the
-      removal of long-lived tokens.
+    objective: Harden RBAC and ServiceAccounts across two namespaces by combining narrow Roles, a closed
+      default ServiceAccount, a bound projected token and the removal of long-lived tokens.
     status: alpha
     runtime_verification: pending
 - id: section-030
@@ -248,37 +250,48 @@ sections:
     - Distinguish bind addresses, filtering and endpoint authorization.
     - Evaluate ingress and egress rules without breaking dependencies.
     - Account for persistence, address families and alternate traffic paths.
+    - The host firewall permits the trusted client and rejects the untrusted client; Both clients retain
+      access to the public service while the restricted service stays healthy
     outline:
     - Listeners And Bind Addresses
     - Host Firewalls With iptables And ufw
     - NetworkPolicy For Pod Traffic
     - NodePorts, Control-Plane Ports And API Access
     - Summary
+    - Test A Host Firewall With Two Clients
     playground: true
     module_lab: true
     sources:
     - reading: sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md
-      adapted_from: 
+      adapted_from: null
+    - reading: sections/section-030/module-01/course-04a-test-a-host-firewall.md
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-030/module-01/labs/lab-01
       after_reading: sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
-      objective: Keep a node-local management-style service reachable locally while
-        closing its node-address listener.
+      objective: Keep a node-local management-style service reachable locally while closing its node-address
+        listener.
+      status: alpha
+      runtime_verification: pending
+    - id: lab-02
+      path: sections/section-030/module-01/labs/lab-02
+      after_reading: sections/section-030/module-01/course-04a-test-a-host-firewall.md
+      objective: The host firewall permits the trusted client and rejects the untrusted client; Both clients
+        retain access to the public service while the restricted service stays healthy
       status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
     title: Limit Service Exposure Outside The Cluster
     objectives:
-    - Compare ClusterIP, NodePort and LoadBalancer and name the component that opens
-      each port.
+    - Compare ClusterIP, NodePort and LoadBalancer and name the component that opens each port.
     - Find and remove accidentally exposed Services.
     - Narrow published Services with externalTrafficPolicy and loadBalancerSourceRanges.
     - Explain why an Ingress controller is the single entry point.
@@ -291,17 +304,17 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-030/module-02/course-01-service-types-and-what-they-open.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-02/course-03-ingress-and-finding-exposed-services.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-030/module-02/labs/lab-01
       after_reading: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
-      objective: Change an accidental NodePort Service to ClusterIP and set externalTrafficPolicy
-        Local on the one that stays published.
+      objective: Change an accidental NodePort Service to ClusterIP and set externalTrafficPolicy Local
+        on the one that stays published.
       status: alpha
       runtime_verification: pending
     practice_readings: []
@@ -322,27 +335,25 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-030/module-03/course-04-etcd-client-access.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-030/module-03/labs/lab-01
       after_reading: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
-      objective: Turn off anonymous access and AlwaysAllow authorization on a kubelet
-        and restart it.
+      objective: Turn off anonymous access and AlwaysAllow authorization on a kubelet and restart it.
       status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
     id: lab-01
     path: sections/section-030/capstone/labs/lab-01
-    objective: Close a listener, a NodePort and a kubelet API in one cluster without
-      breaking the application.
+    objective: Close a listener, a NodePort and a kubelet API in one cluster without breaking the application.
     status: alpha
     runtime_verification: pending
 - id: section-040
@@ -368,32 +379,29 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-040/module-01/course-04-diagnosing-profile-failures.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-040/module-01/labs/lab-01
       after_reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
-      objective: Keep a non-root workload functional with a read-only root filesystem
-        and a writable scratch volume.
+      objective: Keep a non-root workload functional with a read-only root filesystem and a writable scratch
+        volume.
       status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
     title: Apply seccomp Profiles To Pods
     objectives:
-    - Choose between RuntimeDefault, Localhost and Unconfined and explain the risk
-      of Unconfined.
-    - Place a profile file under /var/lib/kubelet/seccomp and write the matching localhostProfile
-      value.
+    - Choose between RuntimeDefault, Localhost and Unconfined and explain the risk of Unconfined.
+    - Place a profile file under /var/lib/kubelet/seccomp and write the matching localhostProfile value.
     - Read and write a profile with defaultAction and syscalls.
-    - Find the syscall that a profile blocks and repair a pod that fails because of
-      its profile.
+    - Find the syscall that a profile blocks and repair a pod that fails because of its profile.
     outline:
     - Profile Types, Locations And The Unconfined Risk
     - Write And Load A Localhost Profile
@@ -403,17 +411,16 @@ sections:
     module_lab: true
     sources:
     - reading: sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
-      adapted_from: 
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-040/module-02/labs/lab-01
       after_reading: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
-      objective: Write a seccomp profile, place it on the node and run a pod that
-        cannot delete files.
+      objective: Write a seccomp profile, place it on the node and run a pod that cannot delete files.
       status: alpha
       runtime_verification: pending
     practice_readings: []
@@ -421,38 +428,55 @@ sections:
     title: Confine Workloads With AppArmor And Capabilities
     objectives:
     - Explain AppArmor enforce and complain modes and load a profile with apparmor_parser.
-    - Select a profile with securityContext.appArmorProfile and verify it from inside
-      the container.
+    - Select a profile with securityContext.appArmorProfile and verify it from inside the container.
     - Drop Linux capabilities and add back only the one that is needed.
-    - Set allowPrivilegeEscalation false and privileged false and explain what each
-      prevents.
+    - Set allowPrivilegeEscalation false and privileged false and explain what each prevents.
+    - Load an enforcing AppArmor profile and prove allowed and denied file access.
+    - Combine a Localhost seccomp profile, dropped capabilities, blocked escalation and a read-only filesystem
+      on one Deployment.
     outline:
     - AppArmor Modes And Loading Profiles
     - Select A Profile With appArmorProfile
     - Drop Capabilities And Block Privilege Escalation
     - Summary
+    - Prove AppArmor Enforcement In A Linux VM
     playground: true
     module_lab: true
     sources:
     - reading: sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
-      adapted_from: 
+      adapted_from: null
     - reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
-      adapted_from: 
+      adapted_from: null
+    - reading: sections/section-040/module-03/course-02a-prove-apparmor-in-a-linux-vm.md
+      adapted_from: null
     labs:
     - id: lab-01
       path: sections/section-040/module-03/labs/lab-01
       after_reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
-      objective: Remove privileged mode from a Deployment, drop all capabilities and
-        keep only the one it needs.
+      objective: Remove privileged mode from a Deployment, drop all capabilities and keep only the one
+        it needs.
+      status: alpha
+      runtime_verification: pending
+    - id: lab-02
+      path: sections/section-040/module-03/labs/lab-02
+      after_reading: sections/section-040/module-03/course-02a-prove-apparmor-in-a-linux-vm.md
+      objective: Load an enforcing AppArmor profile and prove allowed and denied file access.
+      status: alpha
+      runtime_verification: pending
+    - id: lab-01
+      path: sections/section-040/capstone/labs/lab-01
+      after_reading: sections/section-040/module-03/course-02a-prove-apparmor-in-a-linux-vm.md
+      objective: Combine a Localhost seccomp profile, dropped capabilities, blocked escalation and a read-only
+        filesystem on one Deployment.
       status: alpha
       runtime_verification: pending
     practice_readings: []
   capstone_lab:
     id: lab-01
     path: sections/section-040/capstone/labs/lab-01
-    objective: Combine a Localhost seccomp profile, dropped capabilities, blocked
-      escalation and a read-only filesystem on one Deployment.
+    objective: Combine a Localhost seccomp profile, dropped capabilities, blocked escalation and a read-only
+      filesystem on one Deployment.
     status: alpha
     runtime_verification: pending
