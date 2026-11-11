@@ -176,8 +176,8 @@ jobs:
           DIAGNOSTICS_DIR: ${{ runner.temp }}/diagnostics
         run: scripts/ci/test-playground.sh "${{ matrix.env.path }}"
 
-      - name: Upload diagnostics
-        if: failure()
+      - name: Upload test evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: diagnostics-${{ strategy.job-index }}

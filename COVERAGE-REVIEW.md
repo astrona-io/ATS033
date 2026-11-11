@@ -4,13 +4,14 @@ The course has teaching material for its registered lab tasks, but its readings 
 
 `TEACHING-COVERAGE.yaml` names the preparation set for every lab. `LAB-COVERAGE.md` renders both directions: lab to preparation and reading to assessment. A preparation link means the reading teaches something used by that task, not that every operation in the reading is graded. The additional-reading list makes material without a module assessment visible. Capstones combine selected skills and do not silently count as coverage of every reading.
 
+## Live assessment additions
+
+The SSH assessment now reloads a running sshd and tests fresh permitted and rejected logins. A separate QEMU lab applies nftables rules and tests trusted and untrusted clients while preserving required traffic.
+
 ## Remaining practical gaps and boundaries
 
-- The new QEMU lab proves real AppArmor file enforcement. Kubernetes `appArmorProfile` selection remains conditional playground practice; it is not covered by that host-process test.
-- SSH hardening currently grades staged configuration and account state in a kind node. It does not prove an actual sshd login or reload.
-- Package removal and host firewall procedures have no dedicated module grader. The listener lab proves loopback binding, which is a different control.
-
-These are explicit limits, not completed assessments. When closing one, add or extend a runnable environment, teach the actual commands and evidence, add a live grader with negative cases, and update the mapping. Do not mark a reference procedure as practiced just because it contains a command block.
+- The AppArmor VM proves host-process file enforcement. Kubernetes appArmorProfile selection remains conditional playground practice.
+- Package removal has no dedicated module assessment. SSH uses a separate training listener; it does not modify the VM management service.
 
 ## Runtime choice
 
