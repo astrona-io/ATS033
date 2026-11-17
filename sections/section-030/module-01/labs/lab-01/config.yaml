@@ -37,13 +37,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: node-local-server
-    description: node-local-server runs on the control-plane host network and answers on loopback
+  - name: loopback-listener
+    description: ss on the control-plane node shows port 19090 on 127.0.0.1 only, and the server still answers on loopback
     type: file
-    source: validation/validate-node-local-server.sh
+    source: validation/validate-loopback-listener.sh
     points: 1
-  - name: loopback-only
-    description: node-local-server listens on 127.0.0.1 only, so pods get connection refused
+  - name: node-address-refused
+    description: A request from shuttle to the node InternalIP on port 19090 gets connection refused
     type: file
-    source: validation/validate-loopback-only.sh
+    source: validation/validate-node-address-refused.sh
     points: 1

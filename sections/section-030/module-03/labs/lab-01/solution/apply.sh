@@ -7,11 +7,5 @@ if [[ "$(kubectl config current-context)" != "$context" ]]; then
   printf 'Refusing to operate on another Kubernetes context\n' >&2
   exit 1
 fi
-lab_directory="$(cd "$(dirname "$0")/.." && pwd)"
-worker_name="$cluster-worker"
-
-"$engine" exec "$worker_name" sed -i '/^authentication:/,/^  webhook:/ s/enabled: true/enabled: false/' /var/lib/kubelet/config.yaml
-"$engine" exec "$worker_name" sed -i 's/^  mode: AlwaysAllow$/  mode: Webhook/' /var/lib/kubelet/config.yaml
-"$engine" exec "$worker_name" systemctl restart kubelet
-sleep 10
-kubectl wait --for=condition=Ready "node/$worker_name" --timeout=180s
+node_name="$cluster-control-plane"
+"$engine" exec "$node_name" sed -i 's/--bind-address=0.0.0.0/--bind-address=127.0.0.1/' /etc/kubernetes/manifests/kube-scheduler.yaml

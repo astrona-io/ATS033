@@ -1,0 +1,30 @@
+{
+  "context": "kind-astro-ats-033-lab-030-02-03",
+  "cluster": "astro-ats-033-lab-030-02-03",
+  "namespace": "starfleet-033-030-02-03",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "probe",
+      "namespace": "starfleet-033-030-02-03",
+      "expected": {
+        "metadata": {
+          "name": "probe"
+        }
+      },
+      "state": "deployment"
+    },
+    {
+      "kind": "pod",
+      "name": "shuttle",
+      "namespace": "starfleet-033-030-02-03",
+      "expected": {
+        "metadata": {
+          "name": "shuttle"
+        }
+      },
+      "state": "pod"
+    }
+  ],
+  "behavior": []
+}

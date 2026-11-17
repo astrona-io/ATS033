@@ -6,7 +6,7 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-A node was set up for debugging. Its kubelet accepts anonymous requests and allows every request it receives, so anyone who can reach port 10250 of that node can list its pods. The cluster has one control-plane node and one worker node. The kubelet on the worker node has `authentication.anonymous.enabled` set to `true` and `authorization.mode` set to `AlwaysAllow` in `/var/lib/kubelet/config.yaml`. The node is `Ready`.
+A change to the control-plane node widened the listener of kube-scheduler. Port 10259 now answers on every address of the node, and the pod `shuttle` in `starfleet-033-030-03-01` on the worker node can reach it. Only the node itself needs this port, for health checks and metrics.
 
 Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
 
@@ -17,23 +17,21 @@ node_name="astro-ats-033-lab-030-03-01-control-plane"
 worker_name="astro-ats-033-lab-030-03-01-worker"
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+Keep this connection selected. Run node commands with `podman exec "$node_name" <command>`.
 
-Allow about 8 minutes for the tasks. Cluster startup adds time.
+Allow about 10 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. On the worker node, set `authentication.anonymous.enabled` to `false` in `/var/lib/kubelet/config.yaml`.
-2. In the same file, set `authorization.mode` to `Webhook`.
-3. Restart the kubelet, and confirm that an unauthenticated request to `https://127.0.0.1:10250/pods` from inside the worker container returns status 401.
+1. Change the kube-scheduler static pod manifest on the control-plane node so that kube-scheduler listens on `127.0.0.1` only.
+2. Confirm that kube-scheduler still answers `ok` on `https://127.0.0.1:10259/healthz` from inside the control-plane node.
+3. Confirm that a request from `shuttle` to port 10259 on the control-plane node's InternalIP is refused.
 
 ## Constraints
 
-- Change only the kubelet configuration of the worker node. Keep `authentication.webhook.enabled` as it is.
-- The worker node must be `Ready`.
+- Change only the bind address. Keep every other flag of kube-scheduler.
+- Do not add a firewall rule and do not stop kube-scheduler.
 
 ## How the answer is checked
 
-The grader runs two checks: the worker kubelet configuration disables anonymous authentication and an unauthenticated request returns 401; and its authorization mode is `Webhook`. Every check also needs the worker node to be `Ready`.
-
-Hint: `podman exec "$worker_name" systemctl restart kubelet` restarts the kubelet inside the worker container.
+The grader reads the command line of the running kube-scheduler process and expects `--bind-address=127.0.0.1`. It reads the listeners of the control-plane node with `ss` and expects port 10259 on `127.0.0.1` only, and it expects `ok` from the local health check. Then it sends a request from `shuttle` to port 10259 on the control-plane node's InternalIP, which must fail with `Connection refused`. A guard checks that the kube-scheduler pod is Ready.

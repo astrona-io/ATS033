@@ -1,0 +1,41 @@
+{
+  "context": "kind-astro-ats-033-lab-030-01-02",
+  "cluster": "astro-ats-033-lab-030-01-02",
+  "namespace": "starfleet-033-030-01-02",
+  "resources": [
+    {
+      "kind": "pod",
+      "name": "node-metrics-server",
+      "namespace": "starfleet-033-030-01-02",
+      "expected": {
+        "spec": {
+          "hostNetwork": true
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "shuttle",
+      "namespace": "starfleet-033-030-01-02",
+      "expected": {
+        "metadata": {
+          "name": "shuttle"
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "scout",
+      "namespace": "starfleet-033-030-01-02",
+      "expected": {
+        "spec": {
+          "hostNetwork": true
+        }
+      },
+      "state": "pod"
+    }
+  ],
+  "behavior": []
+}

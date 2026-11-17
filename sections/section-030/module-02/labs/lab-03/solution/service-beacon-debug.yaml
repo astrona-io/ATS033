@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: beacon-debug
+  namespace: outpost-033-030-02-03
+spec:
+  type: ClusterIP
+  selector:
+    app: beacon
+  ports:
+  - name: http
+    port: 80
+    targetPort: http

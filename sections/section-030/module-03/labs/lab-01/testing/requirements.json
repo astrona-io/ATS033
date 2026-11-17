@@ -2,6 +2,18 @@
   "context": "kind-astro-ats-033-lab-030-03-01",
   "cluster": "astro-ats-033-lab-030-03-01",
   "namespace": "starfleet-033-030-03-01",
-  "resources": [],
+  "resources": [
+    {
+      "kind": "pod",
+      "name": "shuttle",
+      "namespace": "starfleet-033-030-03-01",
+      "state": "pod",
+      "expected": {
+        "metadata": {
+          "name": "shuttle"
+        }
+      }
+    }
+  ],
   "behavior": []
 }
