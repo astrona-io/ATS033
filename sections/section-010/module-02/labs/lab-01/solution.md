@@ -2,100 +2,106 @@
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
-# Harden SSH Access And Unused Accounts Solution
+# Restrict SSH Logins In sshd_config Solution
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Select the private environment and define a helper. The helper `run_on_node` runs one command on the control-plane node container, which is the same as running it in a shell on the node.
 
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-02-01)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-02-01" || exit 1
 node_name="astro-ats-033-lab-010-02-01-control-plane"
 worker_name="astro-ats-033-lab-010-02-01-worker"
+run_on_node() { podman exec "$node_name" "$@"; }
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+## Read the settings in the order sshd reads them
 
-## Inspect And Explain
-
-Read the effective SSH settings before you change anything. The shell expands the file names in sorted order, which is the order the daemon reads them, because the first line of the main file includes the drop-in directory.
+The main file includes the drop-in directory on its second line, so `sshd` reads the drop-in files before the rest of the main file. The shell expands `*.conf` in alphabetical order, which is the order `sshd` uses. `grep -i` ignores upper and lower case, because `sshd` keywords do not depend on case, and `^ *` also catches indented lines inside a `Match` block:
 
 ```sh
-podman exec "$node_name" sh -c 'cat /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config'
-podman exec "$node_name" getent passwd opsadmin olduser
+run_on_node sh -c "grep -n -i -E '^ *(Include|PermitRootLogin|PasswordAuthentication|PubkeyAuthentication|AllowUsers|Match)' /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config"
 ```
 
-The drop-in file comes first and sets `PasswordAuthentication yes`. The daemon uses the first value it reads for a setting, so the later `PasswordAuthentication no` in the main file has no effect. This is the fault to repair, together with the root login, the missing `AllowUsers` line and the shell of `olduser`.
-
-Change only the control-plane node of this environment.
-
-1. Set `PermitRootLogin` to `no`.
-2. Make the first `PasswordAuthentication` value that sshd reads `no`. Keep `PubkeyAuthentication` set to `yes`.
-3. Allow only the account `opsadmin` with an `AllowUsers` line.
-4. Give `olduser` the login shell `/usr/sbin/nologin` and lock its password. Do not delete the account and do not change `opsadmin`.
-5. Create the ConfigMap `node-access-review` in the `starfleet-033-010-02-01` namespace with the data `ssh: key-only`, `account: olduser` and `result: hardened`.
-
-The `kubelet` and `containerd` services must stay active and the API readiness endpoint must answer.
-
-Save this as `harden-ssh.py`:
-
-```python
-import subprocess
-CONTEXT="kind-astro-ats-033-lab-010-02-01"
-NODE="astro-ats-033-lab-010-02-01-control-plane"
-def run(*args):
-    result=subprocess.run(args,check=True,text=True,capture_output=True,timeout=30)
-    return result.stdout.strip()
-assert run('kubectl','config','current-context')==CONTEXT, 'Select the private environment'
-assert run('podman','inspect',NODE,'--format','{{index .Config.Labels "io.x-k8s.kind.cluster"}}')=='astro-ats-033-lab-010-02-01', 'Refusing an unrelated node container'
-def node(*args):return run('podman','exec',NODE,*args)
-
-node('sed','-i','s/^PermitRootLogin .*/PermitRootLogin no/','/etc/ssh/sshd_config')
-node('sed','-i','s/^PasswordAuthentication .*/PasswordAuthentication no/','/etc/ssh/sshd_config.d/50-cloud-init.conf')
-if 'AllowUsers' not in node('cat','/etc/ssh/sshd_config'):
-    node('sh','-c',"printf 'AllowUsers opsadmin\\n' >> /etc/ssh/sshd_config")
-node('usermod','--shell','/usr/sbin/nologin','--lock','olduser')
+```text
+/etc/ssh/sshd_config.d/10-legacy-root.conf:2:permitrootlogin yes
+/etc/ssh/sshd_config.d/50-cloud-init.conf:1:PasswordAuthentication yes
+/etc/ssh/sshd_config:2:Include /etc/ssh/sshd_config.d/*.conf
+/etc/ssh/sshd_config:5:PermitRootLogin prohibit-password
+/etc/ssh/sshd_config:6:PubkeyAuthentication yes
+/etc/ssh/sshd_config:7:PasswordAuthentication no
+/etc/ssh/sshd_config:12:Match User backup
 ```
 
-Save this as `configmap-node-access-review.yaml`:
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: node-access-review
-  namespace: starfleet-033-010-02-01
-data:
-  ssh: key-only
-  account: olduser
-  result: hardened
-```
-
-Apply the scoped correction:
+The output shows three problems. The first `PermitRootLogin` value is `yes`, written in lower case in `10-legacy-root.conf`, so the `prohibit-password` line in the main file never applies. The first `PasswordAuthentication` value is `yes`, from `50-cloud-init.conf`. There is no `AllowUsers` line, so every account may log in. The main file also ends with a `Match` block:
 
 ```sh
-python3 harden-ssh.py
-kubectl apply -f configmap-node-access-review.yaml
+run_on_node sed -n '10,16p' /etc/ssh/sshd_config
 ```
 
-## Verify The Result
+```text
+Subsystem sftp internal-sftp
 
-Read the settings again and check the accounts and the cluster. A node that still answers the readiness endpoint shows that the change did not touch Kubernetes.
+Match User backup
+    # The backup account may only copy files.
+    ForceCommand internal-sftp
+    AllowTcpForwarding no
+```
+
+Every line after `Match User backup` belongs to that block, up to the end of the file. A line appended with `>>` would apply only to the `backup` account.
+
+## Fix the values that sshd reads first
+
+Change the lines that win, which are the lines in the drop-in files. The `I` flag at the end of the first `sed` expression makes the pattern ignore case, so it matches `permitrootlogin`:
 
 ```sh
-podman exec "$node_name" sh -c 'cat /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config'
-podman exec "$node_name" getent passwd olduser
-podman exec "$node_name" passwd -S olduser
-kubectl get --raw=/readyz
+run_on_node sed -i 's/^permitrootlogin .*/PermitRootLogin no/I' /etc/ssh/sshd_config.d/10-legacy-root.conf
+run_on_node sed -i 's/^PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config.d/50-cloud-init.conf
+run_on_node sed -i 's/^PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
 ```
 
-The first value of each setting must now be the required one, `olduser` must show `/usr/sbin/nologin` and the status letter `L`, and the readiness endpoint must answer `ok`.
+The commands print nothing when they succeed. The third command is optional: the main file value is read later and does not win, but making it say `no` as well keeps the files consistent for the next reader.
 
-After you record your result, remove the independent lab with `astrona destroy ats-033-lab-010-02-01`.
+## Add a global AllowUsers line above the Match block
+
+The `sed` command `i` inserts text before every line that matches the pattern. Here it inserts `AllowUsers opsadmin` and an empty line before `Match User backup`, so the new line stays global:
+
+```sh
+run_on_node sed -i '/^Match User backup/i AllowUsers opsadmin\n' /etc/ssh/sshd_config
+```
+
+A drop-in file such as `/etc/ssh/sshd_config.d/00-allow.conf` with the line `AllowUsers opsadmin` also works, because the `Include` line sits above the `Match` block.
+
+## Verify the result
+
+Read the settings again in the same order:
+
+```sh
+run_on_node sh -c "grep -n -i -E '^ *(Include|PermitRootLogin|PasswordAuthentication|PubkeyAuthentication|AllowUsers|Match)' /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config"
+run_on_node getent passwd opsadmin
+```
+
+```text
+/etc/ssh/sshd_config.d/10-legacy-root.conf:2:PermitRootLogin no
+/etc/ssh/sshd_config.d/50-cloud-init.conf:1:PasswordAuthentication no
+/etc/ssh/sshd_config:2:Include /etc/ssh/sshd_config.d/*.conf
+/etc/ssh/sshd_config:5:PermitRootLogin no
+/etc/ssh/sshd_config:6:PubkeyAuthentication yes
+/etc/ssh/sshd_config:7:PasswordAuthentication no
+/etc/ssh/sshd_config:12:AllowUsers opsadmin
+/etc/ssh/sshd_config:14:Match User backup
+```
+
+```text
+opsadmin:x:1000:1000::/home/opsadmin:/bin/bash
+```
+
+The first value of each keyword is now the safe one, and `AllowUsers opsadmin` is on line 12, above the `Match` line on line 14. `opsadmin` keeps `/bin/bash`. On a node that runs `sshd`, you would now check the files with `sshd -t`, print the effective values with `sshd -T`, reload the daemon with `systemctl reload ssh` and test a new login from a second terminal before you close the first one. This node has no `sshd`, so the grader reads the files instead. Then submit.
+
+After recording your result, remove the independent lab with `astrona destroy ats-033-lab-010-02-01`.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - Edit the file that holds the first value of a setting. A correct line later in the main file does not override an earlier drop-in.
-> - Do not remove `PubkeyAuthentication yes` while you turn passwords off. Key logins are the access path that remains.
-> - Do not delete `olduser` or change `opsadmin`. The task asks for a login restriction, not for account removal.
-> - Confirm the private context and the node container name before you change a file.
+> - **Fixing only the main file.** The drop-in values are read first and win. Change the drop-in lines.
+> - **Searching with case.** `grep PermitRootLogin` misses `permitrootlogin yes`. Use `grep -i`.
+> - **Appending after a `Match` block.** `printf 'AllowUsers opsadmin\n' >> /etc/ssh/sshd_config` puts the line inside `Match User backup`, and the grader reports that `AllowUsers` appears only inside a `Match` block.

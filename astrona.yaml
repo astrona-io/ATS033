@@ -52,28 +52,46 @@ modules:
     title: Stop, Disable And Mask Services
     path: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
   - type: reading
-    title: Disable An Unneeded Node Service — Task
+    title: Close An Unneeded Listener On A Node — Task
     path: sections/section-010/module-01/labs/lab-01/question.md
   - type: lab
-    title: Disable An Unneeded Node Service
+    title: Close An Unneeded Listener On A Node
     path: sections/section-010/module-01/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 5m
+    estimated_duration: 8m
     topic: host-service-footprint
     task_kind: build
     learning_goals:
-    - Remove a seeded extra service from active and enabled node services while preserving
-      Kubernetes.
+    - Stop and disable a seeded systemd service so that its port closes, while kubelet and containerd keep running.
     tags:
     - cks
     - host-service-footprint
   - type: reading
-    title: Disable An Unneeded Node Service — Solution
+    title: Close An Unneeded Listener On A Node — Solution
     path: sections/section-010/module-01/labs/lab-01/solution.md
   - type: reading
     title: Remove Packages And Keep The Node Working
     path: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+  - type: reading
+    title: Purge An Unneeded Package From A Node — Task
+    path: sections/section-010/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Purge An Unneeded Package From A Node
+    path: sections/section-010/module-01/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: host-package-footprint
+    task_kind: build
+    learning_goals:
+    - Purge an unneeded Debian package and its configuration files from a node without breaking Kubernetes.
+    tags:
+    - cks
+    - host-package-footprint
+  - type: reading
+    title: Purge An Unneeded Package From A Node — Solution
+    path: sections/section-010/module-01/labs/lab-02/solution.md
   - type: reading
     title: Privileged Host Interfaces
     path: sections/section-010/module-01/course-04-privileged-host-interfaces.md
@@ -90,13 +108,10 @@ modules:
     title: Limit Who Can Log In
     path: sections/section-010/module-02/course-02-limit-who-can-log-in.md
   - type: reading
-    title: Login Shells And Unused Accounts
-    path: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
-  - type: reading
-    title: Harden SSH Access And Unused Accounts — Task
+    title: Restrict SSH Logins In sshd_config — Task
     path: sections/section-010/module-02/labs/lab-01/question.md
   - type: lab
-    title: Harden SSH Access And Unused Accounts
+    title: Restrict SSH Logins In sshd_config
     path: sections/section-010/module-02/labs/lab-01
     examScope: cluster
     difficulty: intermediate
@@ -104,14 +119,35 @@ modules:
     topic: ssh-host-login
     task_kind: build
     learning_goals:
-    - Set key-only SSH for one administrator account and remove the login paths of
-      an unused account.
+    - Fix drop-in precedence in sshd_config so that root and password logins are refused and only one administrator account may log in.
     tags:
     - cks
     - ssh-host-login
   - type: reading
-    title: Harden SSH Access And Unused Accounts — Solution
+    title: Restrict SSH Logins In sshd_config — Solution
     path: sections/section-010/module-02/labs/lab-01/solution.md
+  - type: reading
+    title: Login Shells And Unused Accounts
+    path: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+  - type: reading
+    title: Close Unused And Duplicate Root Accounts — Task
+    path: sections/section-010/module-02/labs/lab-02/question.md
+  - type: lab
+    title: Close Unused And Duplicate Root Accounts
+    path: sections/section-010/module-02/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: unused-host-accounts
+    task_kind: build
+    learning_goals:
+    - Lock an unused account, give it a refusing shell and remove a second account with UID 0.
+    tags:
+    - cks
+    - unused-host-accounts
+  - type: reading
+    title: Close Unused And Duplicate Root Accounts — Solution
+    path: sections/section-010/module-02/labs/lab-02/solution.md
   - type: reading
     title: Summary
     path: sections/section-010/module-02/course-04-summary.md
@@ -121,9 +157,6 @@ modules:
   - type: reading
     title: Host Namespaces, hostPath And Privileged Containers
     path: sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
-  - type: reading
-    title: Enforce Limits With Pod Security Admission
-    path: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
   - type: reading
     title: Remove Host Access From A Workload — Task
     path: sections/section-010/module-03/labs/lab-01/question.md
@@ -136,8 +169,7 @@ modules:
     topic: workload-host-access
     task_kind: build
     learning_goals:
-    - Rewrite a Deployment without host access and enforce the baseline standard on
-      its namespace.
+    - Rewrite a Deployment without host namespaces, hostPath or privilege, as a non-root user with a read-only root filesystem.
     tags:
     - cks
     - workload-host-access
@@ -145,8 +177,49 @@ modules:
     title: Remove Host Access From A Workload — Solution
     path: sections/section-010/module-03/labs/lab-01/solution.md
   - type: reading
+    title: Enforce Limits With Pod Security Admission
+    path: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+  - type: reading
+    title: Enforce The Baseline Pod Security Standard — Task
+    path: sections/section-010/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Enforce The Baseline Pod Security Standard
+    path: sections/section-010/module-03/labs/lab-02
+    examScope: namespace
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: namespace-pod-security
+    task_kind: build
+    learning_goals:
+    - Fix a workload that uses a host namespace, then enforce the baseline Pod Security Standard on its namespace.
+    tags:
+    - cks
+    - namespace-pod-security
+  - type: reading
+    title: Enforce The Baseline Pod Security Standard — Solution
+    path: sections/section-010/module-03/labs/lab-02/solution.md
+  - type: reading
     title: Kubelet Settings And Dedicated Nodes
     path: sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
+  - type: reading
+    title: Dedicate A Worker Node To One Workload — Task
+    path: sections/section-010/module-03/labs/lab-03/question.md
+  - type: lab
+    title: Dedicate A Worker Node To One Workload
+    path: sections/section-010/module-03/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: dedicated-workload-nodes
+    task_kind: build
+    learning_goals:
+    - Label and taint a worker node and give a Deployment the selector and toleration that pin it there.
+    tags:
+    - cks
+    - dedicated-workload-nodes
+  - type: reading
+    title: Dedicate A Worker Node To One Workload — Solution
+    path: sections/section-010/module-03/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-010/module-03/course-04-summary.md

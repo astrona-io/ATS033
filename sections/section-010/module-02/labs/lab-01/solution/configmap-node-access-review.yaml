@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: node-access-review
-  namespace: starfleet-033-010-02-01
-data:
-  ssh: key-only
-  account: olduser
-  result: hardened

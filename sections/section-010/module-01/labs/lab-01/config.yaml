@@ -10,9 +10,6 @@ runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
     nodes:
       workers: 1
 bootstrap:
@@ -37,18 +34,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: service-stopped
-    description: training-extra.service is inactive
+  - name: listener-closed
+    description: remote-diag.service is stopped and nothing listens on TCP port 8099
     type: file
-    source: validation/validate-service-stopped.sh
+    source: validation/validate-listener-closed.sh
     points: 1
-  - name: service-disabled
-    description: training-extra.service does not start at boot
+  - name: boot-start-removed
+    description: remote-diag.service no longer starts at boot (disabled, masked or removed)
     type: file
-    source: validation/validate-service-disabled.sh
-    points: 1
-  - name: host-review-record
-    description: ConfigMap host-review records the disabled service
-    type: file
-    source: validation/validate-host-review-record.sh
+    source: validation/validate-boot-start-removed.sh
     points: 1
