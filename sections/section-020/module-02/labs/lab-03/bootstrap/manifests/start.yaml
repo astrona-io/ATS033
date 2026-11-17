@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet-033-020-02-03
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bridge-credentials
+  namespace: starfleet-033-020-02-03
+type: Opaque
+stringData:
+  password: docking-code-7
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboard
+  namespace: starfleet-033-020-02-03
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dashboard-view
+  namespace: starfleet-033-020-02-03
+subjects:
+- kind: ServiceAccount
+  name: dashboard
+  namespace: starfleet-033-020-02-03
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: auditor-view
+  namespace: starfleet-033-020-02-03
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: auditor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: secret-peek-033-020-02-03
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: crew-editors
+  namespace: starfleet-033-020-02-03
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:serviceaccounts:starfleet-033-020-02-03
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit

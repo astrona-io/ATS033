@@ -1,0 +1,56 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-033-lab-020-01-03
+  docs:
+    prerequisites: docs/prerequisites.md
+    examQuestion: question.md
+    caseStudy: docs/case-study.md
+    guide: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 0
+bootstrap:
+  init:
+  - name: seed-private-environment
+    type: file
+    source: bootstrap/setup.sh
+teardown:
+  keepCluster: false
+testing:
+  init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
+  - name: reference-result
+    type: file
+    source: solution/apply.sh
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
+    type: file
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: group-access-revoked
+    description: leaver is out of flight-ops and cannot read the roster, while crew-member still can
+    type: file
+    source: validation/validate-group-access-revoked.sh
+    points: 1
+  - name: sudo-rule-removed
+    description: No file under /etc/sudoers.d grants leaver anything, and the crew-member rule stays
+    type: file
+    source: validation/validate-sudo-rule-removed.sh
+    points: 1
+  - name: cluster-access-revoked
+    description: The Kubernetes user leaver has no binding and kubectl auth can-i answers no, while crew-member keeps its access
+    type: file
+    source: validation/validate-cluster-access-revoked.sh
+    points: 1
+  - name: account-locked
+    description: passwd -S reports leaver as locked (L) and the account still exists
+    type: file
+    source: validation/validate-account-locked.sh
+    points: 1

@@ -10,11 +10,8 @@ runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
     nodes:
-      workers: 1
+      workers: 0
 bootstrap:
   init:
   - name: seed-private-environment
@@ -37,18 +34,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: cluster-admin-removed
-    description: ops-agent has no binding to cluster-admin and no cluster-wide access
+  - name: single-configmap-reader
+    description: code-reviewer can get the ConfigMap probe-code and no other ConfigMap
     type: file
-    source: validation/validate-cluster-admin-removed.sh
+    source: validation/validate-single-configmap-reader.sh
     points: 1
-  - name: wildcard-binding-removed
-    description: ops-agent has no RoleBinding to a wildcard Role
+  - name: namespaced-view-binding
+    description: inspector has view access in starfleet through a RoleBinding and no cluster-wide binding
     type: file
-    source: validation/validate-wildcard-binding-removed.sh
+    source: validation/validate-namespaced-view-binding.sh
     points: 1
-  - name: least-privilege-reader
-    description: ops-agent can read pods and logs in its namespace through ops-agent-reader and nothing more
-    type: file
-    source: validation/validate-least-privilege-reader.sh
-    points: 2

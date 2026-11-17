@@ -4,6 +4,6 @@ exam_objectives:
 ---
 # Starting Environment
 
-The isolated environment has two healthy probe replicas, an internal Service and two client Pods. The required result has not been configured.
+The cluster has one control-plane node and no application workloads. The node holds the file `/srv/flight-logs/telemetry.log`, owned by `root:root` with mode `644`, so every account on the node can read it.
 
-Grant a dedicated host identity access to one report without granting root access.
+The node also has two normal accounts, `navigator` and `cadet`, and an empty group `flight-log-readers`. The task is to give read access to `navigator` only, through that group.

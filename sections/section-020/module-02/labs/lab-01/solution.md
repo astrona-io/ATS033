@@ -2,102 +2,181 @@
 exam_objectives:
 - Using least-privilege identity and access management
 ---
-# Replace A Wildcard Role And cluster-admin Binding Solution
+# Scope Access With resourceNames And A RoleBinding Solution
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Select the private cluster first:
 
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-020-02-01)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-02-01" || exit 1
 ```
 
-Keep this connection selected. Every script supplied by the lab refuses a different context.
-
-## Inspect the current authority
-
-Start with the identity and the objects that bind it. Look at the Role, the RoleBinding and the ClusterRoleBinding, and ask the API server what the ServiceAccount may do.
+`kubectl auth can-i <verb> <resource> --as=<user>` asks the API server whether that user may send that request. A ServiceAccount has the user name `system:serviceaccount:<namespace>:<name>`. Put the two names in variables so the commands stay short:
 
 ```sh
-account=system:serviceaccount:starfleet-033-020-02-01:ops-agent
-kubectl -n starfleet-033-020-02-01 get role ops-wide -o yaml
-kubectl -n starfleet-033-020-02-01 get rolebinding ops-wide -o wide
-kubectl get clusterrolebinding ops-agent-admin -o wide
-kubectl auth can-i delete secrets --as="$account" -n outpost-033-020-02-01
+reviewer=system:serviceaccount:starfleet-033-020-02-01:code-reviewer
+inspector=system:serviceaccount:outpost-033-020-02-01:inspector
 ```
 
-The last command answers `yes`, because the ClusterRoleBinding to `cluster-admin` applies in every namespace. Deleting only the Role would leave that path open.
+## 1. Inspect the starting state
 
-## Create the narrow Role and its binding
+```sh
+kubectl -n starfleet-033-020-02-01 get configmaps
+kubectl auth can-i get configmap/probe-code --as=$reviewer -n starfleet-033-020-02-01
+```
 
-Save this as `role-ops-agent-reader.yaml`:
+```text
+NAME               DATA   AGE
+bridge-settings    1      22s
+kube-root-ca.crt   1      22s
+probe-code         1      22s
+no
+```
+
+The namespace has three ConfigMaps, and `code-reviewer` has no access yet. Next, look at the binding of `inspector`:
+
+```sh
+kubectl get clusterrolebindings -o wide --field-selector metadata.name=inspector-view
+kubectl auth can-i list pods --as=$inspector -n kube-system
+```
+
+```text
+NAME             ROLE               AGE   USERS   GROUPS   SERVICEACCOUNTS
+inspector-view   ClusterRole/view   22s                    outpost-033-020-02-01/inspector
+yes
+```
+
+A ClusterRoleBinding grants its role in every namespace, so `inspector` can even read Pods in `kube-system`.
+
+## 2. Allow get on one ConfigMap only
+
+The field `resourceNames` limits a rule to objects with these names. The API server can check a name only when the request names one object, so `resourceNames` works for `get`, `update`, `patch` and `delete`. It never allows `list` or `watch` on the whole collection, which is what you want here.
+
+Save this as `role-probe-code-reader.yaml`:
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: ops-agent-reader
+  name: probe-code-reader
   namespace: starfleet-033-020-02-01
 rules:
 - apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list"]
-- apiGroups: [""]
-  resources: ["pods/log"]
+  resources: ["configmaps"]
+  resourceNames: ["probe-code"]
   verbs: ["get"]
 ```
 
-Save this as `rolebinding-ops-agent-reader.yaml`:
+Save this as `rolebinding-code-reviewer.yaml`:
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: ops-agent-reader
+  name: code-reviewer
   namespace: starfleet-033-020-02-01
 subjects:
 - kind: ServiceAccount
-  name: ops-agent
+  name: code-reviewer
   namespace: starfleet-033-020-02-01
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ops-agent-reader
+  name: probe-code-reader
 ```
 
-Apply both:
+Apply them:
 
 ```sh
-kubectl apply -f role-ops-agent-reader.yaml -f rolebinding-ops-agent-reader.yaml
+kubectl apply -f role-probe-code-reader.yaml
+kubectl apply -f rolebinding-code-reviewer.yaml
 ```
 
-## Remove the old paths
+```text
+role.rbac.authorization.k8s.io/probe-code-reader created
+rolebinding.rbac.authorization.k8s.io/code-reviewer created
+```
 
-RBAC only adds permissions, so the wide access stays until you delete the bindings. Delete the ClusterRoleBinding, the RoleBinding and the Role:
+Then check the result:
 
 ```sh
-kubectl delete clusterrolebinding ops-agent-admin
-kubectl -n starfleet-033-020-02-01 delete rolebinding ops-wide
-kubectl -n starfleet-033-020-02-01 delete role ops-wide
+kubectl auth can-i get configmap/probe-code --as=$reviewer -n starfleet-033-020-02-01
+kubectl auth can-i get configmap/bridge-settings --as=$reviewer -n starfleet-033-020-02-01
+kubectl auth can-i list configmaps --as=$reviewer -n starfleet-033-020-02-01
 ```
 
-## Verify the result
+```text
+yes
+no
+no
+```
 
-Ask the questions as the ServiceAccount. The first three must answer `yes`. The last five must answer `no`, and `kubectl auth can-i` ends with a nonzero status when the answer is `no`, so run the commands one at a time.
+`kubectl auth can-i --list` shows the whole rule set of a user. Its output for `code-reviewer` is long, because every user may call discovery URLs such as `/api` and `/healthz`. The last line is the rule from the new Role:
 
 ```sh
-kubectl auth can-i list pods --as="$account" -n starfleet-033-020-02-01
-kubectl auth can-i get pods --as="$account" -n starfleet-033-020-02-01
-kubectl auth can-i get pods/log --as="$account" -n starfleet-033-020-02-01
-kubectl auth can-i delete pods --as="$account" -n starfleet-033-020-02-01
-kubectl auth can-i get secrets --as="$account" -n starfleet-033-020-02-01
-kubectl auth can-i create deployments --as="$account" -n starfleet-033-020-02-01
-kubectl auth can-i list pods --as="$account" -n outpost-033-020-02-01
-kubectl auth can-i list nodes --as="$account"
+kubectl auth can-i --list --as=$reviewer -n starfleet-033-020-02-01
 ```
 
-After recording your result, remove the independent lab with `astrona destroy ats-033-lab-020-02-01`.
+```text
+configmaps                                      []                                     [probe-code]     [get]
+```
+
+The output above is shortened to that last line.
+
+## 3. Bind view in one namespace only
+
+A RoleBinding can reference a ClusterRole. The API server then grants the ClusterRole's rules only inside the RoleBinding's namespace. The subject can come from any namespace, so the binding names the namespace of `inspector`.
+
+Save this as `rolebinding-inspector-view.yaml`:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: inspector-view
+  namespace: starfleet-033-020-02-01
+subjects:
+- kind: ServiceAccount
+  name: inspector
+  namespace: outpost-033-020-02-01
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+```
+
+Apply it, and delete the ClusterRoleBinding:
+
+```sh
+kubectl apply -f rolebinding-inspector-view.yaml
+kubectl delete clusterrolebinding inspector-view
+```
+
+```text
+rolebinding.rbac.authorization.k8s.io/inspector-view created
+clusterrolebinding.rbac.authorization.k8s.io "inspector-view" deleted
+```
+
+Then check the result:
+
+```sh
+kubectl auth can-i list pods --as=$inspector -n starfleet-033-020-02-01
+kubectl auth can-i list pods --as=$inspector -n kube-system
+kubectl auth can-i list pods --as=$inspector -n outpost-033-020-02-01
+```
+
+```text
+yes
+no
+no
+```
+
+`inspector` reads only `starfleet-033-020-02-01`. It has no access even in its own namespace. Submit with `astrona submit`. When you are done, remove the lab with `astrona destroy ats-033-lab-020-02-01`.
 
 ## Common pitfalls
 
 > [!WARNING]
-> Confirm the private context before a change. Delete every old binding as well as creating the new one, because RBAC only adds permissions. Test as the ServiceAccount with `--as`, never with your own administrator session.
+> - **Expecting `resourceNames` to allow `list`.** A list request names no object, so a rule with `resourceNames` never matches it.
+> - **Keeping the ClusterRoleBinding.** RBAC only adds permissions. A new RoleBinding does not remove the cluster-wide access; you must delete the ClusterRoleBinding.
+> - **Wrong subject namespace.** The subject of the RoleBinding is `inspector` in `outpost-033-020-02-01`, not in the namespace of the binding.
+> - **Testing without the full name.** `--as=inspector` tests a user called `inspector`, not the ServiceAccount. Use `system:serviceaccount:<namespace>:<name>`.
