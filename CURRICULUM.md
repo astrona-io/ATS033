@@ -18,15 +18,23 @@ The [official objectives](https://training.linuxfoundation.org/certification/cer
 | 030 / 01 | Minimizing External Access To Host Services | Minimizing External Access To Host Services |
 | 040 / 01 | Seccomp And AppArmor As Different Kernel Boundaries | Seccomp And AppArmor As Different Kernel Boundaries |
 
-AUTHORING.yaml records measurable goals and adaptation sources. Every objective retains its section ID. All technical readings remain draft. Question banks are separate from the reading manifest and follow their declared summaries. No labs, playgrounds or runtime validation are included.
+AUTHORING.yaml records measurable goals and adaptation sources. Every objective retains its section ID. All technical readings remain draft. Question banks are separate from the reading manifest and follow their declared summaries. Each module has a private playground, and graded labs follow the readings they practise.
 
 ## Hands-On Coverage
 
-This course has 4 ungraded module playgrounds and 4 draft independent labs. Tasks and solutions are registered around each lab immediately after its teaching reading. Static configuration, shell/Python/YAML, parser, lifecycle and offline grader checks pass. Live execution remains pending because the session cannot access Podman; installed CLI configuration validation is separately blocked by its maintenance lock.
+This course has 12 ungraded module playgrounds and 36 graded labs. Each lab is registered right after the reading it practises. 33 labs passed `astrona validate` and `astrona test` on a live kind cluster. The 3 AppArmor labs passed `astrona validate`; they need a Linux host with AppArmor for a live test.
 
 | Module | Labs in teaching order |
 | --- | --- |
-| 010/01 | Disable An Unneeded Node Service |
-| 020/01 | Grant One Host Identity Scoped Read Access |
-| 030/01 | Bind A Host-Network Service To Loopback |
-| 040/01 | Run With A Restricted Security Context |
+| 010/01 | Close An Unneeded Listener On A Node; Purge An Unneeded Package From A Node |
+| 010/02 | Restrict SSH Logins In sshd_config; Close Unused And Duplicate Root Accounts |
+| 010/03 | Remove Host Access From A Workload; Enforce The Baseline Pod Security Standard; Dedicate A Worker Node To One Workload |
+| 020/01 | Grant Read Access Through A Group; Lock And Expire A Departed Account; Revoke A Leaver's Access Everywhere |
+| 020/02 | Scope Access With resourceNames And A RoleBinding; Replace Wildcard And Cluster-Admin Access; Find Hidden RBAC Grants |
+| 020/03 | Give A Workload Its Own ServiceAccount; Mount A Short-Lived Projected Token; Close The Default ServiceAccount |
+| 030/01 | Bind A Host-Network Service To Loopback; Allow A Node Port Only From The Worker With iptables; Default-Deny Ingress With One Allowed Client |
+| 030/02 | Close An Accidental NodePort; Answer A NodePort Only On Nodes With Endpoints; Audit And Close Unapproved Service Exposure |
+| 030/03 | Bind The Scheduler To Loopback; Remove Anonymous Access From RBAC Bindings; Close The Kubelet API To Anonymous Callers; Restrict The etcd Data Directory |
+| 040/01 | Install And Use A Localhost seccomp Profile; Load An AppArmor Profile And Attach It To A Pod; Harden A Deployment To The Restricted Pod Security Level; Fix A Pod That References A Missing seccomp Profile |
+| 040/02 | Apply The RuntimeDefault seccomp Profile To Deployments; Block File Deletion With A Localhost seccomp Profile; Find And Fix A Blocked System Call In A seccomp Profile |
+| 040/03 | Switch An AppArmor Profile From Complain To Enforce Mode; Set An AppArmor Profile For One Container; Drop All Capabilities Except NET_BIND_SERVICE |
