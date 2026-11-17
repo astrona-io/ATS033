@@ -155,10 +155,24 @@ sections:
     - id: lab-01
       path: sections/section-020/module-01/labs/lab-01
       after_reading: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
-      objective: Grant a dedicated host identity access to one report without granting
-        root access.
+      objective: Give one host account read access to a file through a group, without
+        making the file world-readable or granting root access.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-020/module-01/labs/lab-02
+      after_reading: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+      objective: Lock, expire and remove the login shell of a host account without
+        deleting it.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-020/module-01/labs/lab-03
+      after_reading: sections/section-020/module-01/course-04-revocation-and-audit.md
+      objective: Remove one person's group membership, sudoers rule and RBAC binding,
+        and lock the host account.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-02
     title: Least-Privilege RBAC Roles And Bindings
@@ -184,11 +198,25 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-020/module-02/labs/lab-01
+      after_reading: sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
+      objective: Limit a Role to one named object and bind a ClusterRole in one namespace
+        with a RoleBinding.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-020/module-02/labs/lab-02
       after_reading: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
       objective: Replace a wildcard Role and a cluster-admin binding of one ServiceAccount
         with a narrow Role.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-020/module-02/labs/lab-03
+      after_reading: sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
+      objective: Find and remove an aggregated ClusterRole and a group binding that
+        grant more than the intended roles.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-03
     title: Restrict ServiceAccounts And API Tokens
@@ -214,11 +242,25 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-020/module-03/labs/lab-01
-      after_reading: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
-      objective: Move a workload to a dedicated ServiceAccount without a mounted token,
-        and remove the unused token paths.
+      after_reading: sections/section-020/module-03/course-01-dedicated-serviceaccounts-and-automount.md
+      objective: Run one workload as a dedicated ServiceAccount with only the access
+        it needs, and remove the token from a workload that does not call the API server.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-020/module-03/labs/lab-02
+      after_reading: sections/section-020/module-03/course-02-bound-projected-tokens.md
+      objective: Mount a projected ServiceAccount token with its own audience and a
+        600-second lifetime, and remove the default token.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-020/module-03/labs/lab-03
+      after_reading: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
+      objective: Stop the default ServiceAccount from mounting tokens, remove its binding
+        and delete a long-lived token Secret.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
 - id: section-030
   title: Minimize external access to the network

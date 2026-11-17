@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: code-reviewer
+  namespace: starfleet-033-020-02-01
+subjects:
+- kind: ServiceAccount
+  name: code-reviewer
+  namespace: starfleet-033-020-02-01
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: probe-code-reader

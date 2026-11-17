@@ -11,10 +11,9 @@ runtime:
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
     preloadImages:
-    - docker.io/library/python:3.13-alpine
     - docker.io/library/busybox:1.37.0
     nodes:
-      workers: 1
+      workers: 0
 bootstrap:
   init:
   - name: seed-private-environment
@@ -37,18 +36,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: monitor-without-token
-    description: The monitor pod runs as the monitor ServiceAccount with no mounted token
+  - name: monitor-dedicated-account
+    description: The monitor Pod runs as the monitor ServiceAccount, which can list Pods and cannot read Secrets
     type: file
-    source: validation/validate-monitor-without-token.sh
-    points: 2
-  - name: default-account-closed
-    description: The default ServiceAccount mounts no token and has no binding
-    type: file
-    source: validation/validate-default-account-closed.sh
+    source: validation/validate-monitor-dedicated-account.sh
     points: 1
-  - name: legacy-token-deleted
-    description: The long-lived token Secret legacy-monitor-token is gone
+  - name: probe-without-token
+    description: The probe Pod has no ServiceAccount token mounted
     type: file
-    source: validation/validate-legacy-token-deleted.sh
+    source: validation/validate-probe-without-token.sh
     points: 1

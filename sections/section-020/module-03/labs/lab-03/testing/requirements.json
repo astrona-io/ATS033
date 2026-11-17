@@ -1,0 +1,20 @@
+{
+  "context": "kind-astro-ats-033-lab-020-03-03",
+  "cluster": "astro-ats-033-lab-020-03-03",
+  "namespace": "starfleet-033-020-03-03",
+  "resources": [
+    {
+      "kind": "serviceaccount",
+      "name": "default",
+      "namespace": "starfleet-033-020-03-03",
+      "expected": {}
+    },
+    {
+      "kind": "serviceaccount",
+      "name": "legacy-monitor",
+      "namespace": "starfleet-033-020-03-03",
+      "expected": {}
+    }
+  ],
+  "behavior": []
+}

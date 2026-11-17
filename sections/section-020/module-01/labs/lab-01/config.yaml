@@ -10,11 +10,8 @@ runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
     nodes:
-      workers: 1
+      workers: 0
 bootstrap:
   init:
   - name: seed-private-environment
@@ -37,13 +34,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: scoped-group-read
-    description: training-reader reads public-report through the training-readers group only
+  - name: navigator-group-read
+    description: navigator reads telemetry.log through the flight-log-readers group and holds no other extra group
     type: file
-    source: validation/validate-scoped-group-read.sh
+    source: validation/validate-navigator-group-read.sh
     points: 1
-  - name: identity-review-record
-    description: ConfigMap identity-review records the scoped read
+  - name: other-accounts-denied
+    description: telemetry.log is root:flight-log-readers without read access for other accounts, so cadet is denied
     type: file
-    source: validation/validate-identity-review-record.sh
+    source: validation/validate-other-accounts-denied.sh
     points: 1

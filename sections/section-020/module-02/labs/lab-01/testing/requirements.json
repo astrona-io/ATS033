@@ -4,195 +4,37 @@
   "namespace": "starfleet-033-020-02-01",
   "resources": [
     {
-      "kind": "deployment",
-      "name": "probe",
+      "kind": "serviceaccount",
+      "name": "code-reviewer",
       "namespace": "starfleet-033-020-02-01",
       "expected": {
-        "apiVersion": "apps/v1",
-        "kind": "Deployment",
         "metadata": {
-          "name": "probe",
-          "namespace": "starfleet-033-020-02-01"
-        },
-        "spec": {
-          "replicas": 2,
-          "selector": {
-            "matchLabels": {
-              "app": "probe",
-              "release": "probe"
-            }
-          }
-        }
-      },
-      "state": "deployment"
-    },
-    {
-      "kind": "pod",
-      "name": "shuttle",
-      "namespace": "starfleet-033-020-02-01",
-      "expected": {
-        "apiVersion": "v1",
-        "kind": "Pod",
-        "metadata": {
-          "name": "shuttle",
+          "name": "code-reviewer",
           "namespace": "starfleet-033-020-02-01"
         }
-      },
-      "state": "pod"
-    },
-    {
-      "kind": "pod",
-      "name": "drifter",
-      "namespace": "outpost-033-020-02-01",
-      "expected": {
-        "apiVersion": "v1",
-        "kind": "Pod",
-        "metadata": {
-          "name": "drifter",
-          "namespace": "outpost-033-020-02-01"
-        }
-      },
-      "state": "pod"
+      }
     },
     {
       "kind": "serviceaccount",
-      "name": "ops-agent",
+      "name": "inspector",
+      "namespace": "outpost-033-020-02-01",
+      "expected": {
+        "metadata": {
+          "name": "inspector",
+          "namespace": "outpost-033-020-02-01"
+        }
+      }
+    },
+    {
+      "kind": "configmap",
+      "name": "bridge-settings",
       "namespace": "starfleet-033-020-02-01",
       "expected": {
-        "apiVersion": "v1",
-        "kind": "ServiceAccount",
-        "metadata": {
-          "name": "ops-agent",
-          "namespace": "starfleet-033-020-02-01"
+        "data": {
+          "greeting": "hello"
         }
       }
     }
   ],
-  "behavior": [
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "list",
-        "pods",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent",
-        "-n",
-        "starfleet-033-020-02-01"
-      ],
-      "equals": "yes",
-      "outcome": "least-privilege-reader"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "get",
-        "pods",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent",
-        "-n",
-        "starfleet-033-020-02-01"
-      ],
-      "equals": "yes",
-      "outcome": "least-privilege-reader"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "get",
-        "pods/log",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent",
-        "-n",
-        "starfleet-033-020-02-01"
-      ],
-      "equals": "yes",
-      "outcome": "least-privilege-reader"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "delete",
-        "pods",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent",
-        "-n",
-        "starfleet-033-020-02-01"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "least-privilege-reader"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "get",
-        "secrets",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent",
-        "-n",
-        "starfleet-033-020-02-01"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "least-privilege-reader"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "create",
-        "deployments",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent",
-        "-n",
-        "starfleet-033-020-02-01"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "least-privilege-reader"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "list",
-        "pods",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent",
-        "-n",
-        "outpost-033-020-02-01"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "cluster-admin-removed"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "list",
-        "nodes",
-        "--as=system:serviceaccount:starfleet-033-020-02-01:ops-agent"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "cluster-admin-removed"
-    }
-  ]
+  "behavior": []
 }

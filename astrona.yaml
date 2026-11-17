@@ -171,33 +171,74 @@ modules:
     title: Users, Groups And File Permissions
     path: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
   - type: reading
-    title: Grant One Host Identity Scoped Read Access — Task
+    title: Grant Read Access Through A Group — Task
     path: sections/section-020/module-01/labs/lab-01/question.md
   - type: lab
-    title: Grant One Host Identity Scoped Read Access
+    title: Grant Read Access Through A Group
     path: sections/section-020/module-01/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 5m
+    estimated_duration: 6m
     topic: host-identity
     task_kind: build
     learning_goals:
-    - Grant a dedicated host identity access to one report without granting root access.
+    - Give one host account read access to a file through a group, without making
+      the file world-readable or granting root access.
     tags:
     - cks
     - host-identity
   - type: reading
-    title: Grant One Host Identity Scoped Read Access — Solution
+    title: Grant Read Access Through A Group — Solution
     path: sections/section-020/module-01/labs/lab-01/solution.md
   - type: reading
     title: Privilege Elevation And Account Locking
     path: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+  - type: reading
+    title: Lock And Expire A Departed Account — Task
+    path: sections/section-020/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Lock And Expire A Departed Account
+    path: sections/section-020/module-01/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 6m
+    topic: account-locking
+    task_kind: build
+    learning_goals:
+    - Lock, expire and remove the login shell of a host account without deleting
+      it.
+    tags:
+    - cks
+    - account-locking
+  - type: reading
+    title: Lock And Expire A Departed Account — Solution
+    path: sections/section-020/module-01/labs/lab-02/solution.md
   - type: reading
     title: Kubernetes Identities And RBAC
     path: sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
   - type: reading
     title: Revocation And Audit
     path: sections/section-020/module-01/course-04-revocation-and-audit.md
+  - type: reading
+    title: Revoke A Leaver's Access Everywhere — Task
+    path: sections/section-020/module-01/labs/lab-03/question.md
+  - type: lab
+    title: Revoke A Leaver's Access Everywhere
+    path: sections/section-020/module-01/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: access-revocation
+    task_kind: build
+    learning_goals:
+    - Remove one person's group membership, sudoers rule and RBAC binding, and lock
+      the host account.
+    tags:
+    - cks
+    - access-revocation
+  - type: reading
+    title: Revoke A Leaver's Access Everywhere — Solution
+    path: sections/section-020/module-01/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-020/module-01/course-05-summary.md
@@ -208,14 +249,34 @@ modules:
     title: Roles, ClusterRoles And Bindings
     path: sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
   - type: reading
+    title: Scope Access With resourceNames And A RoleBinding — Task
+    path: sections/section-020/module-02/labs/lab-01/question.md
+  - type: lab
+    title: Scope Access With resourceNames And A RoleBinding
+    path: sections/section-020/module-02/labs/lab-01
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: rbac-resource-scoping
+    task_kind: build
+    learning_goals:
+    - Limit a Role to one named object and bind a ClusterRole in one namespace with
+      a RoleBinding.
+    tags:
+    - cks
+    - rbac-resource-scoping
+  - type: reading
+    title: Scope Access With resourceNames And A RoleBinding — Solution
+    path: sections/section-020/module-02/labs/lab-01/solution.md
+  - type: reading
     title: Wildcards, cluster-admin And Escalation
     path: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
   - type: reading
-    title: Replace A Wildcard Role And cluster-admin Binding — Task
-    path: sections/section-020/module-02/labs/lab-01/question.md
+    title: Replace Wildcard And Cluster-Admin Access — Task
+    path: sections/section-020/module-02/labs/lab-02/question.md
   - type: lab
-    title: Replace A Wildcard Role And cluster-admin Binding
-    path: sections/section-020/module-02/labs/lab-01
+    title: Replace Wildcard And Cluster-Admin Access
+    path: sections/section-020/module-02/labs/lab-02
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
@@ -228,11 +289,31 @@ modules:
     - cks
     - rbac-least-privilege
   - type: reading
-    title: Replace A Wildcard Role And cluster-admin Binding — Solution
-    path: sections/section-020/module-02/labs/lab-01/solution.md
+    title: Replace Wildcard And Cluster-Admin Access — Solution
+    path: sections/section-020/module-02/labs/lab-02/solution.md
   - type: reading
     title: Audit Permissions With kubectl auth can-i
     path: sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
+  - type: reading
+    title: Find Hidden RBAC Grants — Task
+    path: sections/section-020/module-02/labs/lab-03/question.md
+  - type: lab
+    title: Find Hidden RBAC Grants
+    path: sections/section-020/module-02/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: rbac-aggregation
+    task_kind: build
+    learning_goals:
+    - Find and remove an aggregated ClusterRole and a group binding that grant more
+      than the intended roles.
+    tags:
+    - cks
+    - rbac-aggregation
+  - type: reading
+    title: Find Hidden RBAC Grants — Solution
+    path: sections/section-020/module-02/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-020/module-02/course-04-summary.md
@@ -243,31 +324,71 @@ modules:
     title: Dedicated ServiceAccounts And automountServiceAccountToken
     path: sections/section-020/module-03/course-01-dedicated-serviceaccounts-and-automount.md
   - type: reading
-    title: Bound Projected Tokens
-    path: sections/section-020/module-03/course-02-bound-projected-tokens.md
-  - type: reading
-    title: The Default ServiceAccount And Unused Tokens
-    path: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
-  - type: reading
-    title: Give A Workload Its Own ServiceAccount And Remove Its Tokens — Task
+    title: Give A Workload Its Own ServiceAccount — Task
     path: sections/section-020/module-03/labs/lab-01/question.md
   - type: lab
-    title: Give A Workload Its Own ServiceAccount And Remove Its Tokens
+    title: Give A Workload Its Own ServiceAccount
     path: sections/section-020/module-03/labs/lab-01
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 10m
+    estimated_duration: 8m
     topic: serviceaccount-tokens
     task_kind: build
     learning_goals:
-    - Move a workload to a dedicated ServiceAccount without a mounted token, and remove
-      the unused token paths.
+    - Run one workload as a dedicated ServiceAccount with only the access it needs,
+      and remove the token from a workload that does not call the API server.
     tags:
     - cks
     - serviceaccount-tokens
   - type: reading
-    title: Give A Workload Its Own ServiceAccount And Remove Its Tokens — Solution
+    title: Give A Workload Its Own ServiceAccount — Solution
     path: sections/section-020/module-03/labs/lab-01/solution.md
+  - type: reading
+    title: Bound Projected Tokens
+    path: sections/section-020/module-03/course-02-bound-projected-tokens.md
+  - type: reading
+    title: Mount A Short-Lived Projected Token — Task
+    path: sections/section-020/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Mount A Short-Lived Projected Token
+    path: sections/section-020/module-03/labs/lab-02
+    examScope: namespace
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: projected-tokens
+    task_kind: build
+    learning_goals:
+    - Mount a projected ServiceAccount token with its own audience and a 600-second
+      lifetime, and remove the default token.
+    tags:
+    - cks
+    - projected-tokens
+  - type: reading
+    title: Mount A Short-Lived Projected Token — Solution
+    path: sections/section-020/module-03/labs/lab-02/solution.md
+  - type: reading
+    title: The Default ServiceAccount And Unused Tokens
+    path: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
+  - type: reading
+    title: Close The Default ServiceAccount — Task
+    path: sections/section-020/module-03/labs/lab-03/question.md
+  - type: lab
+    title: Close The Default ServiceAccount
+    path: sections/section-020/module-03/labs/lab-03
+    examScope: namespace
+    difficulty: intermediate
+    estimated_duration: 6m
+    topic: default-serviceaccount
+    task_kind: build
+    learning_goals:
+    - Stop the default ServiceAccount from mounting tokens, remove its binding and
+      delete a long-lived token Secret.
+    tags:
+    - cks
+    - default-serviceaccount
+  - type: reading
+    title: Close The Default ServiceAccount — Solution
+    path: sections/section-020/module-03/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-020/module-03/course-04-summary.md

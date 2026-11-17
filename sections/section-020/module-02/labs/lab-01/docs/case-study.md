@@ -4,6 +4,6 @@ exam_objectives:
 ---
 # Starting Environment
 
-The isolated environment has two healthy `probe` replicas, an internal Service and two client pods. The `ops-agent` ServiceAccount in `starfleet-033-020-02-01` is bound to a Role `ops-wide` that allows every verb on every resource, and to `cluster-admin` through the ClusterRoleBinding `ops-agent-admin`. The agent only needs to read pods and their logs in `starfleet-033-020-02-01`.
+The cluster has the namespaces `starfleet-033-020-02-01` and `outpost-033-020-02-01` and no workloads. `starfleet-033-020-02-01` holds the ConfigMaps `probe-code` and `bridge-settings` and the ServiceAccount `code-reviewer`, which has no access yet.
 
-The `ops-agent` in `starfleet-033-020-02-01` has far more authority than its task needs.
+The ServiceAccount `inspector` in `outpost-033-020-02-01` has the ClusterRole `view` in every namespace through the ClusterRoleBinding `inspector-view`. The task is to give `code-reviewer` one ConfigMap only and to limit `inspector` to one namespace.
