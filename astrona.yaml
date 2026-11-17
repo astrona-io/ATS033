@@ -299,12 +299,11 @@ modules:
     path: sections/section-030/module-01/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 8m
+    estimated_duration: 10m
     topic: host-network-exposure
     task_kind: build
     learning_goals:
-    - Keep a node-local management-style service reachable locally while closing its
-      node-address listener.
+    - Keep a node-local management-style service reachable locally while closing its node-address listener.
     tags:
     - cks
     - host-network-exposure
@@ -315,8 +314,46 @@ modules:
     title: Host Firewalls With iptables And ufw
     path: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
   - type: reading
+    title: Allow A Node Port Only From The Worker With iptables — Task
+    path: sections/section-030/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Allow A Node Port Only From The Worker With iptables
+    path: sections/section-030/module-01/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: host-firewall
+    task_kind: build
+    learning_goals:
+    - Add iptables INPUT rules on a node so that only the worker node reaches a host-network listener.
+    tags:
+    - cks
+    - host-firewall
+  - type: reading
+    title: Allow A Node Port Only From The Worker With iptables — Solution
+    path: sections/section-030/module-01/labs/lab-02/solution.md
+  - type: reading
     title: NetworkPolicy For Pod Traffic
     path: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+  - type: reading
+    title: Default-Deny Ingress With One Allowed Client — Task
+    path: sections/section-030/module-01/labs/lab-03/question.md
+  - type: lab
+    title: Default-Deny Ingress With One Allowed Client
+    path: sections/section-030/module-01/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 12m
+    topic: networkpolicy-ingress
+    task_kind: build
+    learning_goals:
+    - Deny all ingress in a namespace and allow one client pod to reach one Service port.
+    tags:
+    - cks
+    - networkpolicy-ingress
+  - type: reading
+    title: Default-Deny Ingress With One Allowed Client — Solution
+    path: sections/section-030/module-01/labs/lab-03/solution.md
   - type: reading
     title: NodePorts, Control-Plane Ports And API Access
     path: sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md
@@ -330,13 +367,10 @@ modules:
     title: Service Types And What They Open
     path: sections/section-030/module-02/course-01-service-types-and-what-they-open.md
   - type: reading
-    title: Narrowing NodePorts And Load Balancers
-    path: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
-  - type: reading
-    title: Close An Accidental NodePort And Keep One Local — Task
+    title: Close An Accidental NodePort — Task
     path: sections/section-030/module-02/labs/lab-01/question.md
   - type: lab
-    title: Close An Accidental NodePort And Keep One Local
+    title: Close An Accidental NodePort
     path: sections/section-030/module-02/labs/lab-01
     examScope: cluster
     difficulty: intermediate
@@ -344,17 +378,57 @@ modules:
     topic: service-exposure
     task_kind: build
     learning_goals:
-    - Change an accidental NodePort Service to ClusterIP and set externalTrafficPolicy
-      Local on the one that stays published.
+    - Change an accidental NodePort Service to ClusterIP so that its node port closes on every node.
     tags:
     - cks
     - service-exposure
   - type: reading
-    title: Close An Accidental NodePort And Keep One Local — Solution
+    title: Close An Accidental NodePort — Solution
     path: sections/section-030/module-02/labs/lab-01/solution.md
+  - type: reading
+    title: Narrowing NodePorts And Load Balancers
+    path: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
+  - type: reading
+    title: Answer A NodePort Only On Nodes With Endpoints — Task
+    path: sections/section-030/module-02/labs/lab-02/question.md
+  - type: lab
+    title: Answer A NodePort Only On Nodes With Endpoints
+    path: sections/section-030/module-02/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: external-traffic-policy
+    task_kind: build
+    learning_goals:
+    - Set externalTrafficPolicy Local on a NodePort Service and prove that nodes without endpoints stop answering.
+    tags:
+    - cks
+    - external-traffic-policy
+  - type: reading
+    title: Answer A NodePort Only On Nodes With Endpoints — Solution
+    path: sections/section-030/module-02/labs/lab-02/solution.md
   - type: reading
     title: Ingress As The Single Entry Point
     path: sections/section-030/module-02/course-03-ingress-and-finding-exposed-services.md
+  - type: reading
+    title: Audit And Close Unapproved Service Exposure — Task
+    path: sections/section-030/module-02/labs/lab-03/question.md
+  - type: lab
+    title: Audit And Close Unapproved Service Exposure
+    path: sections/section-030/module-02/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 15m
+    topic: exposure-audit
+    task_kind: build
+    learning_goals:
+    - Find and close externalIPs, extra NodePorts and host-network listeners while keeping the approved entry.
+    tags:
+    - cks
+    - exposure-audit
+  - type: reading
+    title: Audit And Close Unapproved Service Exposure — Solution
+    path: sections/section-030/module-02/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-030/module-02/course-04-summary.md
@@ -365,34 +439,90 @@ modules:
     title: Control-Plane Ports And Listeners
     path: sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
   - type: reading
+    title: Bind The Scheduler To Loopback — Task
+    path: sections/section-030/module-03/labs/lab-01/question.md
+  - type: lab
+    title: Bind The Scheduler To Loopback
+    path: sections/section-030/module-03/labs/lab-01
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: control-plane-listeners
+    task_kind: build
+    learning_goals:
+    - Restore --bind-address=127.0.0.1 in the kube-scheduler static pod manifest and prove that port 10259 is closed to other nodes.
+    tags:
+    - cks
+    - control-plane-listeners
+  - type: reading
+    title: Bind The Scheduler To Loopback — Solution
+    path: sections/section-030/module-03/labs/lab-01/solution.md
+  - type: reading
     title: API Server Authentication And Authorization
     path: sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
+  - type: reading
+    title: Remove Anonymous Access From RBAC Bindings — Task
+    path: sections/section-030/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Remove Anonymous Access From RBAC Bindings
+    path: sections/section-030/module-03/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: anonymous-api-access
+    task_kind: build
+    learning_goals:
+    - Remove system:anonymous and system:unauthenticated from RBAC bindings while keeping the intended subjects.
+    tags:
+    - cks
+    - anonymous-api-access
+  - type: reading
+    title: Remove Anonymous Access From RBAC Bindings — Solution
+    path: sections/section-030/module-03/labs/lab-02/solution.md
   - type: reading
     title: Kubelet API Authentication And Authorization
     path: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
   - type: reading
     title: Close The Kubelet API To Anonymous Callers — Task
-    path: sections/section-030/module-03/labs/lab-01/question.md
+    path: sections/section-030/module-03/labs/lab-03/question.md
   - type: lab
     title: Close The Kubelet API To Anonymous Callers
-    path: sections/section-030/module-03/labs/lab-01
+    path: sections/section-030/module-03/labs/lab-03
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
     topic: kubelet-api
     task_kind: build
     learning_goals:
-    - Turn off anonymous access and AlwaysAllow authorization on a kubelet and restart
-      it.
+    - Turn off anonymous access and AlwaysAllow authorization on a kubelet and restart it.
     tags:
     - cks
     - kubelet-api
   - type: reading
     title: Close The Kubelet API To Anonymous Callers — Solution
-    path: sections/section-030/module-03/labs/lab-01/solution.md
+    path: sections/section-030/module-03/labs/lab-03/solution.md
   - type: reading
     title: etcd Client Access
     path: sections/section-030/module-03/course-04-etcd-client-access.md
+  - type: reading
+    title: Restrict The etcd Data Directory — Task
+    path: sections/section-030/module-03/labs/lab-04/question.md
+  - type: lab
+    title: Restrict The etcd Data Directory
+    path: sections/section-030/module-03/labs/lab-04
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 6m
+    topic: etcd-data-directory
+    task_kind: build
+    learning_goals:
+    - Set the etcd data directory back to mode 700 while etcd keeps running.
+    tags:
+    - cks
+    - etcd-data-directory
+  - type: reading
+    title: Restrict The etcd Data Directory — Solution
+    path: sections/section-030/module-03/labs/lab-04/solution.md
   - type: reading
     title: Summary
     path: sections/section-030/module-03/course-05-summary.md

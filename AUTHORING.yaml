@@ -257,7 +257,21 @@ sections:
       objective: Keep a node-local management-style service reachable locally while
         closing its node-address listener.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-030/module-01/labs/lab-02
+      after_reading: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
+      objective: Add iptables INPUT rules on a node so that only the worker node reaches
+        a host-network listener.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-030/module-01/labs/lab-03
+      after_reading: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+      objective: Deny all ingress in a namespace and allow one client pod to reach one
+        Service port.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-02
     title: Limit Service Exposure Outside The Cluster
@@ -284,11 +298,25 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-030/module-02/labs/lab-01
-      after_reading: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
-      objective: Change an accidental NodePort Service to ClusterIP and set externalTrafficPolicy
-        Local on the one that stays published.
+      after_reading: sections/section-030/module-02/course-01-service-types-and-what-they-open.md
+      objective: Change an accidental NodePort Service to ClusterIP so that its node
+        port closes on every node.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-030/module-02/labs/lab-02
+      after_reading: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
+      objective: Set externalTrafficPolicy Local on a NodePort Service and prove that
+        nodes without endpoints stop answering.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-030/module-02/labs/lab-03
+      after_reading: sections/section-030/module-02/course-03-ingress-and-finding-exposed-services.md
+      objective: Find and close externalIPs, extra NodePorts and host-network listeners
+        while keeping the approved entry.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-03
     title: Restrict Access To The API Server And Control-Plane Ports
@@ -317,11 +345,31 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-030/module-03/labs/lab-01
+      after_reading: sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
+      objective: Restore --bind-address=127.0.0.1 in the kube-scheduler static pod
+        manifest and prove that port 10259 is closed to other nodes.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-030/module-03/labs/lab-02
+      after_reading: sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
+      objective: Remove system:anonymous and system:unauthenticated from RBAC bindings
+        while keeping the intended subjects.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-030/module-03/labs/lab-03
       after_reading: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
       objective: Turn off anonymous access and AlwaysAllow authorization on a kubelet
         and restart it.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-04
+      path: sections/section-030/module-03/labs/lab-04
+      after_reading: sections/section-030/module-03/course-04-etcd-client-access.md
+      objective: Set the etcd data directory back to mode 700 while etcd keeps running.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
 - id: section-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp

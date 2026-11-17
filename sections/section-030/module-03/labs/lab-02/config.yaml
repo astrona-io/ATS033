@@ -1,0 +1,46 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-033-lab-030-03-02
+  docs:
+    prerequisites: docs/prerequisites.md
+    examQuestion: question.md
+    caseStudy: docs/case-study.md
+    guide: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 1
+bootstrap:
+  init:
+  - name: seed-private-environment
+    type: file
+    source: bootstrap/setup.sh
+teardown:
+  keepCluster: false
+testing:
+  init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
+  - name: reference-result
+    type: file
+    source: solution/apply.sh
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
+    type: file
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: anonymous-namespace-list-denied
+    description: A request without credentials cannot list namespaces, and no binding gives system:anonymous access to namespaces
+    type: file
+    source: validation/validate-anonymous-namespace-list-denied.sh
+    points: 1
+  - name: unauthenticated-pod-read-denied
+    description: A request without credentials cannot list pods in starfleet-033-030-03-02, and no binding gives system:unauthenticated access to them
+    type: file
+    source: validation/validate-unauthenticated-pod-read-denied.sh
+    points: 1
