@@ -11,7 +11,6 @@ runtime:
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
     preloadImages:
-    - docker.io/library/python:3.13-alpine
     - docker.io/library/busybox:1.37.0
 bootstrap:
   init:
@@ -35,13 +34,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: no-delete-pod
-    description: no-delete runs with the Localhost profile profiles/block-delete.json and can write files
+  - name: bridge-runtime-default
+    description: Both bridge pods use the RuntimeDefault seccomp profile and report Seccomp 2
     type: file
-    source: validation/validate-no-delete-pod.sh
+    source: validation/validate-bridge-runtime-default.sh
     points: 1
-  - name: delete-blocked
-    description: rm fails with Operation not permitted inside no-delete
+  - name: scout-runtime-default
+    description: The scout pod is not privileged, uses the RuntimeDefault seccomp profile and reports Seccomp 2
     type: file
-    source: validation/validate-delete-blocked.sh
+    source: validation/validate-scout-runtime-default.sh
     points: 1

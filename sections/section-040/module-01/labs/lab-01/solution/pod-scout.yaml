@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: no-delete
-  namespace: starfleet-033-040-02-01
+  name: scout
+  namespace: starfleet-033-040-01-01
 spec:
   restartPolicy: Never
   securityContext:
     seccompProfile:
       type: Localhost
-      localhostProfile: profiles/block-delete.json
+      localhostProfile: profiles/scout-guard.json
   containers:
-  - name: shell
+  - name: scout
     image: docker.io/library/busybox:1.37.0
     command:
     - sh

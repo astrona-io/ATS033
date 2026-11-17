@@ -1,0 +1,37 @@
+{
+  "context": "kind-astro-ats-033-lab-040-03-03",
+  "cluster": "astro-ats-033-lab-040-03-03",
+  "namespace": "starfleet-033-040-03-03",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "relay",
+      "expected": {
+        "metadata": {
+          "name": "relay",
+          "namespace": "starfleet-033-040-03-03"
+        },
+        "spec": {
+          "replicas": 1,
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "name": "relay",
+                  "image": "docker.io/library/busybox:1.37.0",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "mkdir -p /www && echo relay-ok > /www/index.html && httpd -f -p 80 -h /www"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": []
+}

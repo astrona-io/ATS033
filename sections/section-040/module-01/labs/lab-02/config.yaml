@@ -1,0 +1,53 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-033-lab-040-01-02
+  docs:
+    prerequisites: docs/prerequisites.md
+    examQuestion: question.md
+    caseStudy: docs/case-study.md
+    guide: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    preloadImages:
+    - docker.io/library/busybox:1.37.0
+    nodes:
+      workers: 1
+bootstrap:
+  init:
+  - name: seed-lab
+    type: file
+    source: bootstrap/setup.sh
+teardown:
+  keepCluster: false
+testing:
+  init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: testing/verify-start.sh
+  - name: reference-result
+    type: file
+    source: solution/apply.sh
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
+    type: file
+    source: testing/wait-solved.sh
+validation:
+  scripts:
+  - name: profile-loaded-on-every-node
+    description: k8s-deny-tmp-write is loaded in enforce mode on the control-plane node and on the worker node
+    type: file
+    source: validation/validate-profile-loaded-on-every-node.sh
+    points: 1
+  - name: scout-confined
+    description: The main process of scout runs under k8s-deny-tmp-write in enforce mode
+    type: file
+    source: validation/validate-scout-confined.sh
+    points: 1
+  - name: scout-tmp-write-denied
+    description: Writing a file under /tmp inside scout fails with Permission denied
+    type: file
+    source: validation/validate-scout-tmp-write-denied.sh
+    points: 1

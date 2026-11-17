@@ -4,6 +4,8 @@ exam_objectives:
 ---
 # Starting Environment
 
-The Deployment `relay` in `starfleet-033-040-03-01` was started with `privileged: true` and escalation allowed, as root, with the full set of capabilities. The only privileged operation it ever needs is listening on a port below 1024.
+The cluster has one control-plane node and one worker node. The start of the lab has checked that AppArmor is enabled in the kernel of both nodes. It has saved the profile `k8s-deny-etc-write` as `/etc/apparmor.d/k8s-deny-etc-write` in each node and loaded it with `apparmor_parser -r -C`, which means complain mode.
 
-Change Deployment `relay` in `starfleet-033-040-03-01` and keep its name, selector, image and command. Its pod must set `runAsNonRoot: true`, `runAsUser: 1000` and `RuntimeDefault` seccomp. Its container `relay` must set `privileged: false` and `allowPrivilegeEscalation: false`, drop `ALL` capabilities and add back only `NET_BIND_SERVICE`. The running pod must show `CapBnd` as `0000000000000400`, `NoNewPrivs: 1` and `Seccomp: 2` in `/proc/1/status`, and the Deployment rollout must be complete.
+The profile allows the program to read and run every file, and to write only under `/dev`, `/proc`, `/run`, `/tmp` and `/var`. No rule allows a write under `/etc`. In complain mode the kernel allows such a write and only logs it.
+
+The Deployment `scout` in `starfleet-033-040-03-01` has one replica. Its container `scout` runs `sleep 3600` and selects the profile with `appArmorProfile` type `Localhost`.

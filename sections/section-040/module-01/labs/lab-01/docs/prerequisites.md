@@ -4,7 +4,7 @@ exam_objectives:
 ---
 # Prerequisites
 
-Use a host shell with astrona, kubectl and Python 3. 
+Use a host shell with astrona, kubectl, Podman and Python 3. Podman reaches the node, because a kind node is a container on your machine.
 
 Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
 

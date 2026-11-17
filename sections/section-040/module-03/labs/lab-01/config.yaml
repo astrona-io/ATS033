@@ -11,7 +11,6 @@ runtime:
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
     preloadImages:
-    - docker.io/library/python:3.13-alpine
     - docker.io/library/busybox:1.37.0
     nodes:
       workers: 1
@@ -37,23 +36,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: relay-non-root
-    description: The relay pod runs as user 1000 and requires a non-root user
+  - name: profile-enforced-on-every-node
+    description: k8s-deny-etc-write is loaded in enforce mode on the control-plane node and on the worker node
     type: file
-    source: validation/validate-relay-non-root.sh
+    source: validation/validate-profile-enforced-on-every-node.sh
     points: 1
-  - name: relay-seccomp
-    description: The relay pod runs with the RuntimeDefault seccomp filter
+  - name: scout-etc-write-denied
+    description: The scout process runs under k8s-deny-etc-write in enforce mode, and a write under /etc fails with Permission denied
     type: file
-    source: validation/validate-relay-seccomp.sh
-    points: 1
-  - name: relay-no-escalation
-    description: The relay container is not privileged and blocks privilege escalation
-    type: file
-    source: validation/validate-relay-no-escalation.sh
-    points: 1
-  - name: relay-capabilities
-    description: The relay container keeps only NET_BIND_SERVICE
-    type: file
-    source: validation/validate-relay-capabilities.sh
+    source: validation/validate-scout-etc-write-denied.sh
     points: 1

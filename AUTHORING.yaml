@@ -467,11 +467,28 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-040/module-01/labs/lab-01
-      after_reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
-      objective: Keep a non-root workload functional with a read-only root filesystem
-        and a writable scratch volume.
+      after_reading: sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
+      objective: Copy a seccomp profile into the kubelet seccomp directory and run a pod under it as a Localhost profile.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-040/module-01/labs/lab-02
+      after_reading: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+      objective: Load an AppArmor profile in enforce mode on every node and attach it to a pod.
+      status: alpha
+      runtime_verification: pending (needs AppArmor host)
+    - id: lab-03
+      path: sections/section-040/module-01/labs/lab-03
+      after_reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
+      objective: Harden a Deployment so it runs as non-root with a read-only root filesystem and passes the restricted Pod Security level.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-04
+      path: sections/section-040/module-01/labs/lab-04
+      after_reading: sections/section-040/module-01/course-04-diagnosing-profile-failures.md
+      objective: Read pod events to find a wrong Localhost seccomp profile path and correct the Deployment.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-02
     title: Apply seccomp Profiles To Pods
@@ -500,11 +517,22 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-040/module-02/labs/lab-01
-      after_reading: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
-      objective: Write a seccomp profile, place it on the node and run a pod that
-        cannot delete files.
+      after_reading: sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
+      objective: Set the RuntimeDefault seccomp profile on Deployments and remove privileged mode so the filter applies.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-040/module-02/labs/lab-02
+      after_reading: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
+      objective: Write a seccomp profile, place it on the node and run a pod that cannot delete files.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-040/module-02/labs/lab-03
+      after_reading: sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+      objective: Find the system call that a seccomp profile blocks and fix the profile without removing other rules.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-03
     title: Confine Workloads With AppArmor And Capabilities
@@ -532,9 +560,20 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-040/module-03/labs/lab-01
-      after_reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
-      objective: Remove privileged mode from a Deployment, drop all capabilities and
-        keep only the one it needs.
+      after_reading: sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+      objective: Find the mode of a loaded AppArmor profile and switch it to enforce mode on every node.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: pending (needs AppArmor host)
+    - id: lab-02
+      path: sections/section-040/module-03/labs/lab-02
+      after_reading: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+      objective: Set a pod-level and a container-level AppArmor profile so only one container is confined.
+      status: alpha
+      runtime_verification: pending (needs AppArmor host)
+    - id: lab-03
+      path: sections/section-040/module-03/labs/lab-03
+      after_reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+      objective: Remove privileged mode from a Deployment, drop all capabilities and keep only the one it needs.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []

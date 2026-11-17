@@ -741,34 +741,87 @@ modules:
     title: 'Seccomp: Filtering System Calls'
     path: sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
   - type: reading
+    title: Install And Use A Localhost seccomp Profile — Task
+    path: sections/section-040/module-01/labs/lab-01/question.md
+  - type: lab
+    title: Install And Use A Localhost seccomp Profile
+    path: sections/section-040/module-01/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: seccomp-profile-install
+    task_kind: build
+    learning_goals:
+    - Copy a seccomp profile into the kubelet seccomp directory and run a pod under it as a Localhost profile.
+    tags:
+    - cks
+    - seccomp-profile-install
+  - type: reading
+    title: Install And Use A Localhost seccomp Profile — Solution
+    path: sections/section-040/module-01/labs/lab-01/solution.md
+  - type: reading
     title: 'AppArmor: Profiles For Files And Capabilities'
     path: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+  - type: reading
+    title: Load An AppArmor Profile And Attach It To A Pod — Task
+    path: sections/section-040/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Load An AppArmor Profile And Attach It To A Pod
+    path: sections/section-040/module-01/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 12m
+    topic: apparmor-load
+    task_kind: build
+    learning_goals:
+    - Load an AppArmor profile in enforce mode on every node and attach it to a pod.
+    tags:
+    - cks
+    - apparmor-load
+  - type: reading
+    title: Load An AppArmor Profile And Attach It To A Pod — Solution
+    path: sections/section-040/module-01/labs/lab-02/solution.md
   - type: reading
     title: The Restricted Security Context
     path: sections/section-040/module-01/course-03-the-restricted-security-context.md
   - type: reading
-    title: Run With A Restricted Security Context — Task
-    path: sections/section-040/module-01/labs/lab-01/question.md
+    title: Harden A Deployment To The Restricted Pod Security Level — Task
+    path: sections/section-040/module-01/labs/lab-03/question.md
   - type: lab
-    title: Run With A Restricted Security Context
-    path: sections/section-040/module-01/labs/lab-01
+    title: Harden A Deployment To The Restricted Pod Security Level
+    path: sections/section-040/module-01/labs/lab-03
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 8m
+    estimated_duration: 12m
     topic: security-context
     task_kind: build
     learning_goals:
-    - Keep a non-root workload functional with a read-only root filesystem and a writable
-      scratch volume.
+    - Harden a Deployment so it runs as non-root with a read-only root filesystem and passes the restricted Pod Security level.
     tags:
     - cks
     - security-context
   - type: reading
-    title: Run With A Restricted Security Context — Solution
-    path: sections/section-040/module-01/labs/lab-01/solution.md
+    title: Harden A Deployment To The Restricted Pod Security Level — Solution
+    path: sections/section-040/module-01/labs/lab-03/solution.md
   - type: reading
     title: Diagnosing Profile Failures
     path: sections/section-040/module-01/course-04-diagnosing-profile-failures.md
+  - type: reading
+    title: Fix A Pod That References A Missing seccomp Profile — Task
+    path: sections/section-040/module-01/labs/lab-04/question.md
+  - type: lab
+    title: Fix A Pod That References A Missing seccomp Profile
+    path: sections/section-040/module-01/labs/lab-04
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: seccomp-missing-profile
+    task_kind: build
+    learning_goals:
+    - Read pod events to find a wrong Localhost seccomp profile path and correct the Deployment.
+    tags:
+    - cks
+    - seccomp-missing-profile
+  - type: reading
+    title: Fix A Pod That References A Missing seccomp Profile — Solution
+    path: sections/section-040/module-01/labs/lab-04/solution.md
   - type: reading
     title: Summary
     path: sections/section-040/module-01/course-05-summary.md
@@ -779,30 +832,65 @@ modules:
     title: Profile Types, Locations And The Unconfined Risk
     path: sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
   - type: reading
+    title: Apply The RuntimeDefault seccomp Profile To Deployments — Task
+    path: sections/section-040/module-02/labs/lab-01/question.md
+  - type: lab
+    title: Apply The RuntimeDefault seccomp Profile To Deployments
+    path: sections/section-040/module-02/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: seccomp-runtime-default
+    task_kind: build
+    learning_goals:
+    - Set the RuntimeDefault seccomp profile on Deployments and remove privileged mode so the filter applies.
+    tags:
+    - cks
+    - seccomp-runtime-default
+  - type: reading
+    title: Apply The RuntimeDefault seccomp Profile To Deployments — Solution
+    path: sections/section-040/module-02/labs/lab-01/solution.md
+  - type: reading
     title: Write And Load A Localhost Profile
     path: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
   - type: reading
     title: Block File Deletion With A Localhost seccomp Profile — Task
-    path: sections/section-040/module-02/labs/lab-01/question.md
+    path: sections/section-040/module-02/labs/lab-02/question.md
   - type: lab
     title: Block File Deletion With A Localhost seccomp Profile
-    path: sections/section-040/module-02/labs/lab-01
+    path: sections/section-040/module-02/labs/lab-02
     difficulty: intermediate
     estimated_duration: 10m
     topic: seccomp-localhost
     task_kind: build
     learning_goals:
-    - Write a seccomp profile, place it on the node and run a pod that cannot delete
-      files.
+    - Write a seccomp profile, place it on the node and run a pod that cannot delete files.
     tags:
     - cks
     - seccomp
   - type: reading
     title: Block File Deletion With A Localhost seccomp Profile — Solution
-    path: sections/section-040/module-02/labs/lab-01/solution.md
+    path: sections/section-040/module-02/labs/lab-02/solution.md
   - type: reading
     title: Find Blocked Syscalls And Fix Failures
     path: sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+  - type: reading
+    title: Find And Fix A Blocked System Call In A seccomp Profile — Task
+    path: sections/section-040/module-02/labs/lab-03/question.md
+  - type: lab
+    title: Find And Fix A Blocked System Call In A seccomp Profile
+    path: sections/section-040/module-02/labs/lab-03
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: seccomp-syscall-debug
+    task_kind: build
+    learning_goals:
+    - Find the system call that a seccomp profile blocks and fix the profile without removing other rules.
+    tags:
+    - cks
+    - seccomp-syscall-debug
+  - type: reading
+    title: Find And Fix A Blocked System Call In A seccomp Profile — Solution
+    path: sections/section-040/module-02/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-040/module-02/course-04-summary.md
@@ -813,31 +901,66 @@ modules:
     title: AppArmor Modes And Loading Profiles
     path: sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
   - type: reading
+    title: Switch An AppArmor Profile From Complain To Enforce Mode — Task
+    path: sections/section-040/module-03/labs/lab-01/question.md
+  - type: lab
+    title: Switch An AppArmor Profile From Complain To Enforce Mode
+    path: sections/section-040/module-03/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: apparmor-enforce-mode
+    task_kind: build
+    learning_goals:
+    - Find the mode of a loaded AppArmor profile and switch it to enforce mode on every node.
+    tags:
+    - cks
+    - apparmor-enforce-mode
+  - type: reading
+    title: Switch An AppArmor Profile From Complain To Enforce Mode — Solution
+    path: sections/section-040/module-03/labs/lab-01/solution.md
+  - type: reading
     title: Select A Profile With appArmorProfile
     path: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+  - type: reading
+    title: Set An AppArmor Profile For One Container — Task
+    path: sections/section-040/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Set An AppArmor Profile For One Container
+    path: sections/section-040/module-03/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: apparmor-container-profile
+    task_kind: build
+    learning_goals:
+    - Set a pod-level and a container-level AppArmor profile so only one container is confined.
+    tags:
+    - cks
+    - apparmor-container-profile
+  - type: reading
+    title: Set An AppArmor Profile For One Container — Solution
+    path: sections/section-040/module-03/labs/lab-02/solution.md
   - type: reading
     title: Drop Capabilities And Block Privilege Escalation
     path: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
   - type: reading
-    title: Remove Privileged Mode And Keep One Capability — Task
-    path: sections/section-040/module-03/labs/lab-01/question.md
+    title: Drop All Capabilities Except NET_BIND_SERVICE — Task
+    path: sections/section-040/module-03/labs/lab-03/question.md
   - type: lab
-    title: Remove Privileged Mode And Keep One Capability
-    path: sections/section-040/module-03/labs/lab-01
+    title: Drop All Capabilities Except NET_BIND_SERVICE
+    path: sections/section-040/module-03/labs/lab-03
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 8m
+    estimated_duration: 10m
     topic: capabilities
     task_kind: build
     learning_goals:
-    - Remove privileged mode from a Deployment, drop all capabilities and keep only
-      the one it needs.
+    - Remove privileged mode from a Deployment, drop all capabilities and keep only the one it needs.
     tags:
     - cks
     - capabilities
   - type: reading
-    title: Remove Privileged Mode And Keep One Capability — Solution
-    path: sections/section-040/module-03/labs/lab-01/solution.md
+    title: Drop All Capabilities Except NET_BIND_SERVICE — Solution
+    path: sections/section-040/module-03/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-040/module-03/course-04-summary.md

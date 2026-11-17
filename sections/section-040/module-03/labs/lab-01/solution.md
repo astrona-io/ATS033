@@ -2,7 +2,7 @@
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
-# Remove Privileged Mode And Keep One Capability Solution
+# Switch An AppArmor Profile From Complain To Enforce Mode Solution
 
 Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
 
@@ -13,78 +13,82 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-03-01" ||
 
 Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
 
-## Inspect And Explain
+This walkthrough has no command output. The lab needs a host kernel with AppArmor, and it has not yet run on such a host. Each step says what a correct result contains, so you can compare your own output with it.
 
-Look at the current Deployment and the capabilities of its pod:
+## Find The Current Mode
 
-```sh
-kubectl -n starfleet-033-040-03-01 get deployment relay -o yaml
-kubectl -n starfleet-033-040-03-01 exec deploy/relay -- grep -E 'CapBnd|NoNewPrivs|Seccomp:' /proc/1/status
-```
-
-The pod is privileged, so it holds every capability and runs without a seccomp filter. Setting `privileged: false` is the first step, because the privileged flag overrides every other restriction. Then drop `ALL` capabilities and add back the single one the workload needs. A non-root user, `allowPrivilegeEscalation: false` and `RuntimeDefault` seccomp finish the change.
-
-Save this as `deployment-relay.yaml`:
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: relay
-  namespace: starfleet-033-040-03-01
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: relay
-  template:
-    metadata:
-      labels:
-        app: relay
-    spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        seccompProfile:
-          type: RuntimeDefault
-      containers:
-      - name: relay
-        image: docker.io/library/busybox:1.37.0
-        command:
-        - sh
-        - -c
-        - sleep 3600
-        securityContext:
-          privileged: false
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-            add:
-            - NET_BIND_SERVICE
-```
-
-Apply the required change:
+The kernel keeps one list of loaded profiles per node, in `/sys/kernel/security/apparmor/profiles`. Each line holds a profile name and its mode in parentheses. Read the line for `k8s-deny-etc-write` on both nodes:
 
 ```sh
-kubectl apply -f deployment-relay.yaml
+for node_name in astro-ats-033-lab-040-03-01-control-plane astro-ats-033-lab-040-03-01-worker; do
+  podman exec "$node_name" grep k8s-deny-etc-write /sys/kernel/security/apparmor/profiles
+done
 ```
+
+Each node prints `k8s-deny-etc-write (complain)`. In complain mode the kernel allows an operation that the profile does not allow, and only writes an audit message. The same is visible from inside the pod. `/proc/1/attr/current` shows the profile of the main process, and here it reads `k8s-deny-etc-write (complain)`:
+
+```sh
+kubectl -n starfleet-033-040-03-01 exec deploy/scout -- cat /proc/1/attr/current
+```
+
+So a write under `/etc` still works now, although no rule allows it:
+
+```sh
+kubectl -n starfleet-033-040-03-01 exec deploy/scout -- touch /etc/scout-check
+```
+
+The command prints nothing and returns exit code 0.
+
+## Load The Profile In Enforce Mode
+
+The mode is a property of the loaded profile, not of the file. `apparmor_parser -r` replaces the loaded profile with the content of the file. With `-C` it loads in complain mode, and without `-C` in enforce mode. Load the same file again without `-C` on both nodes:
+
+```sh
+for node_name in astro-ats-033-lab-040-03-01-control-plane astro-ats-033-lab-040-03-01-worker; do
+  podman exec "$node_name" apparmor_parser -r /etc/apparmor.d/k8s-deny-etc-write
+done
+```
+
+The command prints nothing when it works. Read the list again. Each node now prints `k8s-deny-etc-write (enforce)`:
+
+```sh
+for node_name in astro-ats-033-lab-040-03-01-control-plane astro-ats-033-lab-040-03-01-worker; do
+  podman exec "$node_name" grep k8s-deny-etc-write /sys/kernel/security/apparmor/profiles
+done
+```
+
+## Restart The Workload
+
+The kernel applies a replaced profile to processes that already run under it. A restart still gives a clean result: the new pod starts under the profile as it is loaded now, and it shows that the container can start in enforce mode. Restart the Deployment and wait for the rollout:
+
+```sh
+kubectl -n starfleet-033-040-03-01 rollout restart deployment/scout
+kubectl -n starfleet-033-040-03-01 rollout status deployment/scout --timeout=180s
+```
+
+A correct result ends with the line `deployment "scout" successfully rolled out`.
 
 ## Verify The Result
 
-Observe the actual result. A denied operation returns a nonzero status when the control works. Run denial checks separately from a shell sequence that stops on the first nonzero status.
+`kubectl exec deploy/scout` picks a pod that is not being deleted. The main process now reads `k8s-deny-etc-write (enforce)`:
 
 ```sh
-kubectl -n starfleet-033-040-03-01 rollout status deployment/relay --timeout=180s
-kubectl -n starfleet-033-040-03-01 exec deploy/relay -- id -u
-kubectl -n starfleet-033-040-03-01 exec deploy/relay -- grep -E 'CapBnd|NoNewPrivs|Seccomp:' /proc/1/status
+kubectl -n starfleet-033-040-03-01 exec deploy/scout -- cat /proc/1/attr/current
 ```
 
-Change Deployment `relay` in `starfleet-033-040-03-01` and keep its name, selector, image and command. Its pod must set `runAsNonRoot: true`, `runAsUser: 1000` and `RuntimeDefault` seccomp. Its container `relay` must set `privileged: false` and `allowPrivilegeEscalation: false`, drop `ALL` capabilities and add back only `NET_BIND_SERVICE`. The running pod must show `CapBnd` as `0000000000000400`, `NoNewPrivs: 1` and `Seccomp: 2` in `/proc/1/status`, and the Deployment rollout must be complete.
+The last check must fail. A correct result is a `Permission denied` message from `touch` and a non-zero exit code:
+
+```sh
+kubectl -n starfleet-033-040-03-01 exec deploy/scout -- touch /etc/scout-check
+```
+
+The container runs as root, so file permissions allow the write. Only the AppArmor profile stops it.
 
 After recording the result, remove this independent lab with `astrona destroy ats-033-lab-040-03-01`.
 
 ## Common pitfalls
 
 > [!WARNING]
-> The container `securityContext` holds `privileged`, `allowPrivilegeEscalation` and `capabilities`; the pod `securityContext` holds the user and the seccomp profile. For a non-root process, read `CapBnd`, because `CapEff` is empty. Pods of the old ReplicaSet keep their old settings until the rollout replaces them.
+> - Switching only one node. The pod may run on the other node, where the profile is still in complain mode.
+> - Running `aa-enforce` when the tool is missing in the node. `apparmor_parser -r` without `-C` does the same and needs only the parser.
+> - Checking the mode only in the manifest. The Deployment names the profile, but the mode lives in the kernel of each node.

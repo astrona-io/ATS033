@@ -1,0 +1,67 @@
+{
+  "context": "kind-astro-ats-033-lab-040-02-02",
+  "cluster": "astro-ats-033-lab-040-02-02",
+  "namespace": "starfleet-033-040-02-02",
+  "resources": [
+    {
+      "kind": "pod",
+      "name": "no-delete",
+      "expected": {
+        "metadata": {
+          "name": "no-delete",
+          "namespace": "starfleet-033-040-02-02"
+        },
+        "spec": {
+          "restartPolicy": "Never",
+          "containers": [
+            {
+              "name": "shell",
+              "image": "docker.io/library/busybox:1.37.0",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 3600"
+              ]
+            }
+          ]
+        }
+      },
+      "state": "pod"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet-033-040-02-02",
+        "exec",
+        "no-delete",
+        "--",
+        "sh",
+        "-c",
+        "echo kept > /tmp/keep-check && cat /tmp/keep-check"
+      ],
+      "equals": "kept",
+      "outcome": "no-delete-pod"
+    },
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet-033-040-02-02",
+        "exec",
+        "no-delete",
+        "--",
+        "sh",
+        "-c",
+        "echo doomed > /tmp/delete-check && rm /tmp/delete-check"
+      ],
+      "denied": true,
+      "failure_markers": [
+        "operation not permitted"
+      ],
+      "outcome": "delete-blocked"
+    }
+  ]
+}
