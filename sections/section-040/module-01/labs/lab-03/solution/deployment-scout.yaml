@@ -1,35 +1,46 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: relay
-  namespace: starfleet-033-040-03-01
+  name: scout
+  namespace: starfleet-033-040-01-03
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: relay
+      app: scout
   template:
     metadata:
       labels:
-        app: relay
+        app: scout
     spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
+        runAsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       containers:
-      - name: relay
+      - name: scout
         image: docker.io/library/busybox:1.37.0
         command:
         - sh
         - -c
-        - sleep 3600
+        - while date > /tmp/heartbeat; do sleep 5; done
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/heartbeat
+          periodSeconds: 5
         securityContext:
-          privileged: false
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           capabilities:
             drop:
             - ALL
-            add:
-            - NET_BIND_SERVICE
+        volumeMounts:
+        - name: scratch
+          mountPath: /tmp
+      volumes:
+      - name: scratch
+        emptyDir: {}

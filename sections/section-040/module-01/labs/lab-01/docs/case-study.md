@@ -4,6 +4,6 @@ exam_objectives:
 ---
 # Starting Environment
 
-The application and client fixtures are healthy. Complete the required change without replacing unrelated resources.
+The namespace `starfleet-033-040-01-01` exists and is empty. The security team wrote a seccomp profile for the `scout` workload and left it on the node at `/opt/course/seccomp/scout-guard.json`. The profile allows every system call except the ones that create a directory or a device file.
 
-Create Pod `restricted-reader` running BusyBox as user and group 1000, with `runAsNonRoot: true`, RuntimeDefault seccomp and group-writable emptyDir `scratch` mounted at `/scratch`. Its container must disable privilege escalation, drop all capabilities and use a read-only root filesystem. Writing in scratch must work; writing `/root-file` must fail. Keep the sleeping process running.
+The kubelet loads a `Localhost` profile only from its seccomp directory, `/var/lib/kubelet/seccomp`. That directory does not exist on the node yet. The pod `scout` must run under the profile, keep writing files under `/tmp` and fail when it tries to create a directory.

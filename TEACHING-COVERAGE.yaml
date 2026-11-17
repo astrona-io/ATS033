@@ -31,11 +31,32 @@ labs:
     - sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
   sections/section-040/module-01/labs/lab-01:
     preparation:
+    - sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
+  sections/section-040/module-01/labs/lab-02:
+    preparation:
+    - sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+  sections/section-040/module-01/labs/lab-03:
+    preparation:
     - sections/section-040/module-01/course-03-the-restricted-security-context.md
+  sections/section-040/module-01/labs/lab-04:
+    preparation:
+    - sections/section-040/module-01/course-04-diagnosing-profile-failures.md
   sections/section-040/module-02/labs/lab-01:
     preparation:
+    - sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
+  sections/section-040/module-02/labs/lab-02:
+    preparation:
     - sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
+  sections/section-040/module-02/labs/lab-03:
+    preparation:
+    - sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
   sections/section-040/module-03/labs/lab-01:
+    preparation:
+    - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+  sections/section-040/module-03/labs/lab-02:
+    preparation:
+    - sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+  sections/section-040/module-03/labs/lab-03:
     preparation:
     - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
 additional_readings:
@@ -61,10 +82,3 @@ additional_readings:
 - sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
 - sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
 - sections/section-030/module-03/course-04-etcd-client-access.md
-- sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
-- sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
-- sections/section-040/module-01/course-04-diagnosing-profile-failures.md
-- sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
-- sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
-- sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
-- sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md

@@ -2,10 +2,15 @@
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
-# Run With A Restricted Security Context
+# Install And Use A Localhost seccomp Profile
 
-Keep a non-root workload functional with a read-only root filesystem and a writable scratch volume. The task and reference solution use a separate pinned kind cluster. The grader checks declared fields and bounded live evidence. Python 3 is required on the grading host.
+The learner installs a seccomp profile that the bootstrap left at `/opt/course/seccomp/scout-guard.json` on the node into `/var/lib/kubelet/seccomp/profiles/`, then runs the pod `scout` under it. The lab uses a single-node pinned kind cluster. Python 3 and Podman are required on the grading host, because the grader compares the installed file with the original inside the node container.
 
-Run `astrona test` on this folder: `testing/verify-start.sh` checks that every outcome fails on the starting state, then the reference solution is applied and every outcome must pass. Each wait and request is bounded. Live verification is pending until actual container-engine execution is recorded. Static checks are not runtime evidence.
+Outcomes (1 point each):
 
-Verify `/proc/1/status` reports `Seccomp: 2` and `NoNewPrivs: 1` in the running reader. This confirms an installed seccomp filter. AppArmor requires a separately available kernel implementation and profile; this exercise does not claim AppArmor coverage.
+- `scout-localhost-profile`: the installed file matches the original, the effective profile of the container is `Localhost` `profiles/scout-guard.json`, `/proc/1/status` reports `Seccomp: 2` and a write under `/tmp` works.
+- `scout-mkdir-blocked`: `mkdir` fails with `Operation not permitted` while the pod uses that profile.
+
+Run `astrona test` on this folder: `testing/verify-start.sh` checks that every outcome fails on the starting state, then the reference solution is applied and every outcome must pass.
+
+Live run on 2026-11-17 (kind v1.35.0 node image, Podman machine on Apple silicon, containerd 2.2.0): every outcome failed on the start state with `Missing pod scout`, the commands in `solution.md` produced the output quoted there, and `astrona test` passed.
