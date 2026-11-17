@@ -4,12 +4,16 @@
 #    {"kind":"playground","path":"sections/.../playground"}, ...]
 #
 #   list-environments.sh                        # every section
-#   list-environments.sh sections/section-030   # only these paths
-#   list-environments.sh --changed-since <ref>  # sections changed since <ref>
+#   list-environments.sh sections/section-040   # only these paths
+#   list-environments.sh --changed-since <ref>  # environments changed since <ref>
 #
 # With --changed-since, a change to scripts/ or the labs workflow selects
-# every section, because it can break any lab. Otherwise
-# each section with a changed file is selected. No match prints [].
+# every section, because it can break any lab. Otherwise each lab or
+# playground with a changed file in its own directory is selected: every
+# environment is self-contained, so a change in one cannot break another.
+# Changes to course pages, quizzes, astrona.yaml and TEACHING-COVERAGE.yaml
+# select nothing here; the structure checks in the workflow's list job cover
+# them. No match prints [].
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -20,9 +24,10 @@ if [ "${1:-}" = "--changed-since" ]; then
   if grep -qE '^(scripts/|\.github/workflows/labs\.yml$)' <<<"$changed"; then
     paths=(sections)
   else
-    while read -r section; do
-      [ -d "$section" ] && paths+=("$section")
-    done < <(grep -oE '^sections/section-[0-9]+' <<<"$changed" | sort -u)
+    # A deleted lab or playground has no directory left, so it is skipped.
+    while read -r environment; do
+      [ -d "$environment" ] && paths+=("$environment")
+    done < <(grep -oE '^sections/section-[0-9]+/module-[0-9]+/(labs/lab-[0-9]+|playground)/' <<<"$changed" | sort -u)
   fi
   [ "${#paths[@]}" -gt 0 ] || { echo '[]'; exit 0; }
 elif [ "$#" -gt 0 ]; then
@@ -39,6 +44,9 @@ find "${paths[@]}" -name config.yaml \( -path '*/labs/lab-*/config.yaml' -o -pat
       */playground) kind=playground ;;
       *) kind=lab ;;
     esac
-    printf '{"kind":"%s","path":"%s"}\n' "$kind" "$dir"
+    runtime=$(sed -n 's/^  type: //p' "$config" | head -n 1 | tr -d '"')
+    runtime=${runtime:-kind}
+    case "$runtime" in kind|qemu) ;; *) echo "Unsupported runtime: $runtime" >&2; exit 1 ;; esac
+    printf '{"kind":"%s","path":"%s","runtime":"%s"}\n' "$kind" "$dir" "$runtime"
   done |
   jq -cs .

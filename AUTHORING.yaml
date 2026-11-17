@@ -26,7 +26,7 @@ sections:
 - id: section-010
   title: Minimize host OS footprint (reduce attack surface)
   curriculum_item: Minimize host OS footprint (reduce attack surface)
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -121,17 +121,10 @@ sections:
       status: alpha
       runtime_verification: pending
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-010/capstone/labs/lab-01
-    objective: Combine a disabled node service, key-only SSH, a hardened workload
-      with a Pod Security label and a dedicated node.
-    status: alpha
-    runtime_verification: pending
 - id: section-020
   title: Using least-privilege identity and access management
   curriculum_item: Using least-privilege identity and access management
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -227,18 +220,10 @@ sections:
       status: alpha
       runtime_verification: pending
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-020/capstone/labs/lab-01
-    objective: Harden RBAC and ServiceAccounts across two namespaces by combining
-      narrow Roles, a closed default ServiceAccount, a bound projected token and the
-      removal of long-lived tokens.
-    status: alpha
-    runtime_verification: pending
 - id: section-030
   title: Minimize external access to the network
   curriculum_item: Minimize external access to the network
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -338,17 +323,10 @@ sections:
       status: alpha
       runtime_verification: pending
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-030/capstone/labs/lab-01
-    objective: Close a listener, a NodePort and a kubelet API in one cluster without
-      breaking the application.
-    status: alpha
-    runtime_verification: pending
 - id: section-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
   curriculum_item: Appropriately use kernel hardening tools such as AppArmor, seccomp
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -449,10 +427,3 @@ sections:
       status: alpha
       runtime_verification: pending
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-040/capstone/labs/lab-01
-    objective: Combine a Localhost seccomp profile, dropped capabilities, blocked
-      escalation and a read-only filesystem on one Deployment.
-    status: alpha
-    runtime_verification: pending

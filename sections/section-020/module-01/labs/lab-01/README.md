@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Using least-privilege identity and access management
 ---

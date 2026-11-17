@@ -3,7 +3,8 @@ training:
   id: ATS033
   title: 'CKS: System Hardening'
   description: 'Detailed reading material and reusable YAML knowledge checks for CKS:
-    System Hardening. Technical content remains draft. No labs or playgrounds.'
+    System Hardening, with a private playground per module and graded labs after
+    the readings they practise.'
   certification:
     name: Certified Kubernetes Security Specialist
     code: CKS
@@ -58,7 +59,7 @@ modules:
     path: sections/section-010/module-01/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 5m
     topic: host-service-footprint
     task_kind: build
     learning_goals:
@@ -99,7 +100,7 @@ modules:
     path: sections/section-010/module-02/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: ssh-host-login
     task_kind: build
     learning_goals:
@@ -131,7 +132,7 @@ modules:
     path: sections/section-010/module-03/labs/lab-01
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: workload-host-access
     task_kind: build
     learning_goals:
@@ -154,25 +155,6 @@ modules:
     path: sections/section-010/module-01/quiz.yaml
     question_count: 10
     pass_score: 70
-  - type: reading
-    title: Harden A Node And Its Workloads — Task
-    path: sections/section-010/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Harden A Node And Its Workloads
-    path: sections/section-010/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: host-hardening-capstone
-    task_kind: build
-    learning_goals:
-    - Combine a disabled node service, key-only SSH, a hardened workload with a Pod
-      Security label and a dedicated node.
-    tags:
-    - cks
-    - host-hardening-capstone
-  - type: reading
-    title: Harden A Node And Its Workloads — Solution
-    path: sections/section-010/capstone/labs/lab-01/solution.md
 - id: module-020
   title: Using least-privilege identity and access management
   description: Developed reading and reasoning for Using least-privilege identity
@@ -196,7 +178,7 @@ modules:
     path: sections/section-020/module-01/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 5m
     topic: host-identity
     task_kind: build
     learning_goals:
@@ -236,7 +218,7 @@ modules:
     path: sections/section-020/module-02/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: rbac-least-privilege
     task_kind: build
     learning_goals:
@@ -274,7 +256,7 @@ modules:
     path: sections/section-020/module-03/labs/lab-01
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: serviceaccount-tokens
     task_kind: build
     learning_goals:
@@ -294,25 +276,6 @@ modules:
     path: sections/section-020/module-01/quiz.yaml
     question_count: 10
     pass_score: 70
-  - type: reading
-    title: Harden RBAC And ServiceAccounts In Two Namespaces — Task
-    path: sections/section-020/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Harden RBAC And ServiceAccounts In Two Namespaces
-    path: sections/section-020/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: rbac-serviceaccount-capstone
-    task_kind: build
-    learning_goals:
-    - Replace cluster-admin and edit bindings, a mounted token and a long-lived token
-      with least-privilege equivalents across two namespaces.
-    tags:
-    - cks
-    - rbac-serviceaccount-capstone
-  - type: reading
-    title: Harden RBAC And ServiceAccounts In Two Namespaces — Solution
-    path: sections/section-020/capstone/labs/lab-01/solution.md
 - id: module-030
   title: Minimize external access to the network
   description: Developed reading and reasoning for Minimize external access to the
@@ -336,7 +299,7 @@ modules:
     path: sections/section-030/module-01/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: host-network-exposure
     task_kind: build
     learning_goals:
@@ -377,7 +340,7 @@ modules:
     path: sections/section-030/module-02/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 6m
     topic: service-exposure
     task_kind: build
     learning_goals:
@@ -415,7 +378,7 @@ modules:
     path: sections/section-030/module-03/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: kubelet-api
     task_kind: build
     learning_goals:
@@ -438,25 +401,6 @@ modules:
     path: sections/section-030/module-01/quiz.yaml
     question_count: 10
     pass_score: 70
-  - type: reading
-    title: Reduce The External Exposure Of A Cluster — Task
-    path: sections/section-030/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Reduce The External Exposure Of A Cluster
-    path: sections/section-030/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: external-exposure-capstone
-    task_kind: build
-    learning_goals:
-    - Close a listener, a NodePort and a kubelet API in one cluster without breaking
-      the application.
-    tags:
-    - cks
-    - external-exposure-capstone
-  - type: reading
-    title: Reduce The External Exposure Of A Cluster — Solution
-    path: sections/section-030/capstone/labs/lab-01/solution.md
 - id: module-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
   description: Developed reading and reasoning for Appropriately use kernel hardening
@@ -486,7 +430,7 @@ modules:
     path: sections/section-040/module-01/labs/lab-01
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: security-context
     task_kind: build
     learning_goals:
@@ -520,7 +464,7 @@ modules:
     title: Block File Deletion With A Localhost seccomp Profile
     path: sections/section-040/module-02/labs/lab-01
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: seccomp-localhost
     task_kind: build
     learning_goals:
@@ -558,7 +502,7 @@ modules:
     path: sections/section-040/module-03/labs/lab-01
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: capabilities
     task_kind: build
     learning_goals:
@@ -579,28 +523,8 @@ modules:
     path: sections/section-040/module-01/quiz.yaml
     question_count: 10
     pass_score: 70
-  - type: reading
-    title: Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem
-      — Task
-    path: sections/section-040/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem
-    path: sections/section-040/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: kernel-hardening-capstone
-    task_kind: build
-    learning_goals:
-    - Combine a Localhost seccomp profile, dropped capabilities, blocked escalation
-      and a read-only filesystem on one Deployment.
-    tags:
-    - cks
-    - capstone
-  - type: reading
-    title: Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem
-      — Solution
-    path: sections/section-040/capstone/labs/lab-01/solution.md
   - type: quiz
     title: Final Domain Quiz
     path: sections/final-domain-quiz.yaml
+    question_count: 12
     pass_score: 70

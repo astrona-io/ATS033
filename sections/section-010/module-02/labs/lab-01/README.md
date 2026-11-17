@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Starts one playground, runs its smoke test, and always destroys it.
 #
-#   scripts/ci/test-playground.sh sections/section-030/module-10/playground
+#   scripts/ci/test-playground.sh sections/section-040/module-10/playground
 #
 # 1. `astrona run` must finish: the bootstrap and every waitFor in config.yaml
 #    pass.
@@ -15,7 +15,7 @@ set -euo pipefail
 
 dir=${1:?usage: test-playground.sh <playground directory>}
 dir=$(cd "$dir" && pwd)
-name=$(yq '.metadata.name' "$dir/config.yaml")
+name=$(python3 -c 'import sys, yaml; print(yaml.safe_load(open(sys.argv[1]))["metadata"]["name"])' "$dir/config.yaml")
 work=$(mktemp -d)
 export KUBECONFIG="$work/kubeconfig-start"
 

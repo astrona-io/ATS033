@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
