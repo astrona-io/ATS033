@@ -1,0 +1,29 @@
+{
+  "context": "kind-astro-ats-033-lab-010-03-02",
+  "cluster": "astro-ats-033-lab-010-03-02",
+  "namespace": "outpost-033-010-03-02",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "tracker",
+      "namespace": "outpost-033-010-03-02",
+      "expected": {
+        "metadata": {
+          "name": "tracker",
+          "namespace": "outpost-033-010-03-02"
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "--raw=/readyz"
+      ],
+      "equals": "ok"
+    }
+  ]
+}

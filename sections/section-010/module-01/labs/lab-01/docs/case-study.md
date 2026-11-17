@@ -4,6 +4,4 @@ exam_objectives:
 ---
 # Starting Environment
 
-The isolated environment has two healthy probe replicas, an internal Service and two client Pods. The required result has not been configured.
-
-Remove a seeded extra service from active and enabled node services while preserving Kubernetes.
+The cluster has one control-plane node and one worker node. An old image build left a systemd service on the control-plane node. The service is enabled, runs now and serves files over HTTP on TCP port 8099 on every address of the node. The service restarts its program when the program stops. Kubernetes does not use the service, and no other unit depends on it.

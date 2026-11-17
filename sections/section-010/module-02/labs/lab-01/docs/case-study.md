@@ -4,4 +4,4 @@ exam_objectives:
 ---
 # Starting Environment
 
-The control-plane node of this environment holds a stand-in SSH server configuration in `/etc/ssh/sshd_config`, a drop-in file `/etc/ssh/sshd_config.d/50-cloud-init.conf`, and two accounts: `opsadmin`, the account that administrators use, and `olduser`, an account nobody uses any more. The setup script writes the files itself, so the exercise does not depend on an SSH server being installed in the node image. Today root may log in over SSH, the first `PasswordAuthentication` value that the daemon reads allows passwords, any account may log in, and `olduser` has the shell `/bin/bash`.
+The cluster has one control-plane node and one worker node. The control-plane node holds an SSH server configuration: a main file that includes a drop-in directory near its top and ends with a `Match` block for a backup account, and two drop-in files. One drop-in file was added at install time and allows root logins. The other comes from a cloud image and allows password logins. The administrator account is `opsadmin`. The node image has no SSH server program, so the configuration files are the only thing to change.

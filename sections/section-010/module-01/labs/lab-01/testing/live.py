@@ -1,8 +1,26 @@
-def unit(prop):
-    return command([ENGINE,'exec',NODE,'systemctl','show','training-extra.service','--property='+prop,'--value']).stdout.strip()
-assert command([ENGINE,'exec',NODE,'systemctl','is-active','kubelet']).stdout.strip()=='active', 'The kubelet must stay active'
-assert command([ENGINE,'exec',NODE,'systemctl','is-active','containerd']).stdout.strip()=='active', 'containerd must stay active'
-if wants('service-stopped'):
-    assert unit('ActiveState')=='inactive', 'Stop the unnecessary service training-extra.service'
-if wants('service-disabled'):
-    assert unit('UnitFileState')=='disabled', 'Disable automatic startup of training-extra.service'
+# Node checks for this lab. check.py runs this file with its helpers in scope.
+UNIT = 'remote-diag.service'
+PORT = '8099'
+
+
+def unit_property(name):
+    return node_exec(NODE, 'systemctl', 'show', UNIT, '--property=' + name, '--value').stdout.strip()
+
+
+def port_is_listening():
+    listeners = node_exec(NODE, 'ss', '-Htln').stdout.splitlines()
+    return any(line.split()[3].rsplit(':', 1)[-1] == PORT for line in listeners if len(line.split()) > 3)
+
+
+for node in (NODE, WORKER):
+    states = node_exec(node, 'systemctl', 'is-active', 'kubelet.service', 'containerd.service', success=False).stdout.split()
+    assert states == ['active', 'active'], 'kubelet and containerd must stay active on ' + node
+
+if wants('listener-closed'):
+    assert unit_property('ActiveState') not in ('active', 'activating', 'reloading'), UNIT + ' is still running'
+    assert not port_is_listening(), 'A process still listens on TCP port ' + PORT
+
+if wants('boot-start-removed'):
+    load_state = unit_property('LoadState')
+    file_state = unit_property('UnitFileState')
+    assert load_state in ('not-found', 'masked') or file_state in ('disabled', 'masked'), UNIT + ' still starts at boot (unit file state: ' + (file_state or load_state) + ')'

@@ -10,9 +10,6 @@ runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
     nodes:
       workers: 1
 bootstrap:
@@ -38,27 +35,17 @@ testing:
 validation:
   scripts:
   - name: root-login-refused
-    description: sshd refuses root logins
+    description: The first global PermitRootLogin value that sshd reads is no
     type: file
     source: validation/validate-root-login-refused.sh
     points: 1
   - name: password-login-refused
-    description: The first PasswordAuthentication value sshd reads is no and key logins stay on
+    description: The first global PasswordAuthentication value that sshd reads is no and key logins stay on
     type: file
     source: validation/validate-password-login-refused.sh
     points: 1
   - name: allow-only-opsadmin
-    description: AllowUsers allows only opsadmin
+    description: A global AllowUsers list, outside every Match block, allows only opsadmin
     type: file
     source: validation/validate-allow-only-opsadmin.sh
-    points: 1
-  - name: olduser-locked
-    description: olduser has the nologin shell and a locked password
-    type: file
-    source: validation/validate-olduser-locked.sh
-    points: 1
-  - name: node-access-review-record
-    description: ConfigMap node-access-review records the hardening
-    type: file
-    source: validation/validate-node-access-review-record.sh
     points: 1

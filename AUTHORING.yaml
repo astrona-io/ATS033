@@ -57,10 +57,15 @@ sections:
     - id: lab-01
       path: sections/section-010/module-01/labs/lab-01
       after_reading: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-      objective: Remove a seeded extra service from active and enabled node services
-        while preserving Kubernetes.
+      objective: Stop and disable a seeded systemd service so that its port closes, while kubelet and containerd keep running.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-010/module-01/labs/lab-02
+      after_reading: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+      objective: Purge an unneeded Debian package and its configuration files from a node without breaking Kubernetes.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-02
     title: Harden Node Access With SSH And Host Login Paths
@@ -85,11 +90,16 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-010/module-02/labs/lab-01
-      after_reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
-      objective: Set key-only SSH for one administrator account and remove the login
-        paths of an unused account.
+      after_reading: sections/section-010/module-02/course-02-limit-who-can-log-in.md
+      objective: Fix drop-in precedence in sshd_config so that root and password logins are refused and only one administrator account may log in.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-010/module-02/labs/lab-02
+      after_reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+      objective: Lock an unused account, give it a refusing shell and remove a second account with UID 0.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-03
     title: Restrict Workload Access To The Host
@@ -115,11 +125,22 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-010/module-03/labs/lab-01
-      after_reading: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
-      objective: Rewrite a Deployment without host access and enforce the baseline
-        standard on its namespace.
+      after_reading: sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
+      objective: Rewrite a Deployment without host namespaces, hostPath or privilege, as a non-root user with a read-only root filesystem.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-010/module-03/labs/lab-02
+      after_reading: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+      objective: Fix a workload that uses a host namespace, then enforce the baseline Pod Security Standard on its namespace.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-010/module-03/labs/lab-03
+      after_reading: sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
+      objective: Label and taint a worker node and give a Deployment the selector and toleration that pin it there.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
 - id: section-020
   title: Using least-privilege identity and access management
