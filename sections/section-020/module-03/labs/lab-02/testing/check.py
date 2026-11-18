@@ -13,10 +13,16 @@ ASTRONA_KUBE_CONTEXT when astrona sets it (an exam cluster sets its own),
 otherwise the lab mode context in requirements.json. The node containers'
 names and the container engine come from the environment astrona sets too,
 so the same checks run on the lab's own cluster and on an exam cluster.
+
+A qemu lab ("runtime": "qemu" in requirements.json) runs this file inside its
+VM: the cluster is one kubeadm node named after the VM's host name (astrona
+names the VM differently under `astrona test`), so NODE and WORKER are that
+node and node_exec() runs the command on the VM with sudo.
 """
 import json
 import os
 from pathlib import Path
+import socket
 import subprocess
 import sys
 
@@ -26,8 +32,9 @@ CONTEXT = os.environ.get('ASTRONA_KUBE_CONTEXT') or REQUIREMENTS['context']
 CLUSTER = os.environ.get('ASTRONA_KIND_CLUSTER') or REQUIREMENTS['cluster']
 ENGINE = os.environ.get('ASTRONA_CONTAINER_ENGINE') or 'podman'
 NAMESPACE = REQUIREMENTS['namespace']
-NODE = CLUSTER + '-control-plane'
-WORKER = CLUSTER + '-worker'
+QEMU = REQUIREMENTS.get('runtime') == 'qemu'
+NODE = socket.gethostname() if QEMU else CLUSTER + '-control-plane'
+WORKER = socket.gethostname() if QEMU else CLUSTER + '-worker'
 SELECTED = sys.argv[1] if len(sys.argv) > 1 else None
 MATCHED = set()
 
@@ -57,8 +64,9 @@ def kubectl(*args):
 
 
 def node_exec(node, *args, success=True):
-    """Run a command inside a node container (NODE or WORKER)."""
-    return command([ENGINE, 'exec', node, *args], success=success)
+    """Run a command on a node (NODE or WORKER): in its container, or on the qemu VM."""
+    prefix = ['sudo'] if QEMU else [ENGINE, 'exec', node]
+    return command([*prefix, *args], success=success)
 
 
 def get(kind, name, namespace=NAMESPACE):

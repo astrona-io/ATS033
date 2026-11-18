@@ -9,6 +9,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 LAB = 'sections/section-020/module-02/labs/lab-01'
+VM_LAB = 'sections/section-030/module-03/labs/lab-04'
 spec = importlib.util.spec_from_file_location('structure', Path(__file__).with_name('check-course-structure.py'))
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
@@ -139,6 +140,30 @@ class StructureTests(unittest.TestCase):
         question = self.lab / 'question.md'
         question.write_text(question.read_text().replace('---\n', '---\ndraft: true\n', 1))
         with self.assertRaisesRegex(ValueError, 'must not be marked draft'):
+            module.validate(self.root)
+
+    def test_stale_vm_script(self):
+        with (self.root / VM_LAB / 'bootstrap/setup.sh').open('a') as handle:
+            handle.write('# local change\n')
+        with self.assertRaisesRegex(ValueError, 'stale'):
+            module.validate(self.root)
+
+    def test_vm_lab_uses_host_lifecycle(self):
+        path = self.root / VM_LAB / 'config.yaml'
+        path.write_text(path.read_text().replace('source: vm/verify-start.sh', 'source: testing/verify-start.sh'))
+        with self.assertRaisesRegex(ValueError, 'testing.init must be'):
+            module.validate(self.root)
+
+    def test_edited_vm_helpers(self):
+        with (self.root / VM_LAB / 'bootstrap/helpers.sh').open('a') as handle:
+            handle.write('# local change\n')
+        with self.assertRaisesRegex(ValueError, 'differs from scripts/ci/lab-files/vm-helpers.sh'):
+            module.validate(self.root)
+
+    def test_vm_lab_with_kind_context(self):
+        path = self.root / VM_LAB / 'testing/requirements.json'
+        path.write_text(path.read_text().replace('kubernetes-admin@astro-', 'kind-astro-'))
+        with self.assertRaisesRegex(ValueError, 'requirements.json of a qemu lab'):
             module.validate(self.root)
 
 

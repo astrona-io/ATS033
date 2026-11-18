@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check registration, module order and the exam-ready lab layout."""
 from pathlib import Path
+import importlib.util
 import json
 import re
 import sys
@@ -15,6 +16,12 @@ SHARED_FILES = {
     'testing/wait-solved.sh': 'wait-solved.sh',
 }
 LIFECYCLE = ['testing/verify-start.sh', 'solution/apply.sh', 'testing/wait-solved.sh']
+# A qemu lab runs the same scripts inside its VM through the generated vm/
+# wrappers (scripts/ci/vm-lab.py), so config.yaml names those instead.
+VM_LIFECYCLE = ['vm/verify-start.sh', 'vm/apply-solution.sh', 'vm/wait-solved.sh']
+spec = importlib.util.spec_from_file_location('vm_lab', Path(__file__).with_name('vm-lab.py'))
+vm_lab = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(vm_lab)
 MAX_MINUTES = 20
 # The exam-style question shape: these headings, in this order.
 QUESTION_PARTS = ('Solve this question on: `terminal`', '## Tasks', '## Constraints', '## How the answer is checked')
@@ -45,9 +52,11 @@ def check_lab(root, lab, entry):
     name = cfg['metadata']['name']
     suffix = lab_suffix(name)
     runtime = cfg['runtime']['type']
+    qemu = runtime == 'qemu'
     init = [item.get('source') for item in cfg.get('testing', {}).get('init', [])]
-    if init != LIFECYCLE:
-        raise ValueError(f'{lab}: testing.init must be {LIFECYCLE}')
+    lifecycle = VM_LIFECYCLE if qemu else LIFECYCLE
+    if init != lifecycle:
+        raise ValueError(f'{lab}: testing.init must be {lifecycle}')
     scripts = cfg.get('validation', {}).get('scripts', [])
     if not scripts or cfg['validation'].get('script'):
         raise ValueError(f'{lab}: validation needs one scripts entry per outcome')
@@ -55,17 +64,22 @@ def check_lab(root, lab, entry):
     for grader in scripts:
         if not grader.get('description') or not isinstance(grader.get('points'), int):
             raise ValueError(f'{lab}: grader {grader.get("name")} needs a description and points')
-        if grader['source'] != f'validation/validate-{grader["name"]}.sh':
-            raise ValueError(f'{lab}: grader {grader["name"]} must use validation/validate-{grader["name"]}.sh')
-        if (directory / grader['source']).read_bytes() != wrapper:
-            raise ValueError(f'{lab}: {grader["source"]} differs from scripts/ci/lab-files/validate-outcome.sh')
-    listed = {grader['source'] for grader in scripts}
+        source = f'{"vm" if qemu else "validation"}/validate-{grader["name"]}.sh'
+        if grader['source'] != source:
+            raise ValueError(f'{lab}: grader {grader["name"]} must use {source}')
+        if (directory / f'validation/validate-{grader["name"]}.sh').read_bytes() != wrapper:
+            raise ValueError(f'{lab}: validation/validate-{grader["name"]}.sh differs from scripts/ci/lab-files/validate-outcome.sh')
+    listed = {f'validation/validate-{grader["name"]}.sh' for grader in scripts}
     present = {str(path.relative_to(directory)) for path in directory.glob('validation/*')}
     if listed != present:
         raise ValueError(f'{lab}: validation/ files and config.yaml differ: {sorted(listed ^ present)}')
-    for path, shared in SHARED_FILES.items():
+    shared_files = {**SHARED_FILES, 'bootstrap/helpers.sh': 'vm-helpers.sh'} if qemu else SHARED_FILES
+    for path, shared in shared_files.items():
         if (directory / path).read_bytes() != (SHARED / shared).read_bytes():
             raise ValueError(f'{lab}: {path} differs from scripts/ci/lab-files/{shared}')
+    if qemu:
+        if [item.get('source') for item in cfg.get('bootstrap', {}).get('init', [])] != ['vm/install.sh']:
+            raise ValueError(f'{lab}: bootstrap.init of a qemu lab must be vm/install.sh')
     requirements = json.loads((directory / 'testing/requirements.json').read_text())
     outcomes = {grader['name'] for grader in scripts}
     tagged = {item['outcome'] for key in ('resources', 'behavior') for item in requirements.get(key, []) if 'outcome' in item}
@@ -82,6 +96,9 @@ def check_lab(root, lab, entry):
         raise ValueError(f'{lab}: namespace must end with -{suffix}')
     if runtime == 'kind' and (requirements['context'], requirements['cluster']) != (f'kind-astro-{name}', f'astro-{name}'):
         raise ValueError(f'{lab}: requirements.json context and cluster must name astro-{name}')
+    vm_requirements = (f'kubernetes-admin@astro-{name}', f'astro-{name}', 'qemu')
+    if qemu and (requirements['context'], requirements['cluster'], requirements.get('runtime')) != vm_requirements:
+        raise ValueError(f'{lab}: requirements.json of a qemu lab must be context, cluster and runtime {vm_requirements}')
     for script in ['validate.sh', 'solution/apply.sh']:
         if 'ASTRONA_KUBE_CONTEXT' not in (directory / script).read_text():
             raise ValueError(f'{lab}: {script} needs the context guard')
@@ -101,6 +118,9 @@ def check_lab(root, lab, entry):
         raise ValueError(f'{lab}: a registered lab must not be marked draft')
     if entry.get('examScope') and runtime != 'kind':
         raise ValueError(f'{lab}: only kind labs fit the exam profile')
+    # Last, so a broken source file reports its own rule first.
+    if qemu and vm_lab.stale(directory):
+        raise ValueError(f'{lab}: stale {vm_lab.stale(directory)}; run python3 scripts/ci/vm-lab.py {lab}')
     return name
 
 

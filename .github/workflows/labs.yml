@@ -162,14 +162,17 @@ jobs:
 
       - name: Test the lab with its reference solution
         if: matrix.env.kind == 'lab'
-        # `astrona test` names its cluster astro-test-<lab>, not astro-<lab>,
+        # `astrona test` names a kind cluster astro-test-<lab>, not astro-<lab>,
         # so tell the lab scripts which context and cluster to accept. Their
         # guards still refuse every other context. (astrona-cli #276 sets
-        # these itself once released.)
+        # these itself once released.) A qemu lab names its kubeadm cluster
+        # astro-<lab> inside the VM itself, so it needs neither.
         run: |
-          name=$(python3 -c 'import sys, yaml; print(yaml.safe_load(open(sys.argv[1]))["metadata"]["name"])' "${{ matrix.env.path }}/config.yaml")
-          export ASTRONA_KIND_CLUSTER="astro-test-$name"
-          export ASTRONA_KUBE_CONTEXT="kind-astro-test-$name"
+          if [ "${{ matrix.env.runtime }}" = kind ]; then
+            name=$(python3 -c 'import sys, yaml; print(yaml.safe_load(open(sys.argv[1]))["metadata"]["name"])' "${{ matrix.env.path }}/config.yaml")
+            export ASTRONA_KIND_CLUSTER="astro-test-$name"
+            export ASTRONA_KUBE_CONTEXT="kind-astro-test-$name"
+          fi
           astrona test --accept-terms --headless --install-version \
             -c "${{ matrix.env.path }}" \
             --junit-xml "$RUNNER_TEMP/junit.xml" \
