@@ -25,7 +25,7 @@ See [curriculum coverage](CURRICULUM.md), [primary sources](SOURCES.md), [questi
 
 ## Hands-On Coverage
 
-This course has 12 ungraded module playgrounds and 36 graded labs. Each lab is registered right after the reading it practises. 33 labs passed `astrona validate` and `astrona test` on a live kind cluster. The 3 AppArmor labs passed `astrona validate`; they need a Linux host with AppArmor for a live test.
+This course has 12 ungraded module playgrounds and 36 graded labs. Each lab is registered right after the reading it practises. 20 labs and 7 playgrounds run on a kind cluster. 16 labs and 5 playgrounds that work on node files, services, packages, sshd, ufw, static Pods, the kubelet, etcd or AppArmor run in a one-node kubeadm virtual machine (QEMU) built from the pinned `ubuntu-qcow2-image:24.04-cks-20261118` image. 36 labs passed `astrona validate` and `astrona test` on their live runtime.
 
 | Module | Labs in teaching order |
 | --- | --- |
@@ -35,7 +35,7 @@ This course has 12 ungraded module playgrounds and 36 graded labs. Each lab is r
 | 020/01 | Grant Read Access Through A Group; Lock And Expire A Departed Account; Revoke A Leaver's Access Everywhere |
 | 020/02 | Scope Access With resourceNames And A RoleBinding; Replace Wildcard And Cluster-Admin Access; Find Hidden RBAC Grants |
 | 020/03 | Give A Workload Its Own ServiceAccount; Mount A Short-Lived Projected Token; Close The Default ServiceAccount |
-| 030/01 | Bind A Host-Network Service To Loopback; Allow A Node Port Only From The Worker With iptables; Default-Deny Ingress With One Allowed Client |
+| 030/01 | Bind A Host-Network Service To Loopback; Block A Host Port With ufw; Default-Deny Ingress With One Allowed Client |
 | 030/02 | Close An Accidental NodePort; Answer A NodePort Only On Nodes With Endpoints; Audit And Close Unapproved Service Exposure |
 | 030/03 | Bind The Scheduler To Loopback; Remove Anonymous Access From RBAC Bindings; Close The Kubelet API To Anonymous Callers; Restrict The etcd Data Directory |
 | 040/01 | Install And Use A Localhost seccomp Profile; Load An AppArmor Profile And Attach It To A Pod; Harden A Deployment To The Restricted Pod Security Level; Fix A Pod That References A Missing seccomp Profile |
