@@ -1,19 +1,16 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
 # Prerequisites
 
-Use astrona, kubectl, Python 3, Podman and a shell. Node inspection exercises use the containers in this environment, not the physical host.
+Use `astrona` and a terminal. Every command runs in a shell on the lab VM, not on your own computer.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Open a shell on the lab VM (virtual machine) and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-02-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-02-01" || exit 1
-node_name="astro-ats-033-lab-010-02-01-control-plane"
-worker_name="astro-ats-033-lab-010-02-01-worker"
+astrona ssh astro-ats-033-lab-010-02-01
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+The second command prints `kubernetes-admin@astro-ats-033-lab-010-02-01`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Node files and services belong to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.

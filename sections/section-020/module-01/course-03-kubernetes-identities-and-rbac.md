@@ -24,13 +24,17 @@ The diagram shows that the ServiceAccount has no permission itself; the RoleBind
 
 ## Create the identity and its Role
 
-Select the environment first:
+Open a shell on the playground VM. The VM is the only node of the cluster, and the `student` user there has a kubeconfig file with administrator access, so `kubectl` works without extra setup:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-020-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-020-01" || exit 1
+astrona ssh astro-ats-033-playground-020-01
+kubectl config current-context
+```
+
+```text
+kubernetes-admin@astro-ats-033-playground-020-01
 ```
 
 Save this as `serviceaccount-probe-reader.yaml`:
@@ -82,6 +86,12 @@ The empty string in `apiGroups` means the core API group, where `pods` lives. Th
 kubectl apply -f serviceaccount-probe-reader.yaml -f role-pod-reader.yaml -f rolebinding-probe-reader.yaml
 ```
 
+```text
+serviceaccount/probe-reader created
+role.rbac.authorization.k8s.io/pod-reader created
+rolebinding.rbac.authorization.k8s.io/probe-reader-pod-reader created
+```
+
 ## Prove the limit with kubectl auth can-i
 
 `kubectl auth can-i <verb> <resource>` asks the API server whether an action is allowed and prints `yes` or `no`. The option `--as` sends the question as another identity, so you test the permissions of the ServiceAccount from your own administrator session. Ask four questions: one that should be allowed and three that must not be:
@@ -94,10 +104,28 @@ kubectl auth can-i get secrets --as="$sa" -n starfleet
 kubectl auth can-i list pods --as="$sa" -n outpost
 ```
 
+```text
+yes
+no
+no
+no
+```
+
 The answers are `yes`, `no`, `no` and `no`. The Role allows only `get` and `list` on pods, and only in `starfleet`, because the RoleBinding is in that namespace. To see the complete list of what one identity may do in a namespace, use the `--list` option:
 
 ```sh
 kubectl auth can-i --list --as="$sa" -n starfleet
+```
+
+The output below is shortened: it keeps the first five rows and drops the other rows for URLs such as `/healthz` and `/version`.
+
+```text
+Resources                                       Non-Resource URLs                      Resource Names   Verbs
+selfsubjectreviews.authentication.k8s.io        []                                     []               [create]
+selfsubjectaccessreviews.authorization.k8s.io   []                                     []               [create]
+selfsubjectrulesreviews.authorization.k8s.io    []                                     []               [create]
+pods                                            []                                     []               [get list]
+                                                [/.well-known/openid-configuration/]   []               [get]
 ```
 
 The table contains the `get` and `list` verbs for `pods`. It also contains a few rules that every authenticated caller receives, such as the right to ask what it may do (`selfsubjectaccessreviews`). Those come from built-in ClusterRoles and are not part of the Role you wrote.
@@ -139,7 +167,25 @@ kubectl -n starfleet wait --for=condition=Ready pod/sa-reader --timeout=120s
 kubectl -n starfleet exec sa-reader -- ls /var/run/secrets/kubernetes.io/serviceaccount
 ```
 
-The `ls` command fails with `No such file or directory`, which is the expected result. If the mount were on, the directory would hold the files `token`, `ca.crt` and `namespace`. The token in that directory is a bound token: the API server ties it to the pod and it expires, which makes it safer than the old long-lived token Secrets.
+```text
+pod/sa-reader condition met
+ls: /var/run/secrets/kubernetes.io/serviceaccount: No such file or directory
+command terminated with exit code 1
+```
+
+The `ls` command fails, which is the expected result. Compare it with the `probe` Deployment, whose pods use the `default` ServiceAccount with the mount on:
+
+```sh
+kubectl -n starfleet exec deploy/probe -- ls /var/run/secrets/kubernetes.io/serviceaccount
+```
+
+```text
+ca.crt
+namespace
+token
+```
+
+That directory holds the token, the certificate of the cluster's certificate authority (`ca.crt`) and the namespace name. The token in that directory is a bound token: the API server ties it to the pod and it expires, which makes it safer than the old long-lived token Secrets.
 
 ## Common ways RBAC grows too wide
 

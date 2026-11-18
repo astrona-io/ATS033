@@ -1,0 +1,17 @@
+{
+  "context": "kubernetes-admin@astro-ats-033-lab-010-02-02",
+  "cluster": "astro-ats-033-lab-010-02-02",
+  "runtime": "qemu",
+  "namespace": "starfleet-033-010-02-02",
+  "resources": [],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "--raw=/readyz"
+      ],
+      "equals": "ok"
+    }
+  ]
+}

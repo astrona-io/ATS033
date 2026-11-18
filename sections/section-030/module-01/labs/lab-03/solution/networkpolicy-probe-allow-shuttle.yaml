@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: probe-allow-shuttle
+  namespace: starfleet-033-030-01-03
+spec:
+  podSelector:
+    matchLabels:
+      app: probe
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: shuttle
+    ports:
+    - protocol: TCP
+      port: 8080

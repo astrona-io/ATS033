@@ -14,7 +14,7 @@ Seccomp and AppArmor are two of several settings that reduce what a container ca
 - `capabilities.drop: ["ALL"]` removes every Linux capability, the units into which root power is split. Add back only what a workload provably needs.
 - `readOnlyRootFilesystem: true` mounts the container's root filesystem read-only. An attacker cannot place a binary or edit a configuration file there. The application writes to a mounted volume such as an `emptyDir` instead.
 - `seccompProfile` and `appArmorProfile` select the kernel filters from the previous two parts.
-- `fsGroup` changes the group of the files in a mounted volume, so a non-root process can write to it. It is a pod-level field.
+- `fsGroup` sets a group ID that owns the files of supported volumes and is added to the groups of every container process. It matters for a volume whose files already have an owner, such as a persistent volume. It is a pod-level field.
 
 Settings at pod level apply to every container. A value at container level overrides the pod value, and fields such as `allowPrivilegeEscalation`, `capabilities` and `readOnlyRootFilesystem` exist at container level only.
 
@@ -67,7 +67,7 @@ spec:
     emptyDir: {}
 ```
 
-The manifest has no `appArmorProfile`, because AppArmor needs a kernel that supports it, because the node must support it. On a node that supports it, add `appArmorProfile: {type: RuntimeDefault}` next to the seccomp profile at pod level.
+The manifest has no `appArmorProfile`, because AppArmor needs a node whose kernel supports it. On a node that supports it, add `appArmorProfile: {type: RuntimeDefault}` next to the seccomp profile at pod level.
 
 Apply it:
 
@@ -86,7 +86,7 @@ kubectl -n starfleet exec restricted-reader -- sh -c 'printf allowed > /scratch/
 kubectl -n starfleet exec restricted-reader -- grep -E 'Seccomp|NoNewPrivs|CapEff' /proc/1/status
 ```
 
-The user ID is `1000`. The scratch write succeeds and prints `allowed`, because `fsGroup` made the volume writable for the group of the process. The status lines show `Seccomp: 2` for the installed filter, `NoNewPrivs: 1` for the disabled escalation and an effective capability set `CapEff` made of zeros, which means no capabilities are left.
+The user ID is `1000`. The scratch write succeeds and prints `allowed`, because the kubelet creates a new `emptyDir` writable for every user. The status lines show `Seccomp: 2` for the installed filter, `NoNewPrivs: 1` for the disabled escalation and an effective capability set `CapEff` made of zeros, which means no capabilities are left.
 
 The negative check comes last. It is expected to fail, so run it on its own:
 
@@ -123,6 +123,6 @@ You can now write and verify the container-level settings that make up the restr
 > [!WARNING]
 > - **Running as non-root and stopping there.** A non-root user with all capabilities and escalation allowed is not the restricted standard. Combine all the settings.
 > - **Making the root filesystem read-only without a writable volume.** Applications that write temporary files crash. Mount an `emptyDir` for each path that needs writes.
-> - **Forgetting `fsGroup`.** A new `emptyDir` is owned by root, so a non-root process cannot write to it without it.
+> - **Expecting `fsGroup` to fix every write error.** A new `emptyDir` is already writable for every user. `fsGroup` helps with a volume whose files belong to another user, and it cannot make a read-only root filesystem writable.
 > - **Putting container-only fields at pod level.** `allowPrivilegeEscalation`, `capabilities` and `readOnlyRootFilesystem` belong under `containers[].securityContext`.
 > - **Applying an `enforce` label without a dry run.** Existing workloads fail to restart when they violate the level.

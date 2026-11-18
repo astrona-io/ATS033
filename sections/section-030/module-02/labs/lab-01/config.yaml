@@ -37,13 +37,13 @@ testing:
     source: testing/wait-solved.sh
 validation:
   scripts:
-  - name: debug-node-port-closed
-    description: probe-debug is a ClusterIP Service and node port 30080 is closed
+  - name: debug-cluster-ip
+    description: probe-debug is a ClusterIP Service without a node port, and shuttle still gets version=v1 through it
     type: file
-    source: validation/validate-debug-node-port-closed.sh
+    source: validation/validate-debug-cluster-ip.sh
     points: 1
-  - name: public-local-traffic
-    description: probe-public keeps node port 30081 with externalTrafficPolicy Local
+  - name: node-port-closed
+    description: Requests from drifter to port 30080 on both node addresses fail
     type: file
-    source: validation/validate-public-local-traffic.sh
+    source: validation/validate-node-port-closed.sh
     points: 1

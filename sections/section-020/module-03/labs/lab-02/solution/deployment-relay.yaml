@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: relay
+  namespace: starfleet-033-020-03-02
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: relay
+  template:
+    metadata:
+      labels:
+        app: relay
+    spec:
+      serviceAccountName: relay
+      automountServiceAccountToken: false
+      containers:
+      - name: relay
+        image: docker.io/library/busybox:1.37.0
+        command: ["sh", "-c", "sleep 3600"]
+        volumeMounts:
+        - name: bridge-token
+          mountPath: /var/run/secrets/tokens
+          readOnly: true
+      volumes:
+      - name: bridge-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              path: bridge-token
+              expirationSeconds: 600
+              audience: bridge-api

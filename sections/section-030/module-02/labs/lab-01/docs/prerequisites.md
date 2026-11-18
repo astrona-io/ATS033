@@ -1,13 +1,12 @@
 ---
-draft: true
 exam_objectives:
 - Minimize external access to the network
 ---
 # Prerequisites
 
-Use astrona, kubectl, Python 3, Podman and a shell. Node inspection exercises use the containers in this environment, not the physical host.
+Use astrona, kubectl and a shell. Every step uses the Kubernetes API, so no node command is needed.
 
-Use a host shell with the private kubeconfig for this independent kind environment.
+Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
 
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-030-02-01)"
@@ -16,4 +15,4 @@ node_name="astro-ats-033-lab-030-02-01-control-plane"
 worker_name="astro-ats-033-lab-030-02-01-worker"
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers.
+Keep this connection selected.

@@ -1,0 +1,37 @@
+{
+  "context": "kind-astro-ats-033-lab-040-02-03",
+  "cluster": "astro-ats-033-lab-040-02-03",
+  "namespace": "starfleet-033-040-02-03",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "shuttle",
+      "expected": {
+        "metadata": {
+          "name": "shuttle",
+          "namespace": "starfleet-033-040-02-03"
+        },
+        "spec": {
+          "replicas": 1,
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "name": "shuttle",
+                  "image": "docker.io/library/busybox:1.37.0",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "while true; do date > /tmp/manifest.new && mv /tmp/manifest.new /tmp/manifest || exit 1; sleep 5; done"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": []
+}

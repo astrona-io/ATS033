@@ -1,6 +1,7 @@
 {
-  "context": "kind-astro-ats-033-lab-030-01-01",
+  "context": "kubernetes-admin@astro-ats-033-lab-030-01-01",
   "cluster": "astro-ats-033-lab-030-01-01",
+  "runtime": "qemu",
   "namespace": "starfleet-033-030-01-01",
   "resources": [
     {
@@ -8,66 +9,23 @@
       "name": "node-local-server",
       "namespace": "starfleet-033-030-01-01",
       "expected": {
-        "metadata": {
-          "name": "node-local-server"
-        },
         "spec": {
           "hostNetwork": true
         }
       },
-      "state": "pod",
-      "outcome": "node-local-server"
+      "state": "pod"
     },
     {
       "kind": "pod",
-      "name": "node-local-server",
+      "name": "shuttle",
       "namespace": "starfleet-033-030-01-01",
       "expected": {
-        "apiVersion": "v1",
-        "kind": "Pod",
         "metadata": {
-          "name": "node-local-server",
-          "namespace": "starfleet-033-030-01-01"
-        },
-        "spec": {
-          "restartPolicy": "Never",
-          "containers": [
-            {
-              "name": "web",
-              "image": "docker.io/library/python:3.13-alpine",
-              "command": [
-                "python",
-                "-m",
-                "http.server",
-                "19090",
-                "--bind",
-                "127.0.0.1"
-              ]
-            }
-          ],
-          "hostNetwork": true,
-          "dnsPolicy": "ClusterFirstWithHostNet"
+          "name": "shuttle"
         }
       },
-      "state": "pod",
-      "outcome": "loopback-only"
+      "state": "pod"
     }
   ],
-  "behavior": [
-    {
-      "args": [
-        "kubectl",
-        "-n",
-        "starfleet-033-030-01-01",
-        "exec",
-        "node-local-server",
-        "--",
-        "python",
-        "-c",
-        "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:19090/',timeout=3).status)"
-      ],
-      "equals": "200",
-      "outcome": "node-local-server"
-    }
-  ]
+  "behavior": []
 }

@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
@@ -7,7 +6,7 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-The `shuttle` pod in `starfleet-033-040-02-01` carries cargo files, and the operations team wants a workload that can create and read files but can never delete them. The node of this cluster has no custom seccomp profile yet.
+An audit of `starfleet-033-040-02-01` found two Deployments that run without any seccomp filter. `bridge` never set a profile, and `scout` runs as a privileged container. Both must run under the container runtime's default seccomp profile.
 
 Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
 
@@ -18,20 +17,19 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-02-01" ||
 
 Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
 
-Allow about 10 minutes for the tasks. Cluster startup adds time.
+Allow about 8 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. Write a seccomp profile `block-delete.json` with `defaultAction` `SCMP_ACT_ALLOW` and one rule that returns `SCMP_ACT_ERRNO` for the syscalls `unlink`, `unlinkat` and `rmdir`.
-2. Place it on the node at `/var/lib/kubelet/seccomp/profiles/block-delete.json`. The node is the container `astro-ats-033-lab-040-02-01-control-plane`, and `podman cp` copies a file into it.
-3. Create the pod `no-delete` in `starfleet-033-040-02-01` with `restartPolicy: Never`, `seccompProfile` type `Localhost` and `localhostProfile` `profiles/block-delete.json`, and one container `shell` that runs `docker.io/library/busybox:1.37.0` with the command `sh -c "sleep 3600"`.
-4. Confirm that writing a file works and that deleting it with `rm` fails with `Operation not permitted`.
+1. Check the `Seccomp:` line in `/proc/1/status` of every pod in the namespace and note the value.
+2. Change both Deployments so that their pods use the seccomp profile type `RuntimeDefault`.
+3. Make sure that every pod of both Deployments reports `Seccomp: 2`. Change whatever stops a pod from getting the filter.
 
 ## Constraints
 
-- Keep the sleeping process running.
-- Do not use `Unconfined`, and do not change the `shuttle` pod.
+- Keep the Deployment names, container names, images, commands and replica counts (`bridge` 2, `scout` 1).
+- Do not use `Localhost` or `Unconfined` profiles.
 
 ## How the answer is checked
 
-The grader runs two checks: `no-delete` runs with the `Localhost` profile `profiles/block-delete.json`, `/proc/1/status` reports `Seccomp: 2` and writing a file works; and `rm` fails with `Operation not permitted` inside the pod.
+For each Deployment, the grader checks that the name, container, image, command and replica count are unchanged and that the rollout is complete. Then it checks every pod of that Deployment: the pod runs, its container is not privileged, its effective seccomp profile type is `RuntimeDefault`, and `/proc/1/status` reports `Seccomp: 2`. One outcome covers `bridge`, the other covers `scout`.

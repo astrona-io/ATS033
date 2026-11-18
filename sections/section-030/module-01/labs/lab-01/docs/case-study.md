@@ -1,10 +1,9 @@
 ---
-draft: true
 exam_objectives:
 - Minimize external access to the network
 ---
 # Starting Environment
 
-The isolated environment has two healthy probe replicas, an internal Service and two client Pods. The required result has not been configured.
+The namespace `starfleet-033-030-01-01` has two pods. The cluster has one node, which is the control plane and also runs the pods. The pod `node-local-server` runs Python's web server in the network of the node, bound to `0.0.0.0:19090`. The pod `shuttle` runs BusyBox with its own pod address and is the test client.
 
-Keep a node-local management-style service reachable locally while closing its node-address listener.
+The server answers on every address of the node, so any pod can reach it. The task is to narrow the listener to the loopback address of the node.

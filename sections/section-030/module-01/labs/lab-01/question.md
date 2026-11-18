@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Minimize external access to the network
 ---
@@ -7,35 +6,32 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-A node-local, management-style HTTP server must run on the control-plane node and be reachable only from that node itself. The namespace `starfleet-033-030-01-01` runs two healthy `probe` replicas, an internal Service and the client pods `shuttle` and `drifter`. The server does not exist yet.
+A node agent was deployed for local health checks, and a security scan of the node found it listening on all interfaces. The pod `node-local-server` in the namespace `starfleet-033-030-01-01` runs Python's web server on port 19090 in the network of the node (`hostNetwork: true`). Its command binds the server to `0.0.0.0`, so the pod `shuttle` in the same namespace can reach it at the node address. `shuttle` has its own pod network address, so its requests to the node address come from outside the node's network. Only processes on the node itself need this server.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+The lab VM (virtual machine) runs a one-node Kubernetes cluster built with kubeadm. The node is the control plane and also runs the pods. Open a shell on the lab VM and check that `kubectl`, the Kubernetes command-line tool, uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-030-01-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-030-01-01" || exit 1
-node_name="astro-ats-033-lab-030-01-01-control-plane"
-worker_name="astro-ats-033-lab-030-01-01-worker"
+astrona ssh astro-ats-033-lab-030-01-01
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+The second command prints `kubernetes-admin@astro-ats-033-lab-030-01-01`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Commands that read the processes of the node, such as `ss -p`, need `sudo`. They change only the lab VM, not your own computer.
 
-Allow about 8 minutes for the tasks. Cluster startup adds time.
+Allow about 10 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. Create the pod `node-local-server` in `starfleet-033-030-01-01` on the control-plane node's network: `hostNetwork: true` with `dnsPolicy: ClusterFirstWithHostNet`, a `nodeSelector` on the control-plane node's `kubernetes.io/hostname` and a toleration for the `node-role.kubernetes.io/control-plane` taint. Use `restartPolicy: Never` and one container `web` with the image `docker.io/library/python:3.13-alpine` and the command `python -m http.server 19090 --bind 127.0.0.1`.
-2. Confirm that a request from the server container to `http://127.0.0.1:19090/` succeeds.
-3. Confirm that a request from the `shuttle` pod to the node InternalIP on port 19090 fails with `Connection refused`.
+1. Find the listener of port 19090 on the node and confirm that it accepts connections on every address.
+2. Change `node-local-server` so that the web server listens on `127.0.0.1:19090` only. Keep the pod name, the namespace, the host network and the node.
+3. Confirm that a request on the node's loopback address returns status 200, and that a request from `shuttle` to the node's InternalIP on port 19090 fails with `Connection refused`.
 
 ## Constraints
 
-- Listen on loopback only. This practices listener scope, not a host firewall implementation.
-- Keep the node service and the cluster available.
-- Preserve the namespace, the workload names and every unrelated component.
+- Fix the listener itself. Do not add a firewall rule or a NetworkPolicy.
+- Keep `shuttle` and every other component of the cluster as they are.
 
 ## How the answer is checked
 
-The grader runs two checks: `node-local-server` is running on the control-plane node with the host network and answers on loopback with status 200; and its command binds `127.0.0.1`, so a request from `shuttle` to the node InternalIP on port 19090 is refused.
+The grader runs two checks. First, `ss` on the node shows port 19090 on `127.0.0.1` and on no other address. Second, a request from `shuttle` to the node's InternalIP on port 19090 gets `Connection refused`. Both checks also need `node-local-server` to be `Ready` on the node and a request to `http://127.0.0.1:19090/` on the node to return 200.
 
-Hint: `kubectl get node -o wide` shows each node's InternalIP.
+Hint: the command of a running container cannot change. Replace the pod.

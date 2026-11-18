@@ -1,0 +1,37 @@
+{
+  "context": "kind-astro-ats-033-lab-040-01-03",
+  "cluster": "astro-ats-033-lab-040-01-03",
+  "namespace": "starfleet-033-040-01-03",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "scout",
+      "expected": {
+        "metadata": {
+          "name": "scout",
+          "namespace": "starfleet-033-040-01-03"
+        },
+        "spec": {
+          "replicas": 1,
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "name": "scout",
+                  "image": "docker.io/library/busybox:1.37.0",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "while date > /tmp/heartbeat; do sleep 5; done"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": []
+}

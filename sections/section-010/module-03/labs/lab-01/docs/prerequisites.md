@@ -1,11 +1,10 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
 # Prerequisites
 
-Use astrona, kubectl and a shell. This task changes Kubernetes objects only.
+Use `astrona`, `kubectl` and a shell. This task changes Kubernetes objects only.
 
 Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
 

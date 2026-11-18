@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Using least-privilege identity and access management
 ---
@@ -7,32 +6,29 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-The `ops-agent` ServiceAccount in `starfleet-033-020-02-01` is bound to a Role `ops-wide` that allows every verb on every resource, and to `cluster-admin` through the ClusterRoleBinding `ops-agent-admin`. The agent only needs to read pods and their logs in `starfleet-033-020-02-01`. The namespace also runs two healthy `probe` replicas, an internal Service and two client pods.
+Two ServiceAccounts need read access in the namespace `starfleet-033-020-02-01`. A ServiceAccount is the Kubernetes identity that a Pod or a tool uses to call the API server. The ServiceAccount `code-reviewer` in `starfleet-033-020-02-01` must read the ConfigMap `probe-code` and nothing else. The ServiceAccount `inspector` lives in another namespace, `outpost-033-020-02-01`. Today it has the ClusterRole `view` through the ClusterRoleBinding `inspector-view`, so it can read every namespace of the cluster.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Use a host shell with the private kubeconfig for this cluster. A kubeconfig is the file that tells `kubectl`, the Kubernetes command-line tool, which cluster to use and which credentials to send.
 
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-020-02-01)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-02-01" || exit 1
 ```
 
-Keep this connection selected. Every script supplied by the lab refuses a different context.
+Keep this connection selected. Every script of the lab refuses a different context.
 
 Allow about 8 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. Remove the cluster-wide authority: delete the ClusterRoleBinding `ops-agent-admin`.
-2. Remove the wildcard authority: delete the RoleBinding `ops-wide` and the Role `ops-wide`.
-3. Give `ops-agent` exactly this access in `starfleet-033-020-02-01`: `get` and `list` on `pods`, and `get` on `pods/log`. Name the new Role `ops-agent-reader` and its RoleBinding `ops-agent-reader`.
-4. Prove the result with `kubectl auth can-i` as the ServiceAccount: `yes` for listing pods, getting pods and getting pod logs in `starfleet-033-020-02-01`; `no` for deleting pods, getting secrets and creating deployments there, for listing pods in `outpost-033-020-02-01`, and for listing nodes.
+1. In `starfleet-033-020-02-01`, create the Role `probe-code-reader` that allows only `get` on the ConfigMap named `probe-code`. Bind it to the ServiceAccount `code-reviewer` with a RoleBinding named `code-reviewer`.
+2. Give the ServiceAccount `inspector` of `outpost-033-020-02-01` the ClusterRole `view` in `starfleet-033-020-02-01` only. Use a RoleBinding named `inspector-view` in `starfleet-033-020-02-01`, and delete the ClusterRoleBinding `inspector-view`.
 
 ## Constraints
 
-- Remove every route by which `ops-agent` has wildcard or cluster-wide authority.
-- Do not change the workloads or the ServiceAccount itself.
-- Preserve the namespaces, the workload names and every unrelated component.
+- `code-reviewer` must not list or watch ConfigMaps and must not read any other ConfigMap.
+- Do not change the ClusterRole `view`, and do not create a ClusterRoleBinding for either ServiceAccount.
 
 ## How the answer is checked
 
-The grader runs three checks: `ops-agent` has no binding to `cluster-admin` and cannot list nodes or pods in `outpost-033-020-02-01`; the RoleBinding `ops-wide` is gone and no Role bound to `ops-agent` has a wildcard; and the RoleBinding `ops-agent-reader` gives exactly the read access above, with `kubectl auth can-i` answering `no` for the other requests.
+The grader runs two checks with `kubectl auth can-i --as=system:serviceaccount:<namespace>:<name>` and expects an exact `yes` or `no`. The first check expects `yes` for `get configmap/probe-code` and `no` for `get configmap/bridge-settings`, for `list`, `watch`, `update` and `delete` on ConfigMaps and for `get secrets`. The second check reads the RoleBinding `inspector-view`, confirms that no ClusterRoleBinding names `inspector`, and expects `yes` for reading Pods and ConfigMaps in `starfleet-033-020-02-01` and `no` in `outpost-033-020-02-01` and `kube-system`.

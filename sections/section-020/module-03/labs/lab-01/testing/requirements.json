@@ -5,136 +5,26 @@
   "resources": [
     {
       "kind": "deployment",
-      "name": "probe",
+      "name": "monitor",
       "namespace": "starfleet-033-020-03-01",
       "expected": {
-        "apiVersion": "apps/v1",
-        "kind": "Deployment",
-        "metadata": {
-          "name": "probe",
-          "namespace": "starfleet-033-020-03-01"
-        },
         "spec": {
-          "replicas": 2,
-          "selector": {
-            "matchLabels": {
-              "app": "probe",
-              "release": "probe"
-            }
-          }
+          "replicas": 1
         }
       },
       "state": "deployment"
     },
     {
-      "kind": "pod",
-      "name": "shuttle",
-      "namespace": "starfleet-033-020-03-01",
-      "expected": {
-        "apiVersion": "v1",
-        "kind": "Pod",
-        "metadata": {
-          "name": "shuttle",
-          "namespace": "starfleet-033-020-03-01"
-        }
-      },
-      "state": "pod"
-    },
-    {
-      "kind": "pod",
-      "name": "drifter",
-      "namespace": "outpost-033-020-03-01",
-      "expected": {
-        "apiVersion": "v1",
-        "kind": "Pod",
-        "metadata": {
-          "name": "drifter",
-          "namespace": "outpost-033-020-03-01"
-        }
-      },
-      "state": "pod"
-    },
-    {
-      "kind": "serviceaccount",
-      "name": "monitor",
-      "namespace": "starfleet-033-020-03-01",
-      "expected": {
-        "apiVersion": "v1",
-        "kind": "ServiceAccount",
-        "metadata": {
-          "name": "monitor",
-          "namespace": "starfleet-033-020-03-01"
-        },
-        "automountServiceAccountToken": false
-      },
-      "outcome": "monitor-without-token"
-    },
-    {
       "kind": "deployment",
-      "name": "monitor",
+      "name": "probe",
       "namespace": "starfleet-033-020-03-01",
       "expected": {
-        "apiVersion": "apps/v1",
-        "kind": "Deployment",
-        "metadata": {
-          "name": "monitor",
-          "namespace": "starfleet-033-020-03-01"
+        "spec": {
+          "replicas": 1
         }
       },
       "state": "deployment"
     }
   ],
-  "behavior": [
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "list",
-        "pods",
-        "--as=system:serviceaccount:starfleet-033-020-03-01:default",
-        "-n",
-        "starfleet-033-020-03-01"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "default-account-closed"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "get",
-        "secrets",
-        "--as=system:serviceaccount:starfleet-033-020-03-01:default",
-        "-n",
-        "starfleet-033-020-03-01"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "default-account-closed"
-    },
-    {
-      "args": [
-        "kubectl",
-        "auth",
-        "can-i",
-        "list",
-        "pods",
-        "--as=system:serviceaccount:starfleet-033-020-03-01:monitor",
-        "-n",
-        "starfleet-033-020-03-01"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "no"
-      ],
-      "outcome": "monitor-without-token"
-    }
-  ]
+  "behavior": []
 }

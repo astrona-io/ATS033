@@ -1,0 +1,29 @@
+{
+  "context": "kind-astro-ats-033-lab-010-03-03",
+  "cluster": "astro-ats-033-lab-010-03-03",
+  "namespace": "starfleet-033-010-03-03",
+  "resources": [
+    {
+      "kind": "deployment",
+      "name": "ledger",
+      "namespace": "starfleet-033-010-03-03",
+      "expected": {
+        "metadata": {
+          "name": "ledger",
+          "namespace": "starfleet-033-010-03-03"
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "get",
+        "--raw=/readyz"
+      ],
+      "equals": "ok"
+    }
+  ]
+}

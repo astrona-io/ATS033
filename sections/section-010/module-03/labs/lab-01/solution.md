@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
@@ -12,28 +11,41 @@ export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-03-01)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-03-01" || exit 1
 ```
 
-Keep this connection selected. Every script supplied with this task refuses a different context.
+## Inspect the starting pod
 
-## Inspect And Explain
-
-Read what the Deployment asks for before you change it. The first command prints the pod template fields that give host access. The second shows the node address next to the pod address; a pod on the host network has the same address as its node.
+The first command prints the three pod template fields that give host access: `hostNetwork`, `hostPID` and the container's `privileged` flag. The second command shows the pod address next to its node:
 
 ```sh
 kubectl -n starfleet-033-010-03-01 get deployment beacon -o jsonpath='{.spec.template.spec.hostNetwork} {.spec.template.spec.hostPID} {.spec.template.spec.containers[0].securityContext.privileged}{"\n"}'
 kubectl -n starfleet-033-010-03-01 get pods -l app=beacon -o wide
 ```
 
-Do not label the namespace first. The `baseline` standard rejects the pods of the current template, so a replacement pod would never be created after the label. Fix the template first.
+```text
+true true true
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                                 NOMINATED NODE   READINESS GATES
+beacon-5f79969c64-ktt45   1/1     Running   0          27s   10.89.0.105   astro-ats-033-lab-010-03-01-worker   <none>           <none>
+```
 
-Change only the `beacon` Deployment and the `starfleet-033-010-03-01` namespace.
+All three fields are `true`. The pod IP address `10.89.0.105` is the address of the node, because `hostNetwork: true` puts the container in the network namespace of the node. Your pod name and addresses will differ.
 
-1. Remove `hostNetwork`, `hostPID` and `hostIPC` from the pod template.
-2. Replace the `hostPath` volume with an `emptyDir` volume named `scratch`, mounted at `/scratch`.
-3. Make the container run without privilege: `privileged: false`, `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem: true`, `runAsNonRoot: true` with `runAsUser: 10001`, and all capabilities dropped.
-4. After the new pod runs, label the `starfleet-033-010-03-01` namespace `pod-security.kubernetes.io/enforce=baseline`.
-5. Create the ConfigMap `workload-review` in the `starfleet-033-010-03-01` namespace with the data `workload: beacon` and `result: hardened`.
+Because of `hostPID: true`, the container also shares the process ID (PID) namespace of the node, so `ps` in the container lists the processes of the node. `id` shows the user the container runs as:
 
-Keep the Deployment name, the label `app: beacon`, the container name `beacon`, the image and the command. One replica must be ready.
+```sh
+kubectl -n starfleet-033-010-03-01 exec deploy/beacon -- sh -c 'ps -o pid,comm | grep -E "kubelet|containerd" | head -3; id'
+```
+
+```text
+  123 containerd
+  203 kubelet
+  264 containerd-shim
+uid=0(root) gid=0(root) groups=0(root),10(wheel)
+```
+
+The container sees `kubelet` and `containerd` and runs as root (UID 0).
+
+## Rewrite the Deployment
+
+The new pod template drops the host namespace fields and the `hostPath` volume. It adds an `emptyDir` volume, which the kubelet creates empty for the pod and deletes with the pod. The `securityContext` of the container sets the user and blocks privilege. `readOnlyRootFilesystem: true` makes the image filesystem read-only, so the container can write only to mounted volumes.
 
 Save this as `deployment-beacon.yaml`:
 
@@ -77,47 +89,61 @@ spec:
         emptyDir: {}
 ```
 
-Save this as `configmap-workload-review.yaml`:
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: workload-review
-  namespace: starfleet-033-010-03-01
-data:
-  workload: beacon
-  result: hardened
-```
-
-Apply the Deployment, wait for the rollout, then label the namespace and record the review:
+Apply it:
 
 ```sh
 kubectl apply -f deployment-beacon.yaml
-kubectl -n starfleet-033-010-03-01 rollout status deployment/beacon --timeout=120s
-kubectl label namespace starfleet-033-010-03-01 pod-security.kubernetes.io/enforce=baseline --overwrite
-kubectl apply -f configmap-workload-review.yaml
 ```
 
-## Verify The Result
+`kubectl apply` replaces the whole pod template with this file, so the fields that the file leaves out (`hostNetwork`, `hostPID`, the `host-log` volume) are removed. `kubectl edit` works too, but there you must delete each field by hand.
 
-Check the template, the running pod and the label. A server-side dry run of the same label shows whether any pod in the namespace would still violate the standard.
+Then check the result. The Deployment controller creates a new ReplicaSet and replaces the old pod:
 
 ```sh
-kubectl -n starfleet-033-010-03-01 get deployment beacon -o jsonpath='{.spec.template.spec.hostNetwork} {.spec.template.spec.volumes}{"\n"}'
+kubectl -n starfleet-033-010-03-01 rollout status deployment/beacon --timeout=120s
 kubectl -n starfleet-033-010-03-01 get pods -l app=beacon -o wide
-kubectl label namespace starfleet-033-010-03-01 pod-security.kubernetes.io/enforce=baseline --overwrite --dry-run=server
-kubectl get --raw=/readyz
 ```
 
-The first command prints an empty host network value and no volumes of type `hostPath`. The pod address now differs from the node address, and the readiness endpoint answers `ok`.
+```text
+Waiting for deployment "beacon" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "beacon" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "beacon" rollout to finish: 1 old replicas are pending termination...
+deployment "beacon" successfully rolled out
+NAME                      READY   STATUS        RESTARTS   AGE   IP            NODE                                 NOMINATED NODE   READINESS GATES
+beacon-5487874b69-thgp9   1/1     Running       0          0s    10.244.1.2    astro-ats-033-lab-010-03-01-worker   <none>           <none>
+beacon-5f79969c64-ktt45   1/1     Terminating   0          37s   10.89.0.105   astro-ats-033-lab-010-03-01-worker   <none>           <none>
+```
 
-After you record your result, remove the independent lab with `astrona destroy ats-033-lab-010-03-01`.
+The new pod has the address `10.244.1.2` from the pod network, not the node address. The old pod is still terminating; it disappears after a few seconds.
+
+## Test the new pod
+
+The fields only matter if the running container behaves as they say. Check the user, the process list, a write to `/` and a write to `/scratch`:
+
+```sh
+kubectl -n starfleet-033-010-03-01 exec deploy/beacon -- id
+kubectl -n starfleet-033-010-03-01 exec deploy/beacon -- ps -o pid,comm
+kubectl -n starfleet-033-010-03-01 exec deploy/beacon -- touch /test-file
+kubectl -n starfleet-033-010-03-01 exec deploy/beacon -- touch /scratch/test-file
+kubectl -n starfleet-033-010-03-01 exec deploy/beacon -- ls -l /scratch
+```
+
+```text
+uid=10001 gid=0(root) groups=0(root)
+PID   COMMAND
+    1 sleep
+   20 ps
+touch: /test-file: Read-only file system
+command terminated with exit code 1
+-rw-r--r--    1 10001    root             0 Nov 17 21:59 test-file
+```
+
+The container runs as UID 10001. It sees only its own processes, because it has its own PID namespace. The write to `/` fails with `Read-only file system`, and the write to the `emptyDir` at `/scratch` works. The output of `ls -l` is shortened: the line `total 0` is left out. The group is still 0, because the template sets no `runAsGroup`; the task does not require it, but `runAsGroup` is a good addition in a real workload.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - Label the namespace after the new pod runs. With the label first, the Deployment is accepted but its ReplicaSet cannot create pods.
-> - Setting only `privileged: false` is not enough. The host namespaces and the `hostPath` volume stay, and `baseline` rejects them.
-> - `readOnlyRootFilesystem: true` needs a writable volume for any path the container writes to. The `emptyDir` volume `scratch` provides it.
-> - Confirm the private context before every change.
+> - **Setting `hostNetwork: false` and keeping `hostPID: true`.** Each host namespace field is separate. Remove all three.
+> - **`readOnlyRootFilesystem` without a writable volume.** Many programs need a temporary directory. Mount an `emptyDir` where the program writes, or it crashes at start.
+> - **`runAsNonRoot: true` without a user.** The busybox image runs as root by default, so the kubelet refuses to start the container with `CreateContainerConfigError`. Set `runAsUser` to a non-zero UID.
+> - **Patching the template with `kubectl patch` and forgetting the volume mount.** If you remove the `host-log` volume but keep its `volumeMounts` entry, the API server rejects the Deployment.

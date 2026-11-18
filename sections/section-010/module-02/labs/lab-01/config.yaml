@@ -7,19 +7,25 @@ metadata:
     caseStudy: docs/case-study.md
     guide: solution.md
 runtime:
-  type: kind
-  kind:
-    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
-    nodes:
-      workers: 1
+  # The lab works on systemd, packages, sshd and accounts of a real host, so it
+  # runs a one-node kubeadm cluster in an Ubuntu VM instead of kind node containers.
+  type: qemu
+  qemu:
+  - image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-cks
+      checksums:
+        amd64: sha256:dc3348c725b6b36d08888acdcbda44cc34894b76d5b56a594f7ce253b6d2e773
+        arm64: sha256:31798490219e2ee856d7f8c2cb9df83182bbac64c7d8ce7c15e81445527d7898
+    cpus: 2
+    memoryMB: 4096
+    diskSizeGB: 25
+    display: false
 bootstrap:
   init:
   - name: seed-private-environment
     type: file
-    source: bootstrap/setup.sh
+    source: vm/install.sh
 teardown:
   keepCluster: false
 testing:
@@ -27,38 +33,28 @@ testing:
   - name: verify-start
     description: Verify the starting state and reject the unfinished lab
     type: file
-    source: testing/verify-start.sh
+    source: vm/verify-start.sh
   - name: reference-result
     type: file
-    source: solution/apply.sh
+    source: vm/apply-solution.sh
   - name: wait-solved
     description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: testing/wait-solved.sh
+    source: vm/wait-solved.sh
 validation:
   scripts:
   - name: root-login-refused
-    description: sshd refuses root logins
+    description: sshd -T shows the effective global PermitRootLogin value no
     type: file
-    source: validation/validate-root-login-refused.sh
+    source: vm/validate-root-login-refused.sh
     points: 1
   - name: password-login-refused
-    description: The first PasswordAuthentication value sshd reads is no and key logins stay on
+    description: sshd -T shows PasswordAuthentication no and PubkeyAuthentication yes, and the running server no longer offers passwords
     type: file
-    source: validation/validate-password-login-refused.sh
+    source: vm/validate-password-login-refused.sh
     points: 1
-  - name: allow-only-opsadmin
-    description: AllowUsers allows only opsadmin
+  - name: allow-listed-accounts-only
+    description: sshd -T shows a global AllowUsers list of exactly opsadmin, student and astrona, and the running server refuses other accounts
     type: file
-    source: validation/validate-allow-only-opsadmin.sh
-    points: 1
-  - name: olduser-locked
-    description: olduser has the nologin shell and a locked password
-    type: file
-    source: validation/validate-olduser-locked.sh
-    points: 1
-  - name: node-access-review-record
-    description: ConfigMap node-access-review records the hardening
-    type: file
-    source: validation/validate-node-access-review-record.sh
+    source: vm/validate-allow-listed-accounts-only.sh
     points: 1

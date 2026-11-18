@@ -28,55 +28,79 @@ The diagram shows that exactly one set of bits applies, so a file with mode `064
 
 ## Inspect the two reports
 
-Select the environment, confirm the cluster, and define a helper that runs one command in the control-plane node container:
+Open a shell on the playground VM. The VM is the only node of the cluster, so the commands run on the node itself. The second command confirms that `kubectl` uses this playground's cluster:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-020-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-020-01" || exit 1
-node_name="astro-ats-033-playground-020-01-control-plane"
-run_on_node() { podman exec "$node_name" "$@"; }
+astrona ssh astro-ats-033-playground-020-01
+kubectl config current-context
 ```
 
-Look at the identity of the account and at the two files:
+```text
+kubernetes-admin@astro-ats-033-playground-020-01
+```
+
+You are logged in as `student`. Files that `root` owns need `sudo`, the program that runs one command as `root`. Look at the identity of the account and at the two files:
 
 ```sh
-run_on_node id training-reader
-run_on_node ls -l /var/lib/training-identity
+id training-reader
+ls -l /var/lib/training-identity
 ```
 
-`id` prints the UID, the primary group and every supplementary group. The UID is not 0, and the group list does not contain `training-readers`. In the `ls -l` output, `public-report` has the group `training-readers` and the mode `-rw-r-----`, and `private-report` has owner and group `root` and the mode `-rw-------`.
+```text
+uid=1003(training-reader) gid=1004(training-reader) groups=1004(training-reader)
+total 8
+-rw------- 1 root root             26 Nov 18 08:41 private-report
+-rw-r----- 1 root training-readers 18 Nov 18 08:41 public-report
+```
+
+`id` prints the UID, the primary group and every supplementary group. The UID is not 0, and the group list does not contain `training-readers`. In the `ls -l` output, `public-report` has the group `training-readers` and the mode `-rw-r-----`, and `private-report` has owner and group `root` and the mode `-rw-------`. Your dates and IDs can differ.
 
 ## Test access as the account
 
-Reading a file as `root` proves nothing, because `root` can read everything. To test an account, run the command as that account. `runuser -u <user> -- <command>` runs a command as another user. A denied read makes `cat` print a permission error and exit with a non-zero status, and `podman exec` passes that status on:
+Reading a file as `root` proves nothing, because `root` can read everything. To test an account, run the command as that account. `runuser -u <user> -- <command>` runs a command as another user. Only `root` may use `runuser`, so it runs under `sudo`:
 
 ```sh
-run_on_node runuser -u training-reader -- cat /var/lib/training-identity/public-report
+sudo runuser -u training-reader -- cat /var/lib/training-identity/public-report
 ```
 
-The command fails with `Permission denied`. The account is not the owner, it does not belong to the group `training-readers`, and the other bits of the file are empty. Group membership is the missing piece.
+```text
+cat: /var/lib/training-identity/public-report: Permission denied
+```
+
+The command fails, and `cat` exits with status 1. The account is not the owner, it does not belong to the group `training-readers`, and the other bits of the file are empty. Group membership is the missing piece.
 
 ## Grant access through a group
 
 `usermod` changes an account. The option `--append` (`-a`) together with `--groups` (`-G`) adds the account to a supplementary group and keeps its other groups. This is the most important detail of the command: without `--append`, `usermod --groups` replaces the whole list of supplementary groups, and the account silently loses its other groups.
 
 ```sh
-run_on_node usermod --append --groups training-readers training-reader
+sudo usermod --append --groups training-readers training-reader
 ```
 
 The new membership applies to processes that start after the change. Run the two reads again, one allowed and one that must still be denied:
 
 ```sh
-run_on_node runuser -u training-reader -- cat /var/lib/training-identity/public-report
-run_on_node runuser -u training-reader -- cat /var/lib/training-identity/private-report
+sudo runuser -u training-reader -- cat /var/lib/training-identity/public-report
+sudo runuser -u training-reader -- cat /var/lib/training-identity/private-report
 ```
 
-The first read prints `disposable-report`. The second fails with `Permission denied`, because `private-report` belongs to the group `root` with mode `0600`, and the account is neither the owner nor in that group. The account gained one file and nothing else. Finally, confirm the account did not gain root:
+```text
+disposable-report
+cat: /var/lib/training-identity/private-report: Permission denied
+```
+
+The first read succeeds. The second fails, because `private-report` belongs to the group `root` with mode `0600`, and the account is neither the owner nor in that group. The account gained one file and nothing else. Finally, confirm that the account did not gain root, and see who is in the group:
 
 ```sh
-run_on_node id training-reader
+id training-reader
+getent group training-readers
+```
+
+```text
+uid=1003(training-reader) gid=1004(training-reader) groups=1004(training-reader),1003(training-readers)
+training-readers:x:1003:training-reader
 ```
 
 The group list now includes `training-readers`. It does not include `root`, and the UID is still not 0.

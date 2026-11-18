@@ -1,0 +1,13 @@
+#include <tunables/global>
+
+profile k8s-deny-tmp-write flags=(attach_disconnected) {
+  #include <abstractions/base>
+
+  file,
+  network,
+  capability,
+  # Let the container runtime (runc) stop the container.
+  signal (receive) peer=runc,
+
+  deny /tmp/** w,
+}

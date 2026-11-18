@@ -3,7 +3,8 @@ training:
   id: ATS033
   title: 'CKS: System Hardening'
   description: 'Detailed reading material and reusable YAML knowledge checks for CKS:
-    System Hardening. Technical content remains draft. No labs or playgrounds.'
+    System Hardening, with a private playground per module and graded labs after
+    the readings they practise.'
   certification:
     name: Certified Kubernetes Security Specialist
     code: CKS
@@ -51,28 +52,44 @@ modules:
     title: Stop, Disable And Mask Services
     path: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
   - type: reading
-    title: Disable An Unneeded Node Service — Task
+    title: Close An Unneeded Listener On A Node — Task
     path: sections/section-010/module-01/labs/lab-01/question.md
   - type: lab
-    title: Disable An Unneeded Node Service
+    title: Close An Unneeded Listener On A Node
     path: sections/section-010/module-01/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: host-service-footprint
     task_kind: build
     learning_goals:
-    - Remove a seeded extra service from active and enabled node services while preserving
-      Kubernetes.
+    - Stop and disable a seeded systemd service so that its port closes, while kubelet and containerd keep running.
     tags:
     - cks
     - host-service-footprint
   - type: reading
-    title: Disable An Unneeded Node Service — Solution
+    title: Close An Unneeded Listener On A Node — Solution
     path: sections/section-010/module-01/labs/lab-01/solution.md
   - type: reading
     title: Remove Packages And Keep The Node Working
     path: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+  - type: reading
+    title: Purge An Unneeded Package From A Node — Task
+    path: sections/section-010/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Purge An Unneeded Package From A Node
+    path: sections/section-010/module-01/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: host-package-footprint
+    task_kind: build
+    learning_goals:
+    - Purge an unneeded Debian package and its configuration files from a node without breaking Kubernetes.
+    tags:
+    - cks
+    - host-package-footprint
+  - type: reading
+    title: Purge An Unneeded Package From A Node — Solution
+    path: sections/section-010/module-01/labs/lab-02/solution.md
   - type: reading
     title: Privileged Host Interfaces
     path: sections/section-010/module-01/course-04-privileged-host-interfaces.md
@@ -89,28 +106,44 @@ modules:
     title: Limit Who Can Log In
     path: sections/section-010/module-02/course-02-limit-who-can-log-in.md
   - type: reading
-    title: Login Shells And Unused Accounts
-    path: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
-  - type: reading
-    title: Harden SSH Access And Unused Accounts — Task
+    title: Restrict SSH Logins In sshd_config — Task
     path: sections/section-010/module-02/labs/lab-01/question.md
   - type: lab
-    title: Harden SSH Access And Unused Accounts
+    title: Restrict SSH Logins In sshd_config
     path: sections/section-010/module-02/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: ssh-host-login
     task_kind: build
     learning_goals:
-    - Set key-only SSH for one administrator account and remove the login paths of
-      an unused account.
+    - Fix drop-in precedence in sshd_config and reload sshd so that root and password logins are refused and only the listed accounts may log in.
     tags:
     - cks
     - ssh-host-login
   - type: reading
-    title: Harden SSH Access And Unused Accounts — Solution
+    title: Restrict SSH Logins In sshd_config — Solution
     path: sections/section-010/module-02/labs/lab-01/solution.md
+  - type: reading
+    title: Login Shells And Unused Accounts
+    path: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+  - type: reading
+    title: Close Unused And Duplicate Root Accounts — Task
+    path: sections/section-010/module-02/labs/lab-02/question.md
+  - type: lab
+    title: Close Unused And Duplicate Root Accounts
+    path: sections/section-010/module-02/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: unused-host-accounts
+    task_kind: build
+    learning_goals:
+    - Lock an unused account, give it a refusing shell and remove a second account with UID 0.
+    tags:
+    - cks
+    - unused-host-accounts
+  - type: reading
+    title: Close Unused And Duplicate Root Accounts — Solution
+    path: sections/section-010/module-02/labs/lab-02/solution.md
   - type: reading
     title: Summary
     path: sections/section-010/module-02/course-04-summary.md
@@ -121,9 +154,6 @@ modules:
     title: Host Namespaces, hostPath And Privileged Containers
     path: sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
   - type: reading
-    title: Enforce Limits With Pod Security Admission
-    path: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
-  - type: reading
     title: Remove Host Access From A Workload — Task
     path: sections/section-010/module-03/labs/lab-01/question.md
   - type: lab
@@ -131,12 +161,11 @@ modules:
     path: sections/section-010/module-03/labs/lab-01
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: workload-host-access
     task_kind: build
     learning_goals:
-    - Rewrite a Deployment without host access and enforce the baseline standard on
-      its namespace.
+    - Rewrite a Deployment without host namespaces, hostPath or privilege, as a non-root user with a read-only root filesystem.
     tags:
     - cks
     - workload-host-access
@@ -144,8 +173,49 @@ modules:
     title: Remove Host Access From A Workload — Solution
     path: sections/section-010/module-03/labs/lab-01/solution.md
   - type: reading
+    title: Enforce Limits With Pod Security Admission
+    path: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+  - type: reading
+    title: Enforce The Baseline Pod Security Standard — Task
+    path: sections/section-010/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Enforce The Baseline Pod Security Standard
+    path: sections/section-010/module-03/labs/lab-02
+    examScope: namespace
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: namespace-pod-security
+    task_kind: build
+    learning_goals:
+    - Fix a workload that uses a host namespace, then enforce the baseline Pod Security Standard on its namespace.
+    tags:
+    - cks
+    - namespace-pod-security
+  - type: reading
+    title: Enforce The Baseline Pod Security Standard — Solution
+    path: sections/section-010/module-03/labs/lab-02/solution.md
+  - type: reading
     title: Kubelet Settings And Dedicated Nodes
     path: sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
+  - type: reading
+    title: Dedicate A Worker Node To One Workload — Task
+    path: sections/section-010/module-03/labs/lab-03/question.md
+  - type: lab
+    title: Dedicate A Worker Node To One Workload
+    path: sections/section-010/module-03/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: dedicated-workload-nodes
+    task_kind: build
+    learning_goals:
+    - Label and taint a worker node and give a Deployment the selector and toleration that pin it there.
+    tags:
+    - cks
+    - dedicated-workload-nodes
+  - type: reading
+    title: Dedicate A Worker Node To One Workload — Solution
+    path: sections/section-010/module-03/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-010/module-03/course-04-summary.md
@@ -154,25 +224,6 @@ modules:
     path: sections/section-010/module-01/quiz.yaml
     question_count: 10
     pass_score: 70
-  - type: reading
-    title: Harden A Node And Its Workloads — Task
-    path: sections/section-010/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Harden A Node And Its Workloads
-    path: sections/section-010/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: host-hardening-capstone
-    task_kind: build
-    learning_goals:
-    - Combine a disabled node service, key-only SSH, a hardened workload with a Pod
-      Security label and a dedicated node.
-    tags:
-    - cks
-    - host-hardening-capstone
-  - type: reading
-    title: Harden A Node And Its Workloads — Solution
-    path: sections/section-010/capstone/labs/lab-01/solution.md
 - id: module-020
   title: Using least-privilege identity and access management
   description: Developed reading and reasoning for Using least-privilege identity
@@ -189,36 +240,103 @@ modules:
     title: Users, Groups And File Permissions
     path: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
   - type: reading
-    title: Grant One Host Identity Scoped Read Access — Task
+    title: Grant Read Access Through A Group — Task
     path: sections/section-020/module-01/labs/lab-01/question.md
   - type: lab
-    title: Grant One Host Identity Scoped Read Access
+    title: Grant Read Access Through A Group
     path: sections/section-020/module-01/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 6m
     topic: host-identity
     task_kind: build
     learning_goals:
-    - Grant a dedicated host identity access to one report without granting root access.
+    - Give one host account read access to a file through a group, without making
+      the file world-readable or granting root access.
     tags:
     - cks
     - host-identity
   - type: reading
-    title: Grant One Host Identity Scoped Read Access — Solution
+    title: Grant Read Access Through A Group — Solution
     path: sections/section-020/module-01/labs/lab-01/solution.md
   - type: reading
     title: Privilege Elevation And Account Locking
     path: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
   - type: reading
+    title: Lock And Expire A Departed Account — Task
+    path: sections/section-020/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Lock And Expire A Departed Account
+    path: sections/section-020/module-01/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: account-locking
+    task_kind: build
+    learning_goals:
+    - Lock, expire and remove the login shell of a host account without deleting
+      it.
+    - Turn off root and password logins in sshd and make the running service use
+      the change.
+    tags:
+    - cks
+    - account-locking
+  - type: reading
+    title: Lock And Expire A Departed Account — Solution
+    path: sections/section-020/module-01/labs/lab-02/solution.md
+  - type: reading
     title: Kubernetes Identities And RBAC
     path: sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
   - type: reading
-    title: Revocation And Audit
-    path: sections/section-020/module-01/course-04-revocation-and-audit.md
+    title: Revoking Host And Kubernetes Access
+    path: sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
+  - type: reading
+    title: Revoke A Leaver's Access Everywhere — Task
+    path: sections/section-020/module-01/labs/lab-03/question.md
+  - type: lab
+    title: Revoke A Leaver's Access Everywhere
+    path: sections/section-020/module-01/labs/lab-03
+    difficulty: intermediate
+    estimated_duration: 12m
+    topic: access-revocation
+    task_kind: build
+    learning_goals:
+    - Remove one person's group membership, sudoers rule and RBAC binding, and lock
+      the host account.
+    - Remove the person's SSH key, so that a key login is refused.
+    tags:
+    - cks
+    - access-revocation
+  - type: reading
+    title: Revoke A Leaver's Access Everywhere — Solution
+    path: sections/section-020/module-01/labs/lab-03/solution.md
+  - type: reading
+    title: Audit Trails On The Node And In The Cluster
+    path: sections/section-020/module-01/course-05-audit-trails-on-the-node-and-in-the-cluster.md
+  - type: reading
+    title: Persistent Audit Rules With augenrules
+    path: sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
+  - type: reading
+    title: Record Every Change To The Sudo Rules — Task
+    path: sections/section-020/module-01/labs/lab-04/question.md
+  - type: lab
+    title: Record Every Change To The Sudo Rules
+    path: sections/section-020/module-01/labs/lab-04
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: audit-rules
+    task_kind: build
+    learning_goals:
+    - Add a persistent auditd watch rule in /etc/audit/rules.d and load it with augenrules
+      without a reboot.
+    - Add a narrow sudoers rule and find the audit record of the change with ausearch.
+    tags:
+    - cks
+    - audit-rules
+  - type: reading
+    title: Record Every Change To The Sudo Rules — Solution
+    path: sections/section-020/module-01/labs/lab-04/solution.md
   - type: reading
     title: Summary
-    path: sections/section-020/module-01/course-05-summary.md
+    path: sections/section-020/module-01/course-07-summary.md
   - type: reading
     title: Least-Privilege RBAC Roles And Bindings
     path: sections/section-020/module-02/course.md
@@ -226,17 +344,37 @@ modules:
     title: Roles, ClusterRoles And Bindings
     path: sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
   - type: reading
-    title: Wildcards, cluster-admin And Escalation
-    path: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
-  - type: reading
-    title: Replace A Wildcard Role And cluster-admin Binding — Task
+    title: Scope Access With resourceNames And A RoleBinding — Task
     path: sections/section-020/module-02/labs/lab-01/question.md
   - type: lab
-    title: Replace A Wildcard Role And cluster-admin Binding
+    title: Scope Access With resourceNames And A RoleBinding
     path: sections/section-020/module-02/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
+    topic: rbac-resource-scoping
+    task_kind: build
+    learning_goals:
+    - Limit a Role to one named object and bind a ClusterRole in one namespace with
+      a RoleBinding.
+    tags:
+    - cks
+    - rbac-resource-scoping
+  - type: reading
+    title: Scope Access With resourceNames And A RoleBinding — Solution
+    path: sections/section-020/module-02/labs/lab-01/solution.md
+  - type: reading
+    title: Wildcards, cluster-admin And Escalation
+    path: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+  - type: reading
+    title: Replace Wildcard And Cluster-Admin Access — Task
+    path: sections/section-020/module-02/labs/lab-02/question.md
+  - type: lab
+    title: Replace Wildcard And Cluster-Admin Access
+    path: sections/section-020/module-02/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 8m
     topic: rbac-least-privilege
     task_kind: build
     learning_goals:
@@ -246,11 +384,31 @@ modules:
     - cks
     - rbac-least-privilege
   - type: reading
-    title: Replace A Wildcard Role And cluster-admin Binding — Solution
-    path: sections/section-020/module-02/labs/lab-01/solution.md
+    title: Replace Wildcard And Cluster-Admin Access — Solution
+    path: sections/section-020/module-02/labs/lab-02/solution.md
   - type: reading
     title: Audit Permissions With kubectl auth can-i
     path: sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
+  - type: reading
+    title: Find Hidden RBAC Grants — Task
+    path: sections/section-020/module-02/labs/lab-03/question.md
+  - type: lab
+    title: Find Hidden RBAC Grants
+    path: sections/section-020/module-02/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: rbac-aggregation
+    task_kind: build
+    learning_goals:
+    - Find and remove an aggregated ClusterRole and a group binding that grant more
+      than the intended roles.
+    tags:
+    - cks
+    - rbac-aggregation
+  - type: reading
+    title: Find Hidden RBAC Grants — Solution
+    path: sections/section-020/module-02/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-020/module-02/course-04-summary.md
@@ -261,58 +419,79 @@ modules:
     title: Dedicated ServiceAccounts And automountServiceAccountToken
     path: sections/section-020/module-03/course-01-dedicated-serviceaccounts-and-automount.md
   - type: reading
-    title: Bound Projected Tokens
-    path: sections/section-020/module-03/course-02-bound-projected-tokens.md
-  - type: reading
-    title: The Default ServiceAccount And Unused Tokens
-    path: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
-  - type: reading
-    title: Give A Workload Its Own ServiceAccount And Remove Its Tokens — Task
+    title: Give A Workload Its Own ServiceAccount — Task
     path: sections/section-020/module-03/labs/lab-01/question.md
   - type: lab
-    title: Give A Workload Its Own ServiceAccount And Remove Its Tokens
+    title: Give A Workload Its Own ServiceAccount
     path: sections/section-020/module-03/labs/lab-01
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: serviceaccount-tokens
     task_kind: build
     learning_goals:
-    - Move a workload to a dedicated ServiceAccount without a mounted token, and remove
-      the unused token paths.
+    - Run one workload as a dedicated ServiceAccount with only the access it needs,
+      and remove the token from a workload that does not call the API server.
     tags:
     - cks
     - serviceaccount-tokens
   - type: reading
-    title: Give A Workload Its Own ServiceAccount And Remove Its Tokens — Solution
+    title: Give A Workload Its Own ServiceAccount — Solution
     path: sections/section-020/module-03/labs/lab-01/solution.md
+  - type: reading
+    title: Bound Projected Tokens
+    path: sections/section-020/module-03/course-02-bound-projected-tokens.md
+  - type: reading
+    title: Mount A Short-Lived Projected Token — Task
+    path: sections/section-020/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Mount A Short-Lived Projected Token
+    path: sections/section-020/module-03/labs/lab-02
+    examScope: namespace
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: projected-tokens
+    task_kind: build
+    learning_goals:
+    - Mount a projected ServiceAccount token with its own audience and a 600-second
+      lifetime, and remove the default token.
+    tags:
+    - cks
+    - projected-tokens
+  - type: reading
+    title: Mount A Short-Lived Projected Token — Solution
+    path: sections/section-020/module-03/labs/lab-02/solution.md
+  - type: reading
+    title: The Default ServiceAccount And Unused Tokens
+    path: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
+  - type: reading
+    title: Close The Default ServiceAccount — Task
+    path: sections/section-020/module-03/labs/lab-03/question.md
+  - type: lab
+    title: Close The Default ServiceAccount
+    path: sections/section-020/module-03/labs/lab-03
+    examScope: namespace
+    difficulty: intermediate
+    estimated_duration: 6m
+    topic: default-serviceaccount
+    task_kind: build
+    learning_goals:
+    - Stop the default ServiceAccount from mounting tokens, remove its binding and
+      delete a long-lived token Secret.
+    tags:
+    - cks
+    - default-serviceaccount
+  - type: reading
+    title: Close The Default ServiceAccount — Solution
+    path: sections/section-020/module-03/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-020/module-03/course-04-summary.md
   - type: quiz
     title: 'Knowledge Check: Using least-privilege identity and access management'
     path: sections/section-020/module-01/quiz.yaml
-    question_count: 10
+    question_count: 11
     pass_score: 70
-  - type: reading
-    title: Harden RBAC And ServiceAccounts In Two Namespaces — Task
-    path: sections/section-020/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Harden RBAC And ServiceAccounts In Two Namespaces
-    path: sections/section-020/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: rbac-serviceaccount-capstone
-    task_kind: build
-    learning_goals:
-    - Replace cluster-admin and edit bindings, a mounted token and a long-lived token
-      with least-privilege equivalents across two namespaces.
-    tags:
-    - cks
-    - rbac-serviceaccount-capstone
-  - type: reading
-    title: Harden RBAC And ServiceAccounts In Two Namespaces — Solution
-    path: sections/section-020/capstone/labs/lab-01/solution.md
 - id: module-030
   title: Minimize external access to the network
   description: Developed reading and reasoning for Minimize external access to the
@@ -334,14 +513,12 @@ modules:
   - type: lab
     title: Bind A Host-Network Service To Loopback
     path: sections/section-030/module-01/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: host-network-exposure
     task_kind: build
     learning_goals:
-    - Keep a node-local management-style service reachable locally while closing its
-      node-address listener.
+    - Keep a node-local management-style service reachable locally while closing its node-address listener.
     tags:
     - cks
     - host-network-exposure
@@ -352,8 +529,45 @@ modules:
     title: Host Firewalls With iptables And ufw
     path: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
   - type: reading
+    title: Block A Host Port With ufw — Task
+    path: sections/section-030/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Block A Host Port With ufw
+    path: sections/section-030/module-01/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: host-firewall
+    task_kind: build
+    learning_goals:
+    - Turn on ufw on a node with a rule that blocks pod traffic to a host-network listener while the node itself still reaches it.
+    tags:
+    - cks
+    - host-firewall
+  - type: reading
+    title: Block A Host Port With ufw — Solution
+    path: sections/section-030/module-01/labs/lab-02/solution.md
+  - type: reading
     title: NetworkPolicy For Pod Traffic
     path: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+  - type: reading
+    title: Default-Deny Ingress With One Allowed Client — Task
+    path: sections/section-030/module-01/labs/lab-03/question.md
+  - type: lab
+    title: Default-Deny Ingress With One Allowed Client
+    path: sections/section-030/module-01/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 12m
+    topic: networkpolicy-ingress
+    task_kind: build
+    learning_goals:
+    - Deny all ingress in a namespace and allow one client pod to reach one Service port.
+    tags:
+    - cks
+    - networkpolicy-ingress
+  - type: reading
+    title: Default-Deny Ingress With One Allowed Client — Solution
+    path: sections/section-030/module-01/labs/lab-03/solution.md
   - type: reading
     title: NodePorts, Control-Plane Ports And API Access
     path: sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md
@@ -367,31 +581,68 @@ modules:
     title: Service Types And What They Open
     path: sections/section-030/module-02/course-01-service-types-and-what-they-open.md
   - type: reading
-    title: Narrowing NodePorts And Load Balancers
-    path: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
-  - type: reading
-    title: Close An Accidental NodePort And Keep One Local — Task
+    title: Close An Accidental NodePort — Task
     path: sections/section-030/module-02/labs/lab-01/question.md
   - type: lab
-    title: Close An Accidental NodePort And Keep One Local
+    title: Close An Accidental NodePort
     path: sections/section-030/module-02/labs/lab-01
     examScope: cluster
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 6m
     topic: service-exposure
     task_kind: build
     learning_goals:
-    - Change an accidental NodePort Service to ClusterIP and set externalTrafficPolicy
-      Local on the one that stays published.
+    - Change an accidental NodePort Service to ClusterIP so that its node port closes on every node.
     tags:
     - cks
     - service-exposure
   - type: reading
-    title: Close An Accidental NodePort And Keep One Local — Solution
+    title: Close An Accidental NodePort — Solution
     path: sections/section-030/module-02/labs/lab-01/solution.md
+  - type: reading
+    title: Narrowing NodePorts And Load Balancers
+    path: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
+  - type: reading
+    title: Answer A NodePort Only On Nodes With Endpoints — Task
+    path: sections/section-030/module-02/labs/lab-02/question.md
+  - type: lab
+    title: Answer A NodePort Only On Nodes With Endpoints
+    path: sections/section-030/module-02/labs/lab-02
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: external-traffic-policy
+    task_kind: build
+    learning_goals:
+    - Set externalTrafficPolicy Local on a NodePort Service and prove that nodes without endpoints stop answering.
+    tags:
+    - cks
+    - external-traffic-policy
+  - type: reading
+    title: Answer A NodePort Only On Nodes With Endpoints — Solution
+    path: sections/section-030/module-02/labs/lab-02/solution.md
   - type: reading
     title: Ingress As The Single Entry Point
     path: sections/section-030/module-02/course-03-ingress-and-finding-exposed-services.md
+  - type: reading
+    title: Audit And Close Unapproved Service Exposure — Task
+    path: sections/section-030/module-02/labs/lab-03/question.md
+  - type: lab
+    title: Audit And Close Unapproved Service Exposure
+    path: sections/section-030/module-02/labs/lab-03
+    examScope: cluster
+    difficulty: intermediate
+    estimated_duration: 15m
+    topic: exposure-audit
+    task_kind: build
+    learning_goals:
+    - Find and close externalIPs, extra NodePorts and host-network listeners while keeping the approved entry.
+    tags:
+    - cks
+    - exposure-audit
+  - type: reading
+    title: Audit And Close Unapproved Service Exposure — Solution
+    path: sections/section-030/module-02/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-030/module-02/course-04-summary.md
@@ -402,34 +653,86 @@ modules:
     title: Control-Plane Ports And Listeners
     path: sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
   - type: reading
+    title: Bind The Scheduler To Loopback — Task
+    path: sections/section-030/module-03/labs/lab-01/question.md
+  - type: lab
+    title: Bind The Scheduler To Loopback
+    path: sections/section-030/module-03/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: control-plane-listeners
+    task_kind: build
+    learning_goals:
+    - Restore --bind-address=127.0.0.1 in the kube-scheduler static pod manifest and prove that port 10259 is closed to other nodes.
+    tags:
+    - cks
+    - control-plane-listeners
+  - type: reading
+    title: Bind The Scheduler To Loopback — Solution
+    path: sections/section-030/module-03/labs/lab-01/solution.md
+  - type: reading
     title: API Server Authentication And Authorization
     path: sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
+  - type: reading
+    title: Remove Anonymous Access From RBAC Bindings — Task
+    path: sections/section-030/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Remove Anonymous Access From RBAC Bindings
+    path: sections/section-030/module-03/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: anonymous-api-access
+    task_kind: build
+    learning_goals:
+    - Remove system:anonymous and system:unauthenticated from RBAC bindings while keeping the intended subjects.
+    tags:
+    - cks
+    - anonymous-api-access
+  - type: reading
+    title: Remove Anonymous Access From RBAC Bindings — Solution
+    path: sections/section-030/module-03/labs/lab-02/solution.md
   - type: reading
     title: Kubelet API Authentication And Authorization
     path: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
   - type: reading
     title: Close The Kubelet API To Anonymous Callers — Task
-    path: sections/section-030/module-03/labs/lab-01/question.md
+    path: sections/section-030/module-03/labs/lab-03/question.md
   - type: lab
     title: Close The Kubelet API To Anonymous Callers
-    path: sections/section-030/module-03/labs/lab-01
-    examScope: cluster
+    path: sections/section-030/module-03/labs/lab-03
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 8m
     topic: kubelet-api
     task_kind: build
     learning_goals:
-    - Turn off anonymous access and AlwaysAllow authorization on a kubelet and restart
-      it.
+    - Turn off anonymous access and AlwaysAllow authorization on a kubelet and restart it.
     tags:
     - cks
     - kubelet-api
   - type: reading
     title: Close The Kubelet API To Anonymous Callers — Solution
-    path: sections/section-030/module-03/labs/lab-01/solution.md
+    path: sections/section-030/module-03/labs/lab-03/solution.md
   - type: reading
     title: etcd Client Access
     path: sections/section-030/module-03/course-04-etcd-client-access.md
+  - type: reading
+    title: Restrict The etcd Data Directory — Task
+    path: sections/section-030/module-03/labs/lab-04/question.md
+  - type: lab
+    title: Restrict The etcd Data Directory
+    path: sections/section-030/module-03/labs/lab-04
+    difficulty: intermediate
+    estimated_duration: 6m
+    topic: etcd-data-directory
+    task_kind: build
+    learning_goals:
+    - Set the etcd data directory back to mode 700 while etcd keeps running.
+    tags:
+    - cks
+    - etcd-data-directory
+  - type: reading
+    title: Restrict The etcd Data Directory — Solution
+    path: sections/section-030/module-03/labs/lab-04/solution.md
   - type: reading
     title: Summary
     path: sections/section-030/module-03/course-05-summary.md
@@ -438,25 +741,6 @@ modules:
     path: sections/section-030/module-01/quiz.yaml
     question_count: 10
     pass_score: 70
-  - type: reading
-    title: Reduce The External Exposure Of A Cluster — Task
-    path: sections/section-030/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Reduce The External Exposure Of A Cluster
-    path: sections/section-030/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: external-exposure-capstone
-    task_kind: build
-    learning_goals:
-    - Close a listener, a NodePort and a kubelet API in one cluster without breaking
-      the application.
-    tags:
-    - cks
-    - external-exposure-capstone
-  - type: reading
-    title: Reduce The External Exposure Of A Cluster — Solution
-    path: sections/section-030/capstone/labs/lab-01/solution.md
 - id: module-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
   description: Developed reading and reasoning for Appropriately use kernel hardening
@@ -473,34 +757,87 @@ modules:
     title: 'Seccomp: Filtering System Calls'
     path: sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
   - type: reading
+    title: Install And Use A Localhost seccomp Profile — Task
+    path: sections/section-040/module-01/labs/lab-01/question.md
+  - type: lab
+    title: Install And Use A Localhost seccomp Profile
+    path: sections/section-040/module-01/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: seccomp-profile-install
+    task_kind: build
+    learning_goals:
+    - Copy a seccomp profile into the kubelet seccomp directory and run a pod under it as a Localhost profile.
+    tags:
+    - cks
+    - seccomp-profile-install
+  - type: reading
+    title: Install And Use A Localhost seccomp Profile — Solution
+    path: sections/section-040/module-01/labs/lab-01/solution.md
+  - type: reading
     title: 'AppArmor: Profiles For Files And Capabilities'
     path: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+  - type: reading
+    title: Load An AppArmor Profile And Attach It To A Pod — Task
+    path: sections/section-040/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Load An AppArmor Profile And Attach It To A Pod
+    path: sections/section-040/module-01/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 12m
+    topic: apparmor-load
+    task_kind: build
+    learning_goals:
+    - Load an AppArmor profile in enforce mode on the node and attach it to a pod.
+    tags:
+    - cks
+    - apparmor-load
+  - type: reading
+    title: Load An AppArmor Profile And Attach It To A Pod — Solution
+    path: sections/section-040/module-01/labs/lab-02/solution.md
   - type: reading
     title: The Restricted Security Context
     path: sections/section-040/module-01/course-03-the-restricted-security-context.md
   - type: reading
-    title: Run With A Restricted Security Context — Task
-    path: sections/section-040/module-01/labs/lab-01/question.md
+    title: Harden A Deployment To The Restricted Pod Security Level — Task
+    path: sections/section-040/module-01/labs/lab-03/question.md
   - type: lab
-    title: Run With A Restricted Security Context
-    path: sections/section-040/module-01/labs/lab-01
+    title: Harden A Deployment To The Restricted Pod Security Level
+    path: sections/section-040/module-01/labs/lab-03
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 12m
     topic: security-context
     task_kind: build
     learning_goals:
-    - Keep a non-root workload functional with a read-only root filesystem and a writable
-      scratch volume.
+    - Harden a Deployment so it runs as non-root with a read-only root filesystem and passes the restricted Pod Security level.
     tags:
     - cks
     - security-context
   - type: reading
-    title: Run With A Restricted Security Context — Solution
-    path: sections/section-040/module-01/labs/lab-01/solution.md
+    title: Harden A Deployment To The Restricted Pod Security Level — Solution
+    path: sections/section-040/module-01/labs/lab-03/solution.md
   - type: reading
     title: Diagnosing Profile Failures
     path: sections/section-040/module-01/course-04-diagnosing-profile-failures.md
+  - type: reading
+    title: Fix A Pod That References A Missing seccomp Profile — Task
+    path: sections/section-040/module-01/labs/lab-04/question.md
+  - type: lab
+    title: Fix A Pod That References A Missing seccomp Profile
+    path: sections/section-040/module-01/labs/lab-04
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: seccomp-missing-profile
+    task_kind: build
+    learning_goals:
+    - Read pod events to find a wrong Localhost seccomp profile path and correct the Deployment.
+    tags:
+    - cks
+    - seccomp-missing-profile
+  - type: reading
+    title: Fix A Pod That References A Missing seccomp Profile — Solution
+    path: sections/section-040/module-01/labs/lab-04/solution.md
   - type: reading
     title: Summary
     path: sections/section-040/module-01/course-05-summary.md
@@ -511,30 +848,65 @@ modules:
     title: Profile Types, Locations And The Unconfined Risk
     path: sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
   - type: reading
+    title: Apply The RuntimeDefault seccomp Profile To Deployments — Task
+    path: sections/section-040/module-02/labs/lab-01/question.md
+  - type: lab
+    title: Apply The RuntimeDefault seccomp Profile To Deployments
+    path: sections/section-040/module-02/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: seccomp-runtime-default
+    task_kind: build
+    learning_goals:
+    - Set the RuntimeDefault seccomp profile on Deployments and remove privileged mode so the filter applies.
+    tags:
+    - cks
+    - seccomp-runtime-default
+  - type: reading
+    title: Apply The RuntimeDefault seccomp Profile To Deployments — Solution
+    path: sections/section-040/module-02/labs/lab-01/solution.md
+  - type: reading
     title: Write And Load A Localhost Profile
     path: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
   - type: reading
     title: Block File Deletion With A Localhost seccomp Profile — Task
-    path: sections/section-040/module-02/labs/lab-01/question.md
+    path: sections/section-040/module-02/labs/lab-02/question.md
   - type: lab
     title: Block File Deletion With A Localhost seccomp Profile
-    path: sections/section-040/module-02/labs/lab-01
+    path: sections/section-040/module-02/labs/lab-02
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: seccomp-localhost
     task_kind: build
     learning_goals:
-    - Write a seccomp profile, place it on the node and run a pod that cannot delete
-      files.
+    - Write a seccomp profile, place it on the node and run a pod that cannot delete files.
     tags:
     - cks
     - seccomp
   - type: reading
     title: Block File Deletion With A Localhost seccomp Profile — Solution
-    path: sections/section-040/module-02/labs/lab-01/solution.md
+    path: sections/section-040/module-02/labs/lab-02/solution.md
   - type: reading
     title: Find Blocked Syscalls And Fix Failures
     path: sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+  - type: reading
+    title: Find And Fix A Blocked System Call In A seccomp Profile — Task
+    path: sections/section-040/module-02/labs/lab-03/question.md
+  - type: lab
+    title: Find And Fix A Blocked System Call In A seccomp Profile
+    path: sections/section-040/module-02/labs/lab-03
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: seccomp-syscall-debug
+    task_kind: build
+    learning_goals:
+    - Find the system call that a seccomp profile blocks and fix the profile without removing other rules.
+    tags:
+    - cks
+    - seccomp-syscall-debug
+  - type: reading
+    title: Find And Fix A Blocked System Call In A seccomp Profile — Solution
+    path: sections/section-040/module-02/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-040/module-02/course-04-summary.md
@@ -545,31 +917,66 @@ modules:
     title: AppArmor Modes And Loading Profiles
     path: sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
   - type: reading
+    title: Switch An AppArmor Profile From Complain To Enforce Mode — Task
+    path: sections/section-040/module-03/labs/lab-01/question.md
+  - type: lab
+    title: Switch An AppArmor Profile From Complain To Enforce Mode
+    path: sections/section-040/module-03/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 8m
+    topic: apparmor-enforce-mode
+    task_kind: build
+    learning_goals:
+    - Find the mode of a loaded AppArmor profile and switch it to enforce mode on the node.
+    tags:
+    - cks
+    - apparmor-enforce-mode
+  - type: reading
+    title: Switch An AppArmor Profile From Complain To Enforce Mode — Solution
+    path: sections/section-040/module-03/labs/lab-01/solution.md
+  - type: reading
     title: Select A Profile With appArmorProfile
     path: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+  - type: reading
+    title: Set An AppArmor Profile For One Container — Task
+    path: sections/section-040/module-03/labs/lab-02/question.md
+  - type: lab
+    title: Set An AppArmor Profile For One Container
+    path: sections/section-040/module-03/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: apparmor-container-profile
+    task_kind: build
+    learning_goals:
+    - Set a pod-level and a container-level AppArmor profile so only one container is confined.
+    tags:
+    - cks
+    - apparmor-container-profile
+  - type: reading
+    title: Set An AppArmor Profile For One Container — Solution
+    path: sections/section-040/module-03/labs/lab-02/solution.md
   - type: reading
     title: Drop Capabilities And Block Privilege Escalation
     path: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
   - type: reading
-    title: Remove Privileged Mode And Keep One Capability — Task
-    path: sections/section-040/module-03/labs/lab-01/question.md
+    title: Drop All Capabilities Except NET_BIND_SERVICE — Task
+    path: sections/section-040/module-03/labs/lab-03/question.md
   - type: lab
-    title: Remove Privileged Mode And Keep One Capability
-    path: sections/section-040/module-03/labs/lab-01
+    title: Drop All Capabilities Except NET_BIND_SERVICE
+    path: sections/section-040/module-03/labs/lab-03
     examScope: namespace
     difficulty: intermediate
-    estimated_duration: 25m
+    estimated_duration: 10m
     topic: capabilities
     task_kind: build
     learning_goals:
-    - Remove privileged mode from a Deployment, drop all capabilities and keep only
-      the one it needs.
+    - Remove privileged mode from a Deployment, drop all capabilities and keep only the one it needs.
     tags:
     - cks
     - capabilities
   - type: reading
-    title: Remove Privileged Mode And Keep One Capability — Solution
-    path: sections/section-040/module-03/labs/lab-01/solution.md
+    title: Drop All Capabilities Except NET_BIND_SERVICE — Solution
+    path: sections/section-040/module-03/labs/lab-03/solution.md
   - type: reading
     title: Summary
     path: sections/section-040/module-03/course-04-summary.md
@@ -579,28 +986,8 @@ modules:
     path: sections/section-040/module-01/quiz.yaml
     question_count: 10
     pass_score: 70
-  - type: reading
-    title: Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem
-      — Task
-    path: sections/section-040/capstone/labs/lab-01/question.md
-  - type: lab
-    title: Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem
-    path: sections/section-040/capstone/labs/lab-01
-    difficulty: advanced
-    estimated_duration: 50m
-    topic: kernel-hardening-capstone
-    task_kind: build
-    learning_goals:
-    - Combine a Localhost seccomp profile, dropped capabilities, blocked escalation
-      and a read-only filesystem on one Deployment.
-    tags:
-    - cks
-    - capstone
-  - type: reading
-    title: Harden A Workload With seccomp, Capabilities And A Read-Only Filesystem
-      — Solution
-    path: sections/section-040/capstone/labs/lab-01/solution.md
   - type: quiz
     title: Final Domain Quiz
     path: sections/final-domain-quiz.yaml
+    question_count: 12
     pass_score: 70

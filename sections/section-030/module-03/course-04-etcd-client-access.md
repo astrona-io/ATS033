@@ -24,38 +24,79 @@ The diagram shows two allowed paths. A caller on the third path reaches the port
 
 ## Review the settings
 
-Select the environment and read the flags of the etcd static pod:
+Open a shell on the playground VM (virtual machine) and check that `kubectl` uses the playground cluster:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-030-03)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-030-03" || exit 1
-node_name="astro-ats-033-playground-030-03-control-plane"
-podman exec "$node_name" grep -E 'listen-client-urls|listen-peer-urls|client-cert-auth|trusted-ca-file|data-dir' /etc/kubernetes/manifests/etcd.yaml
+astrona ssh astro-ats-033-playground-030-03
+kubectl config current-context
 ```
 
-Four things matter in the result. `--listen-client-urls` lists the loopback address and the node address, so clients on other machines can connect when the network allows it. `--client-cert-auth=true` and `--peer-client-cert-auth=true` appear. `--trusted-ca-file` points to the etcd certificate authority, a separate authority from the cluster one. `--data-dir` names the directory that holds the database.
+```text
+kubernetes-admin@astro-ats-033-playground-030-03
+```
 
-Then read the listeners and the permissions of the data directory:
+The etcd manifest belongs to root, so read the flags of the etcd static pod with `sudo`:
 
 ```sh
-podman exec "$node_name" ss -tlnp | grep -E ':(2379|2380|2381) '
-podman exec "$node_name" stat -c '%a %U' /var/lib/etcd
+sudo grep -E 'listen-client-urls|listen-peer-urls|client-cert-auth|trusted-ca-file|data-dir' /etc/kubernetes/manifests/etcd.yaml
 ```
 
-Ports 2379 and 2380 appear with the node address, and port 2381, the metrics listener, with the loopback address. The `stat` command prints the mode and owner of the data directory, which should not be readable by other users.
+```text
+    - --client-cert-auth=true
+    - --data-dir=/var/lib/etcd
+    - --listen-client-urls=https://127.0.0.1:2379,https://10.0.2.15:2379
+    - --listen-peer-urls=https://10.0.2.15:2380
+    - --peer-client-cert-auth=true
+    - --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+    - --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+```
+
+Four things matter in the result. `--listen-client-urls` lists the loopback address and the node address `10.0.2.15`, so clients on other machines can connect when the network allows it. `--client-cert-auth=true` and `--peer-client-cert-auth=true` appear. `--trusted-ca-file` points to the etcd certificate authority, a separate authority from the cluster one, and `--data-dir` names the directory that holds the database.
+
+The flags say what etcd should do, and the listeners and file modes show what it does. Read them next:
+
+```sh
+sudo ss -tlnp | grep -E ':(2379|2380|2381) '
+sudo stat -c '%a %U' /var/lib/etcd
+```
+
+```text
+LISTEN 0      4096       127.0.0.1:2381       0.0.0.0:*    users:(("etcd",pid=1658,fd=11))
+LISTEN 0      4096       127.0.0.1:2379       0.0.0.0:*    users:(("etcd",pid=1658,fd=7))
+LISTEN 0      4096       10.0.2.15:2380       0.0.0.0:*    users:(("etcd",pid=1658,fd=3))
+LISTEN 0      4096       10.0.2.15:2379       0.0.0.0:*    users:(("etcd",pid=1658,fd=6))
+700 root
+```
+
+Port 2379 appears on the loopback address and on the node address, and port 2380 on the node address. Port 2381, the metrics listener, is on the loopback address only. The data directory has mode `700` and owner `root`, so no other user on the node can read the database files.
 
 ## Try a connection without a certificate
 
-From the control-plane node, ask etcd for its health first without credentials and then with the health check certificate that kubeadm creates:
+From the node, ask etcd for its health first without credentials, and print the exit status of `curl`:
 
 ```sh
-podman exec "$node_name" curl -s --max-time 5 https://127.0.0.1:2379/health
-podman exec "$node_name" curl -s --max-time 5 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/healthcheck-client.crt --key /etc/kubernetes/pki/etcd/healthcheck-client.key https://127.0.0.1:2379/health
+curl -s --max-time 5 https://127.0.0.1:2379/health; echo "rc=$?"
 ```
 
-The first command prints nothing and exits with a nonzero status, because etcd rejects the TLS handshake without a certificate. If it returned data, client certificate authentication would be off. The second command prints a short JSON document that reports the health as `true`. The certificate files are on the control-plane node, so reading them needs access to that node.
+```text
+rc=60
+```
+
+`curl` prints nothing, and `echo` shows the exit status 60, which means it could not check the server certificate: etcd uses a certificate from its own authority, which the system does not trust. With `-k`, which skips that check, the exit status becomes 56, because etcd ends the TLS handshake when the client presents no certificate. If either request returned data, client certificate authentication would be off.
+
+Now send the request with the health check certificate that kubeadm creates. Only root can read the certificate files, so this `curl` runs with `sudo`:
+
+```sh
+sudo curl -s --max-time 5 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/healthcheck-client.crt --key /etc/kubernetes/pki/etcd/healthcheck-client.key https://127.0.0.1:2379/health
+```
+
+```text
+{"health":"true","reason":""}
+```
+
+etcd accepted the client certificate and reports the health as `true`. The `student` user cannot even list `/etc/kubernetes/pki/etcd` without `sudo` (`Permission denied`), so a client certificate for etcd needs root access to the node.
 
 ## What goes wrong
 

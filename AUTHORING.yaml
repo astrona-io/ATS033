@@ -26,7 +26,7 @@ sections:
 - id: section-010
   title: Minimize host OS footprint (reduce attack surface)
   curriculum_item: Minimize host OS footprint (reduce attack surface)
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -57,10 +57,15 @@ sections:
     - id: lab-01
       path: sections/section-010/module-01/labs/lab-01
       after_reading: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
-      objective: Remove a seeded extra service from active and enabled node services
-        while preserving Kubernetes.
+      objective: Stop and disable a seeded systemd service so that its port closes, while kubelet and containerd keep running.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-18
+    - id: lab-02
+      path: sections/section-010/module-01/labs/lab-02
+      after_reading: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+      objective: Purge an unneeded Debian package and its configuration files from a node without breaking Kubernetes.
+      status: alpha
+      runtime_verification: passed 2026-11-18
     practice_readings: []
   - id: module-02
     title: Harden Node Access With SSH And Host Login Paths
@@ -85,11 +90,16 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-010/module-02/labs/lab-01
-      after_reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
-      objective: Set key-only SSH for one administrator account and remove the login
-        paths of an unused account.
+      after_reading: sections/section-010/module-02/course-02-limit-who-can-log-in.md
+      objective: Fix drop-in precedence in sshd_config and reload sshd so that root and password logins are refused and only the listed accounts may log in.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-18
+    - id: lab-02
+      path: sections/section-010/module-02/labs/lab-02
+      after_reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+      objective: Lock an unused account, give it a refusing shell and remove a second account with UID 0.
+      status: alpha
+      runtime_verification: passed 2026-11-18
     practice_readings: []
   - id: module-03
     title: Restrict Workload Access To The Host
@@ -115,23 +125,27 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-010/module-03/labs/lab-01
-      after_reading: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
-      objective: Rewrite a Deployment without host access and enforce the baseline
-        standard on its namespace.
+      after_reading: sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
+      objective: Rewrite a Deployment without host namespaces, hostPath or privilege, as a non-root user with a read-only root filesystem.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-010/module-03/labs/lab-02
+      after_reading: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+      objective: Fix a workload that uses a host namespace, then enforce the baseline Pod Security Standard on its namespace.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-010/module-03/labs/lab-03
+      after_reading: sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
+      objective: Label and taint a worker node and give a Deployment the selector and toleration that pin it there.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-010/capstone/labs/lab-01
-    objective: Combine a disabled node service, key-only SSH, a hardened workload
-      with a Pod Security label and a dedicated node.
-    status: alpha
-    runtime_verification: pending
 - id: section-020
   title: Using least-privilege identity and access management
   curriculum_item: Using least-privilege identity and access management
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -145,7 +159,9 @@ sections:
     - Users, Groups And File Permissions
     - Privilege Elevation And Account Locking
     - Kubernetes Identities And RBAC
-    - Revocation And Audit
+    - Revoking Host And Kubernetes Access
+    - Audit Trails On The Node And In The Cluster
+    - Persistent Audit Rules With augenrules
     - Summary
     playground: true
     module_lab: true
@@ -156,16 +172,41 @@ sections:
       adapted_from: 
     - reading: sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
       adapted_from: 
-    - reading: sections/section-020/module-01/course-04-revocation-and-audit.md
+    - reading: sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
+      adapted_from: 
+    - reading: sections/section-020/module-01/course-05-audit-trails-on-the-node-and-in-the-cluster.md
+      adapted_from: 
+    - reading: sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
       adapted_from: 
     labs:
     - id: lab-01
       path: sections/section-020/module-01/labs/lab-01
       after_reading: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
-      objective: Grant a dedicated host identity access to one report without granting
-        root access.
+      objective: Give one host account read access to a file through a group, without
+        making the file world-readable or granting root access.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-18
+    - id: lab-02
+      path: sections/section-020/module-01/labs/lab-02
+      after_reading: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+      objective: Lock, expire and remove the login shell of a host account without
+        deleting it, and turn off root and password logins in sshd.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-03
+      path: sections/section-020/module-01/labs/lab-03
+      after_reading: sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
+      objective: Remove one person's group membership, sudoers rule, RBAC bindings
+        and SSH key, and lock the host account.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-04
+      path: sections/section-020/module-01/labs/lab-04
+      after_reading: sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
+      objective: Add a persistent auditd watch rule on /etc/sudoers.d, load it without
+        a reboot, add a narrow sudo rule and find its audit record.
+      status: alpha
+      runtime_verification: passed 2026-11-18
     practice_readings: []
   - id: module-02
     title: Least-Privilege RBAC Roles And Bindings
@@ -191,11 +232,25 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-020/module-02/labs/lab-01
+      after_reading: sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
+      objective: Limit a Role to one named object and bind a ClusterRole in one namespace
+        with a RoleBinding.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-020/module-02/labs/lab-02
       after_reading: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
       objective: Replace a wildcard Role and a cluster-admin binding of one ServiceAccount
         with a narrow Role.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-020/module-02/labs/lab-03
+      after_reading: sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
+      objective: Find and remove an aggregated ClusterRole and a group binding that
+        grant more than the intended roles.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-03
     title: Restrict ServiceAccounts And API Tokens
@@ -221,24 +276,30 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-020/module-03/labs/lab-01
-      after_reading: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
-      objective: Move a workload to a dedicated ServiceAccount without a mounted token,
-        and remove the unused token paths.
+      after_reading: sections/section-020/module-03/course-01-dedicated-serviceaccounts-and-automount.md
+      objective: Run one workload as a dedicated ServiceAccount with only the access
+        it needs, and remove the token from a workload that does not call the API server.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-020/module-03/labs/lab-02
+      after_reading: sections/section-020/module-03/course-02-bound-projected-tokens.md
+      objective: Mount a projected ServiceAccount token with its own audience and a
+        600-second lifetime, and remove the default token.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-020/module-03/labs/lab-03
+      after_reading: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
+      objective: Stop the default ServiceAccount from mounting tokens, remove its binding
+        and delete a long-lived token Secret.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-020/capstone/labs/lab-01
-    objective: Harden RBAC and ServiceAccounts across two namespaces by combining
-      narrow Roles, a closed default ServiceAccount, a bound projected token and the
-      removal of long-lived tokens.
-    status: alpha
-    runtime_verification: pending
 - id: section-030
   title: Minimize external access to the network
   curriculum_item: Minimize external access to the network
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -272,7 +333,21 @@ sections:
       objective: Keep a node-local management-style service reachable locally while
         closing its node-address listener.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-18
+    - id: lab-02
+      path: sections/section-030/module-01/labs/lab-02
+      after_reading: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
+      objective: Turn on ufw on a node with a rule that blocks pod traffic to a host-network
+        listener while the node itself still reaches it.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-03
+      path: sections/section-030/module-01/labs/lab-03
+      after_reading: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+      objective: Deny all ingress in a namespace and allow one client pod to reach one
+        Service port.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-02
     title: Limit Service Exposure Outside The Cluster
@@ -299,11 +374,25 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-030/module-02/labs/lab-01
-      after_reading: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
-      objective: Change an accidental NodePort Service to ClusterIP and set externalTrafficPolicy
-        Local on the one that stays published.
+      after_reading: sections/section-030/module-02/course-01-service-types-and-what-they-open.md
+      objective: Change an accidental NodePort Service to ClusterIP so that its node
+        port closes on every node.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-030/module-02/labs/lab-02
+      after_reading: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
+      objective: Set externalTrafficPolicy Local on a NodePort Service and prove that
+        nodes without endpoints stop answering.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-030/module-02/labs/lab-03
+      after_reading: sections/section-030/module-02/course-03-ingress-and-finding-exposed-services.md
+      objective: Find and close externalIPs, extra NodePorts and host-network listeners
+        while keeping the approved entry.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-03
     title: Restrict Access To The API Server And Control-Plane Ports
@@ -332,23 +421,36 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-030/module-03/labs/lab-01
+      after_reading: sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
+      objective: Restore --bind-address=127.0.0.1 in the kube-scheduler static pod
+        manifest and prove that port 10259 is closed to pods.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-02
+      path: sections/section-030/module-03/labs/lab-02
+      after_reading: sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
+      objective: Remove system:anonymous and system:unauthenticated from RBAC bindings
+        while keeping the intended subjects.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-03
+      path: sections/section-030/module-03/labs/lab-03
       after_reading: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
       objective: Turn off anonymous access and AlwaysAllow authorization on a kubelet
         and restart it.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-18
+    - id: lab-04
+      path: sections/section-030/module-03/labs/lab-04
+      after_reading: sections/section-030/module-03/course-04-etcd-client-access.md
+      objective: Set the etcd data directory back to mode 700 while etcd keeps running.
+      status: alpha
+      runtime_verification: passed 2026-11-18
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-030/capstone/labs/lab-01
-    objective: Close a listener, a NodePort and a kubelet API in one cluster without
-      breaking the application.
-    status: alpha
-    runtime_verification: pending
 - id: section-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp
   curriculum_item: Appropriately use kernel hardening tools such as AppArmor, seccomp
-  capstone: true
+  capstone: false
   section_quiz: true
   modules:
   - id: module-01
@@ -378,11 +480,28 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-040/module-01/labs/lab-01
-      after_reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
-      objective: Keep a non-root workload functional with a read-only root filesystem
-        and a writable scratch volume.
+      after_reading: sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
+      objective: Copy a seccomp profile into the kubelet seccomp directory and run a pod under it as a Localhost profile.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-040/module-01/labs/lab-02
+      after_reading: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+      objective: Load an AppArmor profile in enforce mode on the node and attach it to a pod.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-03
+      path: sections/section-040/module-01/labs/lab-03
+      after_reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
+      objective: Harden a Deployment so it runs as non-root with a read-only root filesystem and passes the restricted Pod Security level.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-04
+      path: sections/section-040/module-01/labs/lab-04
+      after_reading: sections/section-040/module-01/course-04-diagnosing-profile-failures.md
+      objective: Read pod events to find a wrong Localhost seccomp profile path and correct the Deployment.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-02
     title: Apply seccomp Profiles To Pods
@@ -411,11 +530,22 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-040/module-02/labs/lab-01
-      after_reading: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
-      objective: Write a seccomp profile, place it on the node and run a pod that
-        cannot delete files.
+      after_reading: sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
+      objective: Set the RuntimeDefault seccomp profile on Deployments and remove privileged mode so the filter applies.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-17
+    - id: lab-02
+      path: sections/section-040/module-02/labs/lab-02
+      after_reading: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
+      objective: Write a seccomp profile, place it on the node and run a pod that cannot delete files.
+      status: alpha
+      runtime_verification: passed 2026-11-17
+    - id: lab-03
+      path: sections/section-040/module-02/labs/lab-03
+      after_reading: sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+      objective: Find the system call that a seccomp profile blocks and fix the profile without removing other rules.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
   - id: module-03
     title: Confine Workloads With AppArmor And Capabilities
@@ -443,16 +573,20 @@ sections:
     labs:
     - id: lab-01
       path: sections/section-040/module-03/labs/lab-01
-      after_reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
-      objective: Remove privileged mode from a Deployment, drop all capabilities and
-        keep only the one it needs.
+      after_reading: sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+      objective: Find the mode of a loaded AppArmor profile and switch it to enforce mode on the node.
       status: alpha
-      runtime_verification: pending
+      runtime_verification: passed 2026-11-18
+    - id: lab-02
+      path: sections/section-040/module-03/labs/lab-02
+      after_reading: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+      objective: Set a pod-level and a container-level AppArmor profile so only one container is confined.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-03
+      path: sections/section-040/module-03/labs/lab-03
+      after_reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+      objective: Remove privileged mode from a Deployment, drop all capabilities and keep only the one it needs.
+      status: alpha
+      runtime_verification: passed 2026-11-17
     practice_readings: []
-  capstone_lab:
-    id: lab-01
-    path: sections/section-040/capstone/labs/lab-01
-    objective: Combine a Localhost seccomp profile, dropped capabilities, blocked
-      escalation and a read-only filesystem on one Deployment.
-    status: alpha
-    runtime_verification: pending

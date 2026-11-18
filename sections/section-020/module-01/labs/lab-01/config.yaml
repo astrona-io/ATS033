@@ -7,19 +7,25 @@ metadata:
     caseStudy: docs/case-study.md
     guide: solution.md
 runtime:
-  type: kind
-  kind:
-    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
-    nodes:
-      workers: 1
+  # The lab works on node accounts, groups, sudo rules and sshd, so it runs a
+  # real one-node kubeadm cluster in a VM instead of a kind node container.
+  type: qemu
+  qemu:
+  - image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-cks
+      checksums:
+        amd64: sha256:dc3348c725b6b36d08888acdcbda44cc34894b76d5b56a594f7ce253b6d2e773
+        arm64: sha256:31798490219e2ee856d7f8c2cb9df83182bbac64c7d8ce7c15e81445527d7898
+    cpus: 2
+    memoryMB: 4096
+    diskSizeGB: 25
+    display: false
 bootstrap:
   init:
   - name: seed-private-environment
     type: file
-    source: bootstrap/setup.sh
+    source: vm/install.sh
 teardown:
   keepCluster: false
 testing:
@@ -27,23 +33,23 @@ testing:
   - name: verify-start
     description: Verify the starting state and reject the unfinished lab
     type: file
-    source: testing/verify-start.sh
+    source: vm/verify-start.sh
   - name: reference-result
     type: file
-    source: solution/apply.sh
+    source: vm/apply-solution.sh
   - name: wait-solved
     description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: testing/wait-solved.sh
+    source: vm/wait-solved.sh
 validation:
   scripts:
-  - name: scoped-group-read
-    description: training-reader reads public-report through the training-readers group only
+  - name: navigator-group-read
+    description: navigator reads telemetry.log through the flight-log-readers group and holds no other extra group
     type: file
-    source: validation/validate-scoped-group-read.sh
+    source: vm/validate-navigator-group-read.sh
     points: 1
-  - name: identity-review-record
-    description: ConfigMap identity-review records the scoped read
+  - name: other-accounts-denied
+    description: telemetry.log is root:flight-log-readers without read access for other accounts, so cadet is denied
     type: file
-    source: validation/validate-identity-review-record.sh
+    source: vm/validate-other-accounts-denied.sh
     points: 1

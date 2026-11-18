@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: monitor-pod-reader
+  namespace: starfleet-033-020-03-01
+subjects:
+- kind: ServiceAccount
+  name: monitor
+  namespace: starfleet-033-020-03-01
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pod-reader

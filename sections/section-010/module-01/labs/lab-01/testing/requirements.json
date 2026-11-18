@@ -1,27 +1,9 @@
 {
-  "context": "kind-astro-ats-033-lab-010-01-01",
+  "context": "kubernetes-admin@astro-ats-033-lab-010-01-01",
   "cluster": "astro-ats-033-lab-010-01-01",
+  "runtime": "qemu",
   "namespace": "starfleet-033-010-01-01",
-  "resources": [
-    {
-      "kind": "configmap",
-      "name": "host-review",
-      "namespace": "starfleet-033-010-01-01",
-      "expected": {
-        "apiVersion": "v1",
-        "kind": "ConfigMap",
-        "metadata": {
-          "name": "host-review",
-          "namespace": "starfleet-033-010-01-01"
-        },
-        "data": {
-          "service": "training-extra.service",
-          "result": "disabled"
-        }
-      },
-      "outcome": "host-review-record"
-    }
-  ],
+  "resources": [],
   "behavior": [
     {
       "args": [

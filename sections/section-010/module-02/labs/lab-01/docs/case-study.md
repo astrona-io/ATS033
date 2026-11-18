@@ -1,8 +1,7 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
 # Starting Environment
 
-The control-plane node of this environment holds a stand-in SSH server configuration in `/etc/ssh/sshd_config`, a drop-in file `/etc/ssh/sshd_config.d/50-cloud-init.conf`, and two accounts: `opsadmin`, the account that administrators use, and `olduser`, an account nobody uses any more. The setup script writes the files itself, so the exercise does not depend on an SSH server being installed in the node image. Today root may log in over SSH, the first `PasswordAuthentication` value that the daemon reads allows passwords, any account may log in, and `olduser` has the shell `/bin/bash`.
+The lab VM runs a one-node Kubernetes cluster built with kubeadm, the standard tool that installs a cluster on a Linux machine. The node is the control plane and also runs the pods. Its SSH server, `sshd`, runs as the `ssh` service. The main configuration file includes a drop-in directory near its top and ends with a `Match` block for a backup account. One drop-in file was added at install time and allows root logins. Another comes from the cloud image and allows password logins. The administrator account is `opsadmin`, and the platform logs in as `student` and `astrona`.

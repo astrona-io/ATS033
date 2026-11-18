@@ -1,0 +1,21 @@
+{
+  "context": "kubernetes-admin@astro-ats-033-lab-020-01-03",
+  "cluster": "astro-ats-033-lab-020-01-03",
+  "runtime": "qemu",
+  "namespace": "starfleet-033-020-01-03",
+  "resources": [
+    {
+      "kind": "rolebinding",
+      "name": "crew-member-view",
+      "namespace": "starfleet-033-020-01-03",
+      "expected": {
+        "roleRef": {
+          "apiGroup": "rbac.authorization.k8s.io",
+          "kind": "ClusterRole",
+          "name": "view"
+        }
+      }
+    }
+  ],
+  "behavior": []
+}

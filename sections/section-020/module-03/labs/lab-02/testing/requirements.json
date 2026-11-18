@@ -1,0 +1,25 @@
+{
+  "context": "kind-astro-ats-033-lab-020-03-02",
+  "cluster": "astro-ats-033-lab-020-03-02",
+  "namespace": "starfleet-033-020-03-02",
+  "resources": [
+    {
+      "kind": "serviceaccount",
+      "name": "relay",
+      "namespace": "starfleet-033-020-03-02",
+      "expected": {}
+    },
+    {
+      "kind": "deployment",
+      "name": "relay",
+      "namespace": "starfleet-033-020-03-02",
+      "expected": {
+        "spec": {
+          "replicas": 1
+        }
+      },
+      "state": "deployment"
+    }
+  ],
+  "behavior": []
+}

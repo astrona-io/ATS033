@@ -1,10 +1,13 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
-# Harden SSH Access And Unused Accounts
+# Restrict SSH Logins In sshd_config
 
-Make key-only SSH access for one administrator account on a node and remove login paths of an unused account.
+The lab runs on the real `sshd` of the lab VM. The setup script writes `/etc/ssh/sshd_config.d/10-legacy-root.conf` (`permitrootlogin yes` in lower case), overwrites `50-cloud-init.conf` with `PasswordAuthentication yes` (it sorts before the image's `60-cloudimg-settings.conf`, which says `no`), appends a `Match User backup` block to the image's `/etc/ssh/sshd_config`, creates the `opsadmin` account, checks the files with `sshd -t` and reloads `ssh.service`.
 
-The task and solution use a separate pinned kind cluster. Run `astrona test` on this folder: `testing/verify-start.sh` checks that every outcome fails on the starting state, then the reference solution is applied and every outcome must pass. Static validation is not live evidence. Runtime verification remains pending.
+`testing/live.py` grades the effective settings with `sudo sshd -T`, so `sshd` itself applies the include order, case rules, first-value-wins and `Match` scoping. Three outcomes are graded. `root-login-refused` needs `permitrootlogin no`. `password-login-refused` needs `passwordauthentication no` and `pubkeyauthentication yes`, and a `PreferredAuthentications=none` test login to `opsadmin@127.0.0.1` must not list `password`, which proves the running server was reloaded. `allow-listed-accounts-only` needs global `allowusers` equal to `opsadmin student astrona` (the platform logs in as `student` and `astrona`, so a list without them locks out `astrona ssh` and the grader), and a test login as `ubuntu` must log `not listed in AllowUsers` in the `ssh` journal. `root-login-refused` reads only the files, so it passes without a reload. Every outcome also checks that `opsadmin` keeps `/bin/bash`, that the `Match User backup` block stays, that `kubelet`, `containerd` and `ssh` are active and that `/readyz` answers `ok`. The lab seeds no Kubernetes workloads and needs no network access.
+
+The task and solution use a VM from the pinned `24.04-cks` image with a one-node kubeadm cluster (Kubernetes v1.35.10). `vm/` holds the scripts astrona pipes into the VM; regenerate them with `python3 scripts/ci/vm-lab.py <this folder>` after you change a lab file. Run `astrona test` on this folder: `vm/install.sh` builds the cluster and runs `bootstrap/setup.sh` in the VM, `testing/verify-start.sh` checks that every outcome fails on the starting state, then `solution/apply.sh` applies the reference solution (fix both drop-in files, write `10-allow-users.conf`, `sshd -t`, reload) and every outcome must pass.
+
+Live run on 2026-11-18 (QEMU, `24.04-cks` image, Kubernetes v1.35.10): `astrona test` reached `PROCTOR: PASS` (3/3), `verify-start.sh` failed all three outcomes on the starting state, and the commands and output in `solution.md` come from a manual run in the same VM image, followed by `astrona submit` with `PROCTOR: PASS`.

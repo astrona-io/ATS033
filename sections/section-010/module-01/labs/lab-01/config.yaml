@@ -7,19 +7,25 @@ metadata:
     caseStudy: docs/case-study.md
     guide: solution.md
 runtime:
-  type: kind
-  kind:
-    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/python:3.13-alpine
-    - docker.io/library/busybox:1.37.0
-    nodes:
-      workers: 1
+  # The lab works on systemd, packages, sshd and accounts of a real host, so it
+  # runs a one-node kubeadm cluster in an Ubuntu VM instead of kind node containers.
+  type: qemu
+  qemu:
+  - image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-cks
+      checksums:
+        amd64: sha256:dc3348c725b6b36d08888acdcbda44cc34894b76d5b56a594f7ce253b6d2e773
+        arm64: sha256:31798490219e2ee856d7f8c2cb9df83182bbac64c7d8ce7c15e81445527d7898
+    cpus: 2
+    memoryMB: 4096
+    diskSizeGB: 25
+    display: false
 bootstrap:
   init:
   - name: seed-private-environment
     type: file
-    source: bootstrap/setup.sh
+    source: vm/install.sh
 teardown:
   keepCluster: false
 testing:
@@ -27,28 +33,23 @@ testing:
   - name: verify-start
     description: Verify the starting state and reject the unfinished lab
     type: file
-    source: testing/verify-start.sh
+    source: vm/verify-start.sh
   - name: reference-result
     type: file
-    source: solution/apply.sh
+    source: vm/apply-solution.sh
   - name: wait-solved
     description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: testing/wait-solved.sh
+    source: vm/wait-solved.sh
 validation:
   scripts:
-  - name: service-stopped
-    description: training-extra.service is inactive
+  - name: listener-closed
+    description: remote-diag.service is stopped and nothing listens on TCP port 8099
     type: file
-    source: validation/validate-service-stopped.sh
+    source: vm/validate-listener-closed.sh
     points: 1
-  - name: service-disabled
-    description: training-extra.service does not start at boot
+  - name: boot-start-removed
+    description: remote-diag.service no longer starts at boot (disabled, masked or removed)
     type: file
-    source: validation/validate-service-disabled.sh
-    points: 1
-  - name: host-review-record
-    description: ConfigMap host-review records the disabled service
-    type: file
-    source: validation/validate-host-review-record.sh
+    source: vm/validate-boot-start-removed.sh
     points: 1

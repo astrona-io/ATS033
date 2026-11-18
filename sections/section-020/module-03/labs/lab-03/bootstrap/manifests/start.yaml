@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet-033-020-03-03
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: default-edit
+  namespace: starfleet-033-020-03-03
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: starfleet-033-020-03-03
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: legacy-monitor
+  namespace: starfleet-033-020-03-03
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: legacy-monitor-token
+  namespace: starfleet-033-020-03-03
+  annotations:
+    kubernetes.io/service-account.name: legacy-monitor
+type: kubernetes.io/service-account-token

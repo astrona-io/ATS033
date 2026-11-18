@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
@@ -7,31 +6,30 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-The Deployment `relay` in `starfleet-033-040-03-01` was started with `privileged: true` and escalation allowed, as root, with the full set of capabilities. The only privileged operation it ever needs is listening on a port below 1024.
+The `scout` Deployment in `starfleet-033-040-03-01` runs under the AppArmor profile `k8s-deny-etc-write`. The team tested the profile in complain mode and found that `scout` needs no write access under `/etc`. Now the profile must start blocking.
 
-Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
+The lab VM (virtual machine) runs a one-node Kubernetes cluster built with kubeadm. The node `astro-ats-033-lab-040-03-01` is the control plane and also runs the pods, and its kernel has AppArmor enabled. Open a shell on the lab VM and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-03-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-03-01" || exit 1
+astrona ssh astro-ats-033-lab-040-03-01
+kubectl config current-context
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+The second command prints `kubernetes-admin@astro-ats-033-lab-040-03-01`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. AppArmor files and the kernel profile list belong to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.
 
 Allow about 8 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. In the pod template of `relay`, set `runAsNonRoot: true`, `runAsUser: 1000` and the `RuntimeDefault` seccomp profile.
-2. In the container `relay`, set `privileged: false` and `allowPrivilegeEscalation: false`.
-3. Drop `ALL` capabilities and add back only `NET_BIND_SERVICE`.
-4. Wait for the rollout, then confirm that `/proc/1/status` in the running pod shows `CapBnd: 0000000000000400`, `NoNewPrivs: 1` and `Seccomp: 2`.
+1. Find the current mode of `k8s-deny-etc-write` on the node. The profile file is `/etc/apparmor.d/k8s-deny-etc-write`.
+2. Load the same file in enforce mode.
+3. Restart the `scout` Deployment and confirm that `touch /etc/scout-check` inside the new pod fails.
 
 ## Constraints
 
-- Keep the Deployment name, selector, image, command and one replica.
-- Do not use `Unconfined`.
+- Do not change the rules in the profile file.
+- Keep the `Localhost` AppArmor profile `k8s-deny-etc-write` on `scout`, and keep its image, command and one replica.
 
 ## How the answer is checked
 
-The grader runs four checks: the pod requires a non-root user and runs as user 1000; it runs with the `RuntimeDefault` seccomp filter; the container is not privileged and blocks escalation (`NoNewPrivs: 1`); and the container keeps only `NET_BIND_SERVICE` (`CapBnd: 0000000000000400`). Every check also needs exactly one running `relay` pod after a complete rollout.
+The grader first checks that `scout` keeps its container, image, command and one replica, that the rollout is complete with exactly one pod, and that the pod uses the `Localhost` AppArmor profile `k8s-deny-etc-write`. Then it checks two outcomes. First, `/sys/kernel/security/apparmor/profiles` on the node lists `k8s-deny-etc-write (enforce)`. Second, `/proc/1/attr/current` in the `scout` pod reads `k8s-deny-etc-write (enforce)`, and `touch /etc/scout-check` fails with `Permission denied`.

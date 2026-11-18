@@ -1,19 +1,16 @@
 ---
-draft: true
 exam_objectives:
 - Using least-privilege identity and access management
 ---
 # Prerequisites
 
-Use astrona, kubectl, Python 3, Podman and a shell. Node inspection exercises use the containers in this environment, not the physical host.
+Use `astrona` and a shell. The lab runs in a virtual machine (VM), and the VM is the only node of a one-node Kubernetes cluster. You work inside that VM, not on your own machine.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Open a shell on the VM and confirm the cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-020-01-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-01-01" || exit 1
-node_name="astro-ats-033-lab-020-01-01-control-plane"
-worker_name="astro-ats-033-lab-020-01-01-worker"
+astrona ssh astro-ats-033-lab-020-01-01
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+The second command prints `kubernetes-admin@astro-ats-033-lab-020-01-01`. You are logged in as the `student` user, which has a kubeconfig file (the file that tells `kubectl` which cluster to use and which credentials to send). Node files belong to `root`, so run the commands that change them with `sudo`.

@@ -1,0 +1,19 @@
+{
+  "context": "kubernetes-admin@astro-ats-033-lab-030-03-03",
+  "cluster": "astro-ats-033-lab-030-03-03",
+  "runtime": "qemu",
+  "namespace": "starfleet-033-030-03-03",
+  "resources": [
+    {
+      "kind": "serviceaccount",
+      "name": "metrics-reader",
+      "namespace": "starfleet-033-030-03-03",
+      "expected": {
+        "metadata": {
+          "name": "metrics-reader"
+        }
+      }
+    }
+  ],
+  "behavior": []
+}

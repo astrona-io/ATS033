@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
@@ -7,35 +6,31 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-The control-plane node container of this environment runs an extra systemd service, `training-extra.service`, that Kubernetes does not need. It is active and enabled. The `starfleet-033-010-01-01` namespace runs two healthy `probe` replicas, an internal Service and two client pods.
+A security scan of the cluster reports that the node accepts connections on TCP port `8099` on every address. Kubernetes does not use this port. Some systemd service on the node opens it, and nobody on the team owns that service.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Open a shell on the lab VM (virtual machine) and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-01-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-01-01" || exit 1
-node_name="astro-ats-033-lab-010-01-01-control-plane"
-worker_name="astro-ats-033-lab-010-01-01-worker"
+astrona ssh astro-ats-033-lab-010-01-01
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+The second command prints `kubernetes-admin@astro-ats-033-lab-010-01-01`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Node files and services belong to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.
 
-Allow about 5 minutes for the tasks. Cluster startup adds time.
+Allow about 8 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. On the control-plane node, stop `training-extra.service`.
-2. Disable `training-extra.service` so that it does not start at boot.
-3. Record the change: create the ConfigMap `host-review` in the namespace `starfleet-033-010-01-01` with the data `service: training-extra.service` and `result: disabled`.
+1. On the node, find the process that listens on TCP port `8099` and the systemd service that started it.
+2. Stop that service, so that nothing listens on port `8099` any more.
+3. Make sure the service does not start again when the node boots. Disabling it, masking it or removing its unit file are all accepted.
 
 ## Constraints
 
-- Change only `training-extra.service` on the control-plane node container. This is a scoped host-service exercise, not a full host hardening assessment.
-- The `kubelet` and `containerd` services must stay active, and the API readiness endpoint must answer.
-- Preserve the namespace, the workload names and every unrelated component.
+- Change only the service that opens port `8099`. Do not stop, disable or mask any other unit.
+- The `kubelet` and `containerd` services must stay active, and the API server readiness endpoint `/readyz` must answer `ok`.
+- Killing the process is not enough: the service restarts it after two seconds.
 
 ## How the answer is checked
 
-The grader runs three checks: `training-extra.service` is inactive; it is disabled; and the ConfigMap `host-review` has the required data. Every check also confirms that `kubelet` and `containerd` are active and that the API answers `/readyz`.
-
-Hint: run `systemctl` inside the node container, for example `podman exec "$node_name" systemctl status training-extra.service`.
+The grader runs two checks on the node. The first check reads the active state of the service and lists the listening TCP sockets with `ss`: the service must not run, and no process may listen on port `8099`. The second check reads the load state and the unit file state of the service: it must be `disabled` or `masked`, or the unit file must be gone (`not-found`). Every check also confirms that `kubelet` and `containerd` are active and that `/readyz` answers `ok`.

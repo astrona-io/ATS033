@@ -5,7 +5,7 @@ exam_objectives:
 ---
 # Host Namespaces, hostPath And Privileged Containers
 
-A container isolates a process from its node by giving it its own view of the system. A few fields of the pod specification switch that view off. Each of them has real uses, and each of them is dangerous when a pod does not need it. This part explains what the container isolation is made of, what each field removes, and shows two of the fields working in a running pod, so you can recognise them in a manifest before you decide whether to allow them.
+A container isolates a process from its node by giving it its own view of the system. A few fields of the pod specification switch that view off. Each of them has real uses, and each of them is dangerous when a pod does not need it. This part explains what the container isolation is made of and what each field removes. It shows two of the fields working in a running pod and names the safe settings that replace them, so you can recognise them in a manifest before you decide whether to allow them.
 
 ## What isolation is made of and who sets it
 
@@ -77,13 +77,29 @@ Remove the pod when you have seen the result:
 kubectl -n starfleet delete pod host-view
 ```
 
+## What to use instead of host access
+
+Removing the host fields is only half of the fix. A workload that loses its `hostPath` volume still needs somewhere to write, and a container that loses `privileged: true` should not keep root rights by default. The pod specification has fields for both, and the container runtime applies them when it creates the container.
+
+An **`emptyDir`** volume is an empty directory that the kubelet creates for the pod on the node and deletes when the pod is removed. It gives the container a writable place for temporary files without exposing any existing node directory. It replaces a `hostPath` that a pod used only as scratch space.
+
+The `securityContext` of a container holds the settings that limit what the process may do. These fields remove root rights from a container:
+
+- **`runAsUser`** sets the numeric user ID (UID) of the container process, for example `10001`. It can also be set on the pod's `securityContext` for all containers.
+- **`runAsNonRoot: true`** makes the kubelet refuse to start the container if the process would run as UID 0.
+- **`allowPrivilegeEscalation: false`** stops the process and its children from gaining more rights than their parent, for example through a set-user-ID program.
+- **`capabilities.drop: ["ALL"]`** removes every Linux capability. A capability is one piece of root power, such as changing file owners or binding to a low port.
+- **`readOnlyRootFilesystem: true`** mounts the container's image files read-only. A write to `/` fails, so the process can write only to volumes such as an `emptyDir`.
+
+These settings work together. With `readOnlyRootFilesystem: true`, a container that writes temporary files fails unless it gets an `emptyDir` volume for them. The usual pattern is therefore a read-only root, a non-root UID, no capabilities and one `emptyDir` mounted where the program writes.
+
 ## Legitimate uses and the failure case
 
 Some workloads need these fields. A network plugin runs with `hostNetwork` to configure the node's networking. A log collector mounts `/var/log` with `hostPath`. A node monitoring agent reads host processes. These pods run in system namespaces, are reviewed, and use the narrowest setting that works, for example a read-only `hostPath` of one directory instead of `/`.
 
 The failure case is a workload that gets host access by convenience. A developer adds `privileged: true` because a pod fails with a permission error, or mounts `/var/run` to talk to the runtime, and the setting stays. Such a pod is the entry point for the escape that the rest of the module guards against. The question to ask of every pod with one of these fields is whether its job truly needs the field, and which narrower setting would do.
 
-You now know the five fields that remove container isolation and have seen two of them work. The open question is how a cluster stops a pod from using them without relying on every author to remember: the API server can reject such pods.
+You now know the five fields that remove container isolation, have seen two of them work, and know the settings that replace them. The open question is how a cluster stops a pod from using them without relying on every author to remember: the API server can reject such pods.
 
 ## Common pitfalls
 

@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
@@ -7,7 +6,7 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-A reader workload must run with the smallest set of rights that still lets it work: no root, no extra privileges and no writes outside one scratch directory. The namespace `starfleet-033-040-01-01` has healthy application and client fixtures. The pod does not exist yet.
+The `scout` workload in `starfleet-033-040-01-01` collects samples into files and must never create directories or device files. The security team wrote a seccomp profile for it and left the file on the node at `/opt/course/seccomp/scout-guard.json`. The kubelet cannot use the file there, and the pod `scout` does not exist yet.
 
 Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
 
@@ -22,16 +21,15 @@ Allow about 8 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. Create the pod `restricted-reader` in `starfleet-033-040-01-01` with `restartPolicy: Never` and one container `reader` that runs `docker.io/library/busybox:1.37.0` with the command `sh -c "sleep 3600"`. At pod level, run as user and group 1000 with `runAsNonRoot: true`, `fsGroup: 1000` and the `RuntimeDefault` seccomp profile.
-2. Harden the `reader` container: disable privilege escalation, drop all capabilities and use a read-only root filesystem.
-3. Mount an `emptyDir` volume named `scratch` at `/scratch`. Writing in `/scratch` must work; writing `/root-file` must fail.
-4. Confirm that `/proc/1/status` in the running container reports `Seccomp: 2` and `NoNewPrivs: 1`.
+1. Install the profile so that the kubelet can load it as the `Localhost` profile `profiles/scout-guard.json`. The cluster has one node, the container `astro-ats-033-lab-040-01-01-control-plane`, and `podman exec` runs a command inside it.
+2. Create the pod `scout` in `starfleet-033-040-01-01` with `restartPolicy: Never` and one container that runs `docker.io/library/busybox:1.37.0` with the command `sh -c "sleep 3600"`. The pod must run under the installed profile.
+3. Confirm that the process inside `scout` has a seccomp filter, that it can still write a file under `/tmp`, and that `mkdir` fails with `Operation not permitted`.
 
 ## Constraints
 
-- Keep the sleeping process running.
-- Complete the change without replacing unrelated resources.
+- Do not change the content of the profile.
+- Do not use `Unconfined` or `RuntimeDefault` for `scout`.
 
 ## How the answer is checked
 
-The grader runs four checks: the pod runs as user and group 1000 and requires a non-root user; it runs with the `RuntimeDefault` seccomp filter (`Seccomp: 2`); the container blocks escalation (`NoNewPrivs: 1`), drops all capabilities and cannot write `/root-file`; and the `scratch` volume is mounted and writable. `Seccomp: 2` confirms an installed seccomp filter. AppArmor requires a separately available kernel implementation and profile; this exercise does not claim AppArmor coverage.
+The grader runs two checks. First, the file in the kubelet seccomp directory matches the file the security team left, `scout` uses the `Localhost` profile `profiles/scout-guard.json`, `/proc/1/status` reports `Seccomp: 2` and a write under `/tmp` works. Second, `mkdir` inside `scout` fails with `Operation not permitted` while the pod uses that profile.

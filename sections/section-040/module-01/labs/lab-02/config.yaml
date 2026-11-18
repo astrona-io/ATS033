@@ -1,0 +1,61 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-033-lab-040-01-02
+  docs:
+    prerequisites: docs/prerequisites.md
+    examQuestion: question.md
+    caseStudy: docs/case-study.md
+    guide: solution.md
+# AppArmor profiles live in the kernel of the node. A kind node uses the
+# kernel of the machine that runs Podman, which often has no AppArmor, so the
+# lab runs a real one-node kubeadm cluster in a VM with AppArmor enabled.
+runtime:
+  type: qemu
+  qemu:
+  - image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-cks
+      checksums:
+        amd64: sha256:dc3348c725b6b36d08888acdcbda44cc34894b76d5b56a594f7ce253b6d2e773
+        arm64: sha256:31798490219e2ee856d7f8c2cb9df83182bbac64c7d8ce7c15e81445527d7898
+    cpus: 2
+    memoryMB: 4096
+    diskSizeGB: 25
+    display: false
+bootstrap:
+  init:
+  - name: seed-private-environment
+    type: file
+    source: vm/install.sh
+teardown:
+  keepCluster: false
+testing:
+  init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: vm/verify-start.sh
+  - name: reference-result
+    type: file
+    source: vm/apply-solution.sh
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
+    type: file
+    source: vm/wait-solved.sh
+validation:
+  scripts:
+  - name: profile-loaded-in-enforce-mode
+    description: k8s-deny-tmp-write is loaded in enforce mode in the kernel of the node
+    type: file
+    source: vm/validate-profile-loaded-in-enforce-mode.sh
+    points: 1
+  - name: scout-confined
+    description: The main process of scout runs under k8s-deny-tmp-write in enforce mode
+    type: file
+    source: vm/validate-scout-confined.sh
+    points: 1
+  - name: scout-tmp-write-denied
+    description: Writing a file under /tmp inside scout fails with Permission denied
+    type: file
+    source: vm/validate-scout-tmp-write-denied.sh
+    points: 1

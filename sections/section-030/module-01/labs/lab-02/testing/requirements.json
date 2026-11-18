@@ -1,0 +1,31 @@
+{
+  "context": "kubernetes-admin@astro-ats-033-lab-030-01-02",
+  "cluster": "astro-ats-033-lab-030-01-02",
+  "runtime": "qemu",
+  "namespace": "starfleet-033-030-01-02",
+  "resources": [
+    {
+      "kind": "pod",
+      "name": "node-metrics-server",
+      "namespace": "starfleet-033-030-01-02",
+      "expected": {
+        "spec": {
+          "hostNetwork": true
+        }
+      },
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "shuttle",
+      "namespace": "starfleet-033-030-01-02",
+      "expected": {
+        "metadata": {
+          "name": "shuttle"
+        }
+      },
+      "state": "pod"
+    }
+  ],
+  "behavior": []
+}

@@ -4,73 +4,65 @@
   "namespace": "starfleet-033-040-02-01",
   "resources": [
     {
-      "kind": "pod",
-      "name": "no-delete",
+      "kind": "deployment",
+      "name": "bridge",
       "expected": {
-        "apiVersion": "v1",
-        "kind": "Pod",
         "metadata": {
-          "name": "no-delete",
+          "name": "bridge",
           "namespace": "starfleet-033-040-02-01"
         },
         "spec": {
-          "restartPolicy": "Never",
-          "securityContext": {
-            "seccompProfile": {
-              "type": "Localhost",
-              "localhostProfile": "profiles/block-delete.json"
-            }
-          },
-          "containers": [
-            {
-              "name": "shell",
-              "image": "docker.io/library/busybox:1.37.0",
-              "command": [
-                "sh",
-                "-c",
-                "sleep 3600"
+          "replicas": 2,
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "name": "bridge",
+                  "image": "docker.io/library/busybox:1.37.0",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "sleep 3600"
+                  ]
+                }
               ]
             }
-          ]
+          }
         }
       },
-      "state": "pod",
-      "outcome": "no-delete-pod"
-    }
-  ],
-  "behavior": [
-    {
-      "args": [
-        "kubectl",
-        "-n",
-        "starfleet-033-040-02-01",
-        "exec",
-        "no-delete",
-        "--",
-        "sh",
-        "-c",
-        "echo kept > /tmp/keep; cat /tmp/keep"
-      ],
-      "equals": "kept",
-      "outcome": "no-delete-pod"
+      "state": "deployment",
+      "outcome": "bridge-runtime-default"
     },
     {
-      "args": [
-        "kubectl",
-        "-n",
-        "starfleet-033-040-02-01",
-        "exec",
-        "no-delete",
-        "--",
-        "sh",
-        "-c",
-        "rm /tmp/keep"
-      ],
-      "denied": true,
-      "failure_markers": [
-        "operation not permitted"
-      ],
-      "outcome": "delete-blocked"
+      "kind": "deployment",
+      "name": "scout",
+      "expected": {
+        "metadata": {
+          "name": "scout",
+          "namespace": "starfleet-033-040-02-01"
+        },
+        "spec": {
+          "replicas": 1,
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "name": "scout",
+                  "image": "docker.io/library/busybox:1.37.0",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "sleep 3600"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "state": "deployment",
+      "outcome": "scout-runtime-default"
     }
-  ]
+  ],
+  "behavior": []
 }

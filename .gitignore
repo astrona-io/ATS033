@@ -1,2 +1,4 @@
 .DS_Store
 .astrona/
+__pycache__/
+*.pyc

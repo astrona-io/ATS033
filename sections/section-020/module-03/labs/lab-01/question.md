@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Using least-privilege identity and access management
 ---
@@ -7,31 +6,31 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-The `monitor` Deployment in `starfleet-033-020-03-01` does not call the Kubernetes API, yet it runs with the `default` ServiceAccount, which receives a mounted token and has a RoleBinding `default-pod-lister`. A long-lived token Secret `legacy-monitor-token` also exists. The namespace also runs two healthy `probe` replicas, an internal Service and two client pods.
+In `starfleet-033-020-03-01`, two Deployments run as the `default` ServiceAccount. The `monitor` Deployment must call the Kubernetes API server to list Pods, so it needs its own identity with only that permission. The `probe` Deployment never calls the API server, so it must not receive a ServiceAccount token at all. The Role `pod-reader` already exists in the namespace.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Use a host shell with the private kubeconfig for this cluster. A kubeconfig is the file that tells `kubectl`, the Kubernetes command-line tool, which cluster to use and which credentials to send.
 
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-020-03-01)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-03-01" || exit 1
 ```
 
-Keep this connection selected. Every script supplied by the lab refuses a different context.
+Keep this connection selected. Every script of the lab refuses a different context.
 
-Allow about 10 minutes for the tasks. Cluster startup adds time.
+Allow about 8 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. Give `monitor` its own identity: create the ServiceAccount `monitor` with `automountServiceAccountToken: false`, and make the Deployment use it with `automountServiceAccountToken: false` in the pod template. After the rollout, the pod must have no token directory at `/var/run/secrets/kubernetes.io/serviceaccount`.
-2. Close the `default` ServiceAccount: set `automountServiceAccountToken: false` on it and delete the RoleBinding `default-pod-lister`, so it has no binding of any kind.
-3. Delete the long-lived token Secret `legacy-monitor-token`.
-4. Prove the result: as the `default` and `monitor` ServiceAccounts, `kubectl auth can-i` must answer `no` for listing pods and for getting secrets in `starfleet-033-020-03-01`.
+1. Create the ServiceAccount `monitor` in `starfleet-033-020-03-01` and bind it to the Role `pod-reader` with a RoleBinding.
+2. Change the Deployment `monitor` so that its Pod runs as the ServiceAccount `monitor`.
+3. Change the Deployment `probe` so that its Pod has no ServiceAccount token mounted.
 
 ## Constraints
 
-- Keep the `probe` Deployment, the `legacy-monitor` ServiceAccount and the other pods unchanged.
-- Preserve the namespaces, the workload names and every unrelated component.
+- Keep one replica in each Deployment.
+- The `monitor` Pod still needs its token, because it calls the API server.
+- Do not give `monitor` access to Secrets or any write permission.
 
 ## How the answer is checked
 
-The grader runs three checks: the one `monitor` pod runs as the `monitor` ServiceAccount, has no mounted token, and the ServiceAccount cannot list pods; the `default` ServiceAccount mounts no token, has no binding and cannot list pods or get secrets; and the Secret `legacy-monitor-token` is gone. Wait for the rollout to finish before you submit.
+The grader runs two checks. The first check confirms that the running `monitor` Pod uses the ServiceAccount `monitor` and has a token at `/var/run/secrets/kubernetes.io/serviceaccount/token`. It then asks `kubectl auth can-i` and expects `yes` for listing Pods and `no` for reading Secrets and for deleting Pods. The second check runs `ls` inside the running `probe` Pod and expects the directory `/var/run/secrets/kubernetes.io/serviceaccount` to be absent.

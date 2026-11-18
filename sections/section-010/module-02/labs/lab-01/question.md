@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
@@ -7,37 +6,32 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-The control-plane node of this environment holds a stand-in SSH server configuration in `/etc/ssh/sshd_config`, a drop-in file `/etc/ssh/sshd_config.d/50-cloud-init.conf`, and two accounts: `opsadmin`, the account that administrators use, and `olduser`, an account nobody uses any more. The setup script writes the files itself, so the exercise does not depend on an SSH server being installed in the node image. Today root may log in over SSH, the first `PasswordAuthentication` value that the daemon reads allows passwords, any account may log in, and `olduser` has the shell `/bin/bash`.
+The SSH server (`sshd`) of a Kubernetes node reads the main file `/etc/ssh/sshd_config` and the drop-in files in `/etc/ssh/sshd_config.d/`. The main file looks safe, but two drop-in files loosen it: they allow root logins and password logins. Administrators log in as `opsadmin`. The platform also logs in to the node as `student` and `astrona`, so those two accounts must keep SSH access.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Open a shell on the lab VM (virtual machine) and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-02-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-02-01" || exit 1
-node_name="astro-ats-033-lab-010-02-01-control-plane"
-worker_name="astro-ats-033-lab-010-02-01-worker"
+astrona ssh astro-ats-033-lab-010-02-01
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+The second command prints `kubernetes-admin@astro-ats-033-lab-010-02-01`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Node files and services belong to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.
 
 Allow about 10 minutes for the tasks. Cluster startup adds time.
 
 ## Tasks
 
-1. Refuse root logins: set `PermitRootLogin` to `no`.
-2. Allow key logins for `opsadmin` only: make the first `PasswordAuthentication` value that sshd reads `no`, keep `PubkeyAuthentication` set to `yes`, and allow only `opsadmin` with an `AllowUsers` line.
-3. Close the unused account: give `olduser` the login shell `/usr/sbin/nologin` and lock its password.
-4. Record the change: create the ConfigMap `node-access-review` in the namespace `starfleet-033-010-02-01` with the data `ssh: key-only`, `account: olduser` and `result: hardened`.
+1. Refuse root logins: the effective `PermitRootLogin` value must be `no`.
+2. Refuse password logins: the effective `PasswordAuthentication` value must be `no`, and `PubkeyAuthentication` must stay `yes`.
+3. Allow only the accounts `opsadmin`, `student` and `astrona` to log in, with `AllowUsers` that applies to every connection, not only to the connections of a `Match` block.
+4. Make the running SSH server use the new settings without a reboot.
 
 ## Constraints
 
-- Change only the control-plane node of this environment.
-- Do not delete `olduser`, and do not change `opsadmin`: it keeps the shell `/bin/bash`.
-- The `kubelet` and `containerd` services must stay active, and the API readiness endpoint must answer.
-- Preserve the workloads of the `starfleet-033-010-02-01` and `outpost-033-010-02-01` namespaces and every other component.
+- Keep the `Include` line, the `Match User backup` block and the `opsadmin` account with the shell `/bin/bash`.
+- Check the configuration with `sshd -t` before you reload the server. A broken file can stop new logins.
+- The `kubelet`, `containerd` and `ssh` services must stay active, and the API server readiness endpoint `/readyz` must answer `ok`.
 
 ## How the answer is checked
 
-The grader reads the effective SSH settings the way the daemon does: for each keyword, the first value in the drop-in files and then in `/etc/ssh/sshd_config` wins. It runs five checks: root logins are refused; password logins are refused while key logins stay on; `AllowUsers` allows only `opsadmin`; `olduser` has the `nologin` shell and a locked password; and the ConfigMap `node-access-review` has the required data. Every check also confirms `opsadmin`, `kubelet`, `containerd` and the API readiness endpoint.
-
-Hint: sshd reads the drop-in directory before the rest of `/etc/ssh/sshd_config`, so a value in `50-cloud-init.conf` wins.
+The grader runs `sudo sshd -T`, which reads the configuration files the way `sshd` does and prints the effective global settings. Settings inside a `Match` block are not in this output. The first check needs `permitrootlogin no`. The second check needs `passwordauthentication no` and `pubkeyauthentication yes`, and a test login to `opsadmin@127.0.0.1` must show that the running server no longer offers the `password` method. The third check needs `allowusers` lines for exactly `opsadmin`, `student` and `astrona`, and a test login as `ubuntu` must make the running server log `not listed in AllowUsers`. Every check also confirms that `opsadmin` keeps `/bin/bash`, that the `Match User backup` block is still there, that `kubelet`, `containerd` and `ssh` are active and that `/readyz` answers `ok`.

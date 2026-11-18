@@ -1,3 +1,5 @@
 # Close The Kubelet API To Anonymous Callers Playground
 
-This ungraded environment has a private context and a pinned node image. The guide contains a complete exercise. Author verification is under testing; runtime verification is pending. The configuration has no submission or grading fields.
+This ungraded environment is a QEMU VM with the CKS image `24.04-cks`. `bootstrap/setup.sh` builds a one-node kubeadm cluster (`kubernetes-admin@astro-ats-033-playground-030-03`, also for the `student` user), applies the inlined `starfleet` and `outpost` objects and sets the kubelet to `anonymous.enabled: true` and `authorization.mode: AlwaysAllow`. `validate.sh` only checks that the environment is ready. The configuration has no submission or grading fields. The guide is `docs/overview.md`; learners connect with `astrona ssh astro-ats-033-playground-030-03`.
+
+Live run on 2026-11-18: `astrona run --headless` was ready in about 1 minute 9 seconds. The listener, API server, kubelet and etcd commands of the module readings and the guided practice were run in the VM as `student`, and their output was copied into the readings. `scripts/ci/test-playground.sh` supports only kind playgrounds (`astrona kubeconfig` and a host `testing/smoke.sh`), so it does not apply here.

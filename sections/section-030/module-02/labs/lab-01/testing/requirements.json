@@ -4,68 +4,43 @@
   "namespace": "starfleet-033-030-02-01",
   "resources": [
     {
-      "kind": "service",
-      "name": "probe-debug",
+      "kind": "deployment",
+      "name": "probe",
       "namespace": "starfleet-033-030-02-01",
       "expected": {
-        "apiVersion": "v1",
-        "kind": "Service",
         "metadata": {
-          "name": "probe-debug",
-          "namespace": "starfleet-033-030-02-01"
-        },
-        "spec": {
-          "type": "ClusterIP",
-          "selector": {
-            "app": "probe",
-            "release": "probe"
-          }
+          "name": "probe"
         }
       },
-      "outcome": "debug-node-port-closed"
+      "state": "deployment"
     },
     {
-      "kind": "service",
-      "name": "probe-public",
+      "kind": "pod",
+      "name": "shuttle",
       "namespace": "starfleet-033-030-02-01",
       "expected": {
-        "apiVersion": "v1",
-        "kind": "Service",
         "metadata": {
-          "name": "probe-public",
-          "namespace": "starfleet-033-030-02-01"
-        },
-        "spec": {
-          "type": "NodePort",
-          "selector": {
-            "app": "probe",
-            "release": "probe"
-          },
-          "externalTrafficPolicy": "Local"
+          "name": "shuttle"
         }
       },
-      "outcome": "public-local-traffic"
+      "state": "pod"
+    },
+    {
+      "kind": "pod",
+      "name": "drifter",
+      "namespace": "outpost-033-030-02-01",
+      "expected": {
+        "metadata": {
+          "name": "drifter"
+        }
+      },
+      "state": "pod"
     }
   ],
   "behavior": [
     {
-      "args": [
-        "kubectl",
-        "-n",
-        "starfleet-033-030-02-01",
-        "exec",
-        "shuttle",
-        "--",
-        "wget",
-        "-qO-",
-        "-T",
-        "3",
-        "http://probe-debug.starfleet-033-030-02-01/"
-      ],
-      "contains": [
-        "version=v1"
-      ],
-      "outcome": "debug-node-port-closed"
+      "args": ["kubectl", "-n", "starfleet-033-030-02-01", "exec", "shuttle", "--", "wget", "-q", "-T", "3", "-O-", "http://probe/"],
+      "contains": ["version=v1"]
     }
   ]
 }
