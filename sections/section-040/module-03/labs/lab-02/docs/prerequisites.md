@@ -4,15 +4,13 @@ exam_objectives:
 ---
 # Prerequisites
 
-Use a host shell with astrona, kubectl, Podman and Python 3. Podman reaches the nodes, because a kind node is a container on your machine.
+Use a shell on your own machine with `astrona` installed. The lab runs in a VM (virtual machine) with Ubuntu 24.04, a one-node Kubernetes cluster built with kubeadm, and a kernel with AppArmor enabled. The VM already has `kubectl`, `apparmor_parser` and `aa-status`.
 
-This lab needs a host whose kernel has AppArmor enabled, for example an Ubuntu Linux machine. A kind node uses the kernel of the machine that runs Podman, so a Mac, Windows or Fedora host cannot run it. The start of the lab checks every node: `/sys/module/apparmor/parameters/enabled` must contain `Y`. If `apparmor_parser` is missing in a node, the start installs the `apparmor` package there with `apt-get`, which needs internet access, and it may mount `securityfs` and restart containerd and the kubelet. The start stops with a clear message when the host has no AppArmor.
-
-Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
+Open a shell on the lab VM and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-03-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-03-02" || exit 1
+astrona ssh astro-ats-033-lab-040-03-02
+kubectl config current-context
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+The second command prints `kubernetes-admin@astro-ats-033-lab-040-03-02`. You are logged in as the `student` user. Run node commands, such as `apparmor_parser`, with `sudo`. They change only the lab VM, not your own computer.

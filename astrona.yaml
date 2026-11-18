@@ -772,7 +772,7 @@ modules:
     topic: apparmor-load
     task_kind: build
     learning_goals:
-    - Load an AppArmor profile in enforce mode on every node and attach it to a pod.
+    - Load an AppArmor profile in enforce mode on the node and attach it to a pod.
     tags:
     - cks
     - apparmor-load
@@ -911,7 +911,7 @@ modules:
     topic: apparmor-enforce-mode
     task_kind: build
     learning_goals:
-    - Find the mode of a loaded AppArmor profile and switch it to enforce mode on every node.
+    - Find the mode of a loaded AppArmor profile and switch it to enforce mode on the node.
     tags:
     - cks
     - apparmor-enforce-mode

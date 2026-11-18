@@ -8,16 +8,14 @@ Solve this question on: `terminal`
 
 The pod `bridge` in `starfleet-033-040-03-02` has two containers. Only the `logger` container must run under the AppArmor profile `k8s-deny-tmp-write`. Someone set the profile for the whole pod, so the `console` container cannot write its log under `/tmp` and keeps restarting.
 
-This lab runs only on a host whose kernel has AppArmor enabled, for example an Ubuntu Linux machine. On other hosts the start of the lab stops with a message that says so.
-
-Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
+The lab VM (virtual machine) runs a one-node Kubernetes cluster built with kubeadm. The node `astro-ats-033-lab-040-03-02` is the control plane and also runs the pods, and its kernel has AppArmor enabled. Open a shell on the lab VM and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-03-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-03-02" || exit 1
+astrona ssh astro-ats-033-lab-040-03-02
+kubectl config current-context
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+The second command prints `kubernetes-admin@astro-ats-033-lab-040-03-02`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. The kernel profile list belongs to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.
 
 Allow about 10 minutes for the tasks. Cluster startup adds time.
 
@@ -29,7 +27,7 @@ Allow about 10 minutes for the tasks. Cluster startup adds time.
 
 ## Constraints
 
-- The profile `k8s-deny-tmp-write` is already loaded on both nodes. Do not change or unload it.
+- The profile `k8s-deny-tmp-write` is already loaded on the node. Do not change or unload it.
 - Keep the pod name, the restart policy, both containers and their images and commands.
 
 ## How the answer is checked

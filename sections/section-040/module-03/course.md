@@ -25,7 +25,7 @@ After this module you can:
 
 You need Kubernetes basics (pods, namespaces, `kubectl`) and basic Linux knowledge (processes, users, files).
 
-Your playground is a `kind` cluster running Kubernetes 1.35 with a single control-plane node. The node is a Podman container and uses the kernel of the machine that runs Podman. AppArmor works only if that kernel has it enabled, so the AppArmor steps in the first two parts check this first and tell you what to do when it is missing. The capability steps in the last part work on every machine.
+Your playground is a virtual machine (VM) that runs Ubuntu 24.04 and a one-node Kubernetes 1.35 cluster built with kubeadm. The VM is the node, and its kernel has AppArmor enabled, so every AppArmor step works in it. You open a shell on the VM with `astrona ssh astro-ats-033-playground-040-03`. There you are the user `student`, `kubectl` already points to the cluster, and you run node commands such as `apparmor_parser` with `sudo`.
 
 | Namespace | What is in it |
 | --- | --- |

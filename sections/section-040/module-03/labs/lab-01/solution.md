@@ -4,58 +4,78 @@ exam_objectives:
 ---
 # Switch An AppArmor Profile From Complain To Enforce Mode Solution
 
-Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
+The lab runs in a VM (virtual machine) with a one-node Kubernetes cluster built with kubeadm. Open a shell on the lab VM and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-03-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-03-01" || exit 1
+astrona ssh astro-ats-033-lab-040-03-01
+kubectl config current-context
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+```text
+kubernetes-admin@astro-ats-033-lab-040-03-01
+```
 
-This walkthrough has no command output. The lab needs a host kernel with AppArmor, and it has not yet run on such a host. Each step says what a correct result contains, so you can compare your own output with it.
+You are logged in as the `student` user. The kernel profile list and the audit log belong to root, so the node commands below use `sudo`. The output on this page comes from a run on 2026-11-18.
 
 ## Find The Current Mode
 
-The kernel keeps one list of loaded profiles per node, in `/sys/kernel/security/apparmor/profiles`. Each line holds a profile name and its mode in parentheses. Read the line for `k8s-deny-etc-write` on both nodes:
+The kernel keeps one list of loaded profiles, in `/sys/kernel/security/apparmor/profiles`. Each line holds a profile name and its mode in parentheses. Read the line for `k8s-deny-etc-write`:
 
 ```sh
-for node_name in astro-ats-033-lab-040-03-01-control-plane astro-ats-033-lab-040-03-01-worker; do
-  podman exec "$node_name" grep k8s-deny-etc-write /sys/kernel/security/apparmor/profiles
-done
+sudo grep k8s-deny-etc-write /sys/kernel/security/apparmor/profiles
 ```
 
-Each node prints `k8s-deny-etc-write (complain)`. In complain mode the kernel allows an operation that the profile does not allow, and only writes an audit message. The same is visible from inside the pod. `/proc/1/attr/current` shows the profile of the main process, and here it reads `k8s-deny-etc-write (complain)`:
+```text
+k8s-deny-etc-write (complain)
+```
+
+The same is visible from inside the pod. `/proc/1/attr/current` shows the profile of the main process:
 
 ```sh
 kubectl -n starfleet-033-040-03-01 exec deploy/scout -- cat /proc/1/attr/current
 ```
 
-So a write under `/etc` still works now, although no rule allows it:
+```text
+k8s-deny-etc-write (complain)
+```
+
+In complain mode the kernel allows an access that no rule of the profile covers, and it writes an audit message. The profile has no rule for a write under `/etc`, so this write works now. The command prints nothing and returns exit code 0:
 
 ```sh
 kubectl -n starfleet-033-040-03-01 exec deploy/scout -- touch /etc/scout-check
 ```
 
-The command prints nothing and returns exit code 0.
+The VM runs `auditd`, so the kernel writes AppArmor messages to `/var/log/audit/audit.log`. Find the message for this write:
+
+```sh
+sudo grep 'profile="k8s-deny-etc-write"' /var/log/audit/audit.log | grep scout-check | tail -1
+```
+
+```text
+type=AVC msg=audit(1794992705.891:815): apparmor="ALLOWED" operation="open" class="file" profile="k8s-deny-etc-write" name="/etc/scout-check" pid=2658 comm="touch" requested_mask="wc" denied_mask="wc" fsuid=0 ouid=0FSUID="root" OUID="root"
+```
+
+`apparmor="ALLOWED"` means the profile would deny this access, but complain mode let it through. In enforce mode the same line would say `apparmor="DENIED"`.
 
 ## Load The Profile In Enforce Mode
 
-The mode is a property of the loaded profile, not of the file. `apparmor_parser -r` replaces the loaded profile with the content of the file. With `-C` it loads in complain mode, and without `-C` in enforce mode. Load the same file again without `-C` on both nodes:
+The mode is a property of the loaded profile, not of the file. `apparmor_parser -r` replaces the loaded profile with the content of the file. With `-C` it loads in complain mode, and without `-C` in enforce mode. Load the same file again without `-C`. The command prints nothing when it works:
 
 ```sh
-for node_name in astro-ats-033-lab-040-03-01-control-plane astro-ats-033-lab-040-03-01-worker; do
-  podman exec "$node_name" apparmor_parser -r /etc/apparmor.d/k8s-deny-etc-write
-done
+sudo apparmor_parser -r /etc/apparmor.d/k8s-deny-etc-write
 ```
 
-The command prints nothing when it works. Read the list again. Each node now prints `k8s-deny-etc-write (enforce)`:
+Then check the kernel list again:
 
 ```sh
-for node_name in astro-ats-033-lab-040-03-01-control-plane astro-ats-033-lab-040-03-01-worker; do
-  podman exec "$node_name" grep k8s-deny-etc-write /sys/kernel/security/apparmor/profiles
-done
+sudo grep k8s-deny-etc-write /sys/kernel/security/apparmor/profiles
 ```
+
+```text
+k8s-deny-etc-write (enforce)
+```
+
+`sudo aa-enforce /etc/apparmor.d/k8s-deny-etc-write` does the same job, and it is also installed in the VM.
 
 ## Restart The Workload
 
@@ -66,29 +86,44 @@ kubectl -n starfleet-033-040-03-01 rollout restart deployment/scout
 kubectl -n starfleet-033-040-03-01 rollout status deployment/scout --timeout=180s
 ```
 
-A correct result ends with the line `deployment "scout" successfully rolled out`.
+```text
+deployment.apps/scout restarted
+Waiting for deployment "scout" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "scout" rollout to finish: 1 old replicas are pending termination...
+deployment "scout" successfully rolled out
+```
+
+The old pod can stay in `Terminating` for up to 30 seconds, the default grace period, because the shell that runs as process 1 in the container ignores the `SIGTERM` signal. After the grace period the container runtime (`runc`) sends `SIGKILL`. The profile allows signals from `runc` with the rule `signal (receive) peer=runc,`, so the pod does end.
 
 ## Verify The Result
 
-`kubectl exec deploy/scout` picks a pod that is not being deleted. The main process now reads `k8s-deny-etc-write (enforce)`:
+`kubectl exec deploy/scout` picks a pod that is not being deleted. The main process now runs in enforce mode:
 
 ```sh
 kubectl -n starfleet-033-040-03-01 exec deploy/scout -- cat /proc/1/attr/current
 ```
 
-The last check must fail. A correct result is a `Permission denied` message from `touch` and a non-zero exit code:
+```text
+k8s-deny-etc-write (enforce)
+```
+
+The last check must fail. The container runs as root, so file permissions allow the write. Only the AppArmor profile stops it:
 
 ```sh
 kubectl -n starfleet-033-040-03-01 exec deploy/scout -- touch /etc/scout-check
 ```
 
-The container runs as root, so file permissions allow the write. Only the AppArmor profile stops it.
+```text
+touch: /etc/scout-check: Permission denied
+command terminated with exit code 1
+```
 
 After recording the result, remove this independent lab with `astrona destroy ats-033-lab-040-03-01`.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - Switching only one node. The pod may run on the other node, where the profile is still in complain mode.
-> - Running `aa-enforce` when the tool is missing in the node. `apparmor_parser -r` without `-C` does the same and needs only the parser.
-> - Checking the mode only in the manifest. The Deployment names the profile, but the mode lives in the kernel of each node.
+> - Forgetting `sudo`. As the `student` user, `apparmor_parser` and the read of the kernel profile list fail.
+> - Loading the file again with `-C`. The profile stays in complain mode, and the write under `/etc` still works.
+> - Looking for AppArmor messages with `dmesg` only. When `auditd` runs, the messages go to `/var/log/audit/audit.log`.
+> - Checking the mode only in the manifest. The Deployment names the profile, but the mode lives in the kernel of the node.

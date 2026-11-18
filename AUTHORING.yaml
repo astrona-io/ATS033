@@ -474,9 +474,9 @@ sections:
     - id: lab-02
       path: sections/section-040/module-01/labs/lab-02
       after_reading: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
-      objective: Load an AppArmor profile in enforce mode on every node and attach it to a pod.
+      objective: Load an AppArmor profile in enforce mode on the node and attach it to a pod.
       status: alpha
-      runtime_verification: pending (needs AppArmor host)
+      runtime_verification: passed 2026-11-18
     - id: lab-03
       path: sections/section-040/module-01/labs/lab-03
       after_reading: sections/section-040/module-01/course-03-the-restricted-security-context.md
@@ -561,15 +561,15 @@ sections:
     - id: lab-01
       path: sections/section-040/module-03/labs/lab-01
       after_reading: sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
-      objective: Find the mode of a loaded AppArmor profile and switch it to enforce mode on every node.
+      objective: Find the mode of a loaded AppArmor profile and switch it to enforce mode on the node.
       status: alpha
-      runtime_verification: pending (needs AppArmor host)
+      runtime_verification: passed 2026-11-18
     - id: lab-02
       path: sections/section-040/module-03/labs/lab-02
       after_reading: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
       objective: Set a pod-level and a container-level AppArmor profile so only one container is confined.
       status: alpha
-      runtime_verification: pending (needs AppArmor host)
+      runtime_verification: passed 2026-11-18
     - id: lab-03
       path: sections/section-040/module-03/labs/lab-03
       after_reading: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md

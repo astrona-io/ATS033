@@ -4,16 +4,18 @@ exam_objectives:
 ---
 # Load An AppArmor Profile And Attach It To A Pod
 
-The learner writes the AppArmor profile `k8s-deny-tmp-write`, loads it in enforce mode on both nodes of a two-node kind cluster, and creates the pod `scout` with `appArmorProfile` type `Localhost`. The lab seeds only the namespace.
+The learner writes the AppArmor profile `k8s-deny-tmp-write`, loads it in enforce mode on the node, and creates the pod `scout` with `appArmorProfile` type `Localhost`. The lab seeds only the namespace.
 
-The bootstrap gates on AppArmor before it changes anything. On every node, `/sys/module/apparmor/parameters/enabled` must be `Y`; otherwise it stops with `this lab needs a host with AppArmor, for example an Ubuntu Linux machine`. When a node has no `apparmor_parser`, the bootstrap installs the `apparmor` package with `apt-get` (bounded by `timeout 300`, needs internet access). When `securityfs` is not mounted, it mounts it. After either change it restarts containerd and the kubelet in that node, because both detect AppArmor when they start, and waits for the nodes to be ready.
+The lab runs on the CKS QEMU image (Ubuntu 24.04, one-node kubeadm cluster, containerd, AppArmor enabled). A kind node shares the kernel of the Podman machine, which has no AppArmor on macOS, so the former kind version never passed `astrona test`. The VM removes the host gate, the `apt-get` install and the `securityfs` mount. `scripts/ci/vm-lab.py` generates `vm/` from `bootstrap/`, `solution/`, `testing/` and `validation/`; run it again after editing those files. The bootstrap checks `/sys/module/apparmor/parameters/enabled`, removes any old `/etc/apparmor.d/k8s-deny-tmp-write` and applies the namespace.
+
+The profile needs `signal (receive) peer=runc,`. Without it the kernel denies the `kill` signal that `runc` sends, the audit log shows `apparmor="DENIED" operation="signal" ... signal=kill peer="runc"`, and a deleted pod stays in `Terminating`.
 
 A guard runs before every outcome: `scout` keeps its container, image, command and restart policy, is running and ready, and has the effective profile `Localhost` `k8s-deny-tmp-write`.
 
 Outcomes (1 point each):
 
-- `profile-loaded-on-every-node`: `/sys/kernel/security/apparmor/profiles` lists `k8s-deny-tmp-write (enforce)` on the control-plane node and on the worker node.
+- `profile-loaded-in-enforce-mode`: `/sys/kernel/security/apparmor/profiles` on the node lists `k8s-deny-tmp-write (enforce)`.
 - `scout-confined`: `/proc/1/attr/current` in `scout` reads `k8s-deny-tmp-write (enforce)`.
 - `scout-tmp-write-denied`: `touch /tmp/scout-check` in `scout` fails with `Permission denied`.
 
-Runtime status: pending, needs an AppArmor host. On 2026-11-17 the lab ran on a Podman machine on Apple silicon (kind v1.35.0 node image, containerd 2.2.0). That kernel has no AppArmor, so `astrona test` stopped in the bootstrap with `Stopping: this lab needs a host with AppArmor, for example an Ubuntu Linux machine (AppArmor is not enabled in the kernel of astro-test-ats-033-lab-040-01-02-control-plane)`. For this reason `solution.md` describes the expected results in prose and quotes no command output. The outcomes, the `apt-get` install, the `securityfs` mount and the restart of containerd and the kubelet still need a live run on an Ubuntu host.
+Runtime status: passed on 2026-11-18 on Apple silicon (QEMU with HVF, image `24.04-cks-20261118`). `astrona test` printed `PROCTOR: PASS` with 3 of 3 outcomes; verify-start rejected the unfinished lab; the run took about 64 seconds (bootstrap 46 seconds).

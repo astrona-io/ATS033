@@ -24,9 +24,8 @@ pod = get('pod', 'scout')
 profile = effective_apparmor(pod, 'scout')
 assert profile.get('type') == 'Localhost' and profile.get('localhostProfile') == PROFILE_NAME, 'scout must use the Localhost AppArmor profile ' + PROFILE_NAME
 
-if wants('profile-loaded-on-every-node'):
-    for node in (NODE, WORKER):
-        assert loaded_mode(node, PROFILE_NAME) == 'enforce', PROFILE_NAME + ' is not loaded in enforce mode on ' + node
+if wants('profile-loaded-in-enforce-mode'):
+    assert loaded_mode(NODE, PROFILE_NAME) == 'enforce', PROFILE_NAME + ' is not loaded in enforce mode on ' + NODE
 if wants('scout-confined'):
     current = kubectl('-n', NAMESPACE, 'exec', 'scout', '--', 'cat', '/proc/1/attr/current').strip()
     assert current == PROFILE_NAME + ' (enforce)', 'The scout process runs under ' + current

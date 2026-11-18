@@ -4,20 +4,24 @@ exam_objectives:
 ---
 # Load An AppArmor Profile And Attach It To A Pod Solution
 
-Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool. This environment is separate from the ungraded playground.
+The lab runs in a VM (virtual machine) with a one-node Kubernetes cluster built with kubeadm. Open a shell on the lab VM and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-01-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-01-02" || exit 1
+astrona ssh astro-ats-033-lab-040-01-02
+kubectl config current-context
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+```text
+kubernetes-admin@astro-ats-033-lab-040-01-02
+```
 
-This walkthrough has no command output. The lab needs a host kernel with AppArmor, and it has not yet run on such a host. Each step says what a correct result contains, so you can compare your own output with it.
+You are logged in as the `student` user. The files under `/etc/apparmor.d` and the kernel profile list belong to root, so the node commands below use `sudo`. The output on this page comes from a run on 2026-11-18.
 
 ## Write And Load The Profile
 
 An AppArmor profile is a text file. The word after `profile` is the name that a pod uses. The lines `file,`, `network,` and `capability,` allow those groups of operations. The line `deny /tmp/** w,` denies write access below `/tmp`, and a `deny` rule wins over an allow rule. The flag `attach_disconnected` lets the profile apply to paths that a container sees differently from the host.
+
+The line `signal (receive) peer=runc,` lets the container runtime (`runc`) send signals to the container. When the pod is deleted, `runc` sends the `kill` signal. Without this line the kernel denies that signal, and the pod stays in `Terminating`.
 
 Save this as `k8s-deny-tmp-write`:
 
@@ -30,26 +34,28 @@ profile k8s-deny-tmp-write flags=(attach_disconnected) {
   file,
   network,
   capability,
+  # Let the container runtime (runc) stop the container.
+  signal (receive) peer=runc,
 
   deny /tmp/** w,
 }
 ```
 
-A profile lives in the kernel, and every node has its own kernel list. The pod can run on either node, so copy the file to both nodes and load it with `apparmor_parser -r`. The option `-r` loads the profile, or replaces it when it is already loaded. Without `-C` it loads in enforce mode:
+A profile lives in the kernel of the node, and this cluster has one node: the VM. Copy the file to `/etc/apparmor.d` and load it with `apparmor_parser -r`. The option `-r` loads the profile, or replaces it when it is already loaded. Without `-C` it loads in enforce mode:
 
 ```sh
-for node_name in astro-ats-033-lab-040-01-02-control-plane astro-ats-033-lab-040-01-02-worker; do
-  podman cp k8s-deny-tmp-write "$node_name:/etc/apparmor.d/k8s-deny-tmp-write"
-  podman exec "$node_name" apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
-done
+sudo cp k8s-deny-tmp-write /etc/apparmor.d/k8s-deny-tmp-write
+sudo apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
 ```
 
-The commands print nothing when they work. Check the kernel list on both nodes. Each node prints one line, `k8s-deny-tmp-write (enforce)`:
+Both commands print nothing when they work. Then check the kernel list:
 
 ```sh
-for node_name in astro-ats-033-lab-040-01-02-control-plane astro-ats-033-lab-040-01-02-worker; do
-  podman exec "$node_name" grep k8s-deny-tmp-write /sys/kernel/security/apparmor/profiles
-done
+sudo grep k8s-deny-tmp-write /sys/kernel/security/apparmor/profiles
+```
+
+```text
+k8s-deny-tmp-write (enforce)
 ```
 
 ## Create The Pod
@@ -85,24 +91,41 @@ Apply it:
 kubectl apply -f pod-scout.yaml
 ```
 
-Then check the result. The wait ends with a line that says the pod met the `Ready` condition:
+```text
+pod/scout created
+```
+
+Then check the result:
 
 ```sh
 kubectl -n starfleet-033-040-01-02 wait --for=condition=Ready pod/scout --timeout=180s
 ```
 
+```text
+pod/scout condition met
+```
+
 ## Verify The Result
 
-The kernel shows the profile of a process in `/proc/<pid>/attr/current`. For the main process of `scout`, a correct result is the profile name and the mode in parentheses, `k8s-deny-tmp-write (enforce)`:
+The kernel shows the profile of a process in `/proc/<pid>/attr/current`. For the main process of `scout`, it shows the profile name and the mode in parentheses:
 
 ```sh
 kubectl -n starfleet-033-040-01-02 exec scout -- cat /proc/1/attr/current
 ```
 
-The last check must fail. The container runs as root, so file permissions allow the write; only the AppArmor rule stops it. A correct result is a `Permission denied` message from `touch` and a non-zero exit code:
+```text
+k8s-deny-tmp-write (enforce)
+```
+
+The last check must fail. The container runs as root, so file permissions allow the write. Only the AppArmor rule stops it:
 
 ```sh
 kubectl -n starfleet-033-040-01-02 exec scout -- touch /tmp/scout-check
+```
+
+```text
+touch: /tmp/scout-check: Permission denied
+command terminated with exit code 1
 ```
 
 AppArmor returns `Permission denied` (the error `EACCES`), while a seccomp rule usually returns `Operation not permitted`. The message tells you which control stopped the call.
@@ -112,6 +135,7 @@ After recording the result, remove this independent lab with `astrona destroy at
 ## Common pitfalls
 
 > [!WARNING]
-> - Loading the profile on one node only. When the scheduler places the pod on the other node, the container does not start.
+> - Forgetting `sudo`. As the `student` user, `apparmor_parser` and the read of the kernel profile list fail.
 > - Writing the file name or a path in `localhostProfile`. The field takes the profile name from the line that starts with `profile`.
-> - Loading with `-C`. The profile is then in complain mode, and the write to `/tmp` is only logged.
+> - Leaving out `signal (receive) peer=runc,`. The pod starts, but when it is deleted it stays in `Terminating`, because the kernel denies the stop signal from `runc`.
+> - Loading with `-C`. The profile is then in complain mode, which the grader does not accept.

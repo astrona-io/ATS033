@@ -24,41 +24,36 @@ securityContext:
     localhostProfile: k8s-deny-tmp-write
 ```
 
-## What the kubelet checks
+## What the kubelet and the runtime check
 
-The kubelet is the component that decides whether the pod may start on its node. For a pod with an AppArmor profile it checks that the node supports AppArmor. For `Localhost` it also checks that the named profile is loaded in the kernel. If a check fails, the kubelet does not start the container, and the pod events say which check failed. On a node whose kernel has no AppArmor, a pod that asks for a profile cannot run there.
+Two components check the profile before the container runs. The kubelet is the component that decides whether the pod may start on its node. For a pod with an AppArmor profile it checks that the node supports AppArmor. On a node whose kernel has no AppArmor, the kubelet rejects the pod.
 
-The container runtime then attaches the profile to the container process when it starts it. From that point the kernel enforces the profile, and the process cannot leave it. This is why a change of the profile for a running pod needs a new pod.
+The container runtime (containerd on this node) then creates the container. For `Localhost` it looks up the named profile in the kernel. If the profile is not loaded, the runtime returns an error, the container is not created, and the pod shows `CreateContainerError` with a `Failed` event that names the profile. If the profile is loaded, the runtime attaches it to the container process. From that point the kernel enforces the profile, and the process cannot leave it. This is why a change of the profile for a running pod needs a new pod.
 
 ```mermaid
 flowchart TB
-    A["Pod with appArmorProfile"] --> B["kubelet admits pod"]
+    A["Pod with appArmorProfile"] --> B["kubelet"]
     B --> C{"AppArmor on node?"}
-    C -->|"no"| D["Pod not started"]
-    C -->|"yes"| E{"Profile loaded?"}
-    E -->|"no"| D
-    E -->|"yes"| F["Runtime starts container under profile"]
+    C -->|"no"| D["Pod rejected"]
+    C -->|"yes"| E["containerd"]
+    E --> F{"Profile loaded?"}
+    F -->|"no"| G["CreateContainerError"]
+    F -->|"yes"| H["Container runs under profile"]
 ```
 
-The diagram shows the two checks of the kubelet before the runtime attaches the profile.
+The diagram shows the check of the kubelet and the check of the runtime before the container runs under the profile.
 
 ## Use the profile in a pod
 
-This section needs an active AppArmor module in the kernel. If your playground reports `N` or has no such file, read the section and use the result descriptions, because the pod would not start on your machine.
-
-Select the environment:
+The playground is a virtual machine (VM) that runs a one-node Kubernetes 1.35 cluster built with kubeadm, and its kernel has AppArmor enabled. Open a shell on the VM from your own machine. You are then the user `student`, and `kubectl` points to the playground cluster:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-040-03)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-040-03" || exit 1
-node_name="astro-ats-033-playground-040-03-control-plane"
-run_on_node() { podman exec "$node_name" "$@"; }
-run_on_node cat /sys/module/apparmor/parameters/enabled
+astrona ssh astro-ats-033-playground-040-03
 ```
 
-If the answer is `Y`, save this profile as `k8s-deny-tmp-write` and load it on the node. It denies writes under `/tmp` and allows everything else:
+The pod below needs the profile `k8s-deny-tmp-write` loaded in the kernel of the node. It denies writes under `/tmp` and allows everything else. The `signal` rule lets the runtime `runc` stop the container when you delete the pod. Save it as `k8s-deny-tmp-write`:
 
 ```text
 #include <tunables/global>
@@ -69,14 +64,23 @@ profile k8s-deny-tmp-write flags=(attach_disconnected) {
   file,
   network,
   capability,
+  # Let the container runtime (runc) stop the container.
+  signal (receive) peer=runc,
 
   deny /tmp/** w,
 }
 ```
 
+Copy it into `/etc/apparmor.d`, load it, and check that the kernel has it in enforce mode. The VM is the node, so these node commands run in your shell with `sudo`. If the profile is already loaded, `apparmor_parser -r` replaces it, so the step is safe to repeat:
+
 ```sh
-podman cp k8s-deny-tmp-write "$node_name:/etc/apparmor.d/k8s-deny-tmp-write"
-run_on_node apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
+sudo cp k8s-deny-tmp-write /etc/apparmor.d/k8s-deny-tmp-write
+sudo apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
+sudo grep k8s-deny-tmp-write /sys/kernel/security/apparmor/profiles
+```
+
+```text
+k8s-deny-tmp-write (enforce)
 ```
 
 Save this as `pod-apparmor-container.yaml`. It sets `RuntimeDefault` at pod level for all containers and overrides it for one container with the custom profile:
@@ -125,14 +129,26 @@ kubectl -n starfleet exec apparmor-two -c general -- cat /proc/1/attr/current
 kubectl -n starfleet exec apparmor-two -c guarded -- cat /proc/1/attr/current
 ```
 
-The first container reports the runtime default profile and the second reports `k8s-deny-tmp-write` in enforce mode. The container value replaced the pod value for `guarded` only. Now compare a write in the two containers. The second command is expected to fail, so run each on its own:
+```text
+cri-containerd.apparmor.d (enforce)
+k8s-deny-tmp-write (enforce)
+```
+
+The first container reports `cri-containerd.apparmor.d`, the default profile that containerd loads, in enforce mode. The second reports `k8s-deny-tmp-write` in enforce mode. The container value replaced the pod value for `guarded` only. Now compare a write in the two containers. The second command is expected to fail, so run each on its own:
 
 ```sh
 kubectl -n starfleet exec apparmor-two -c general -- sh -c 'echo test > /tmp/file'
 kubectl -n starfleet exec apparmor-two -c guarded -- sh -c 'echo test > /tmp/file'
 ```
 
-The first write succeeds and the second fails with `Permission denied`, although both containers run as root and `/tmp` is writable by file mode. The AppArmor profile, not the file permission, made the difference. Remove the pod:
+The first command prints nothing, because the write succeeds. The second prints this:
+
+```text
+sh: can't create /tmp/file: Permission denied
+command terminated with exit code 1
+```
+
+Both containers run as root, and `/tmp` is writable by file mode. The AppArmor profile, not the file permission, made the difference. Remove the pod:
 
 ```sh
 kubectl -n starfleet delete pod apparmor-two
@@ -140,13 +156,56 @@ kubectl -n starfleet delete pod apparmor-two
 
 ## When the profile is not available
 
-If the profile is not loaded on the node, or AppArmor is missing, the pod does not start. Show it with the pod events:
+If the profile is not loaded on the node, the kubelet cannot start the container. Save this pod as `pod-apparmor-missing.yaml`. It asks for a profile named `k8s-not-loaded`, which no file on the node defines:
 
-```sh
-kubectl -n starfleet describe pod apparmor-two
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: apparmor-missing
+  namespace: starfleet
+spec:
+  restartPolicy: Never
+  containers:
+  - name: shell
+    image: docker.io/library/busybox:1.37.0
+    command:
+    - sh
+    - -c
+    - sleep 3600
+    securityContext:
+      appArmorProfile:
+        type: Localhost
+        localhostProfile: k8s-not-loaded
 ```
 
-The `Events` section shows a warning from the kubelet. The repair is to load the profile on that node with `apparmor_parser -r`, or to schedule the pod on a node that has it. On a machine without AppArmor in the kernel, the repair is a different node or a different control, such as seccomp and dropped capabilities, and never `Unconfined` to hide the error.
+Apply it:
+
+```sh
+kubectl apply -f pod-apparmor-missing.yaml
+```
+
+Then, after about ten seconds, check the result with the pod status and the events of the pod:
+
+```sh
+kubectl -n starfleet get pod apparmor-missing
+kubectl -n starfleet describe pod apparmor-missing | sed -n '/^Events:/,$p'
+```
+
+```text
+NAME               READY   STATUS                 RESTARTS   AGE
+apparmor-missing   0/1     CreateContainerError   0          10s
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  11s                default-scheduler  Successfully assigned starfleet/apparmor-missing to astro-ats-033-playground-040-03
+  Normal   Pulled     10s (x2 over 10s)  kubelet            spec.containers{shell}: Container image "docker.io/library/busybox:1.37.0" already present on machine and can be accessed by the pod
+  Warning  Failed     10s (x2 over 10s)  kubelet            spec.containers{shell}: Error: failed to get container spec opts: failed to generate apparmor spec opts: apparmor profile not found k8s-not-loaded
+```
+
+The scheduler placed the pod, and the kubelet tried to create the container. The container runtime (containerd) did not find the profile in the kernel, so the container never started, and the status is `CreateContainerError`. The `Warning` event names the missing profile. Delete the pod with `kubectl -n starfleet delete pod apparmor-missing`.
+
+The repair is to load the profile on that node with `apparmor_parser -r`, or to schedule the pod on a node that has it. On a machine without AppArmor in the kernel, the repair is a different node or a different control, such as seccomp and dropped capabilities, and never `Unconfined` to hide the error.
 
 You can now select an AppArmor profile at the right level and prove from inside the container which profile applies. AppArmor limits what the process touches. The next part limits what root power the process holds.
 
@@ -158,3 +217,4 @@ You can now select an AppArmor profile at the right level and prove from inside 
 > - **Forgetting the container override.** A container value replaces the pod value, so check both levels.
 > - **Switching to `Unconfined` when the pod will not start.** Load the profile on the node instead.
 > - **Editing a running pod and expecting a change.** The profile is attached at container start. Create a new pod.
+> - **A custom profile without a `signal` rule.** The runtime cannot stop the container, and a deleted pod stays in `Terminating`. Add `signal (receive) peer=runc,` and reload the profile.
