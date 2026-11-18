@@ -491,7 +491,6 @@ modules:
   - type: lab
     title: Bind A Host-Network Service To Loopback
     path: sections/section-030/module-01/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 10m
     topic: host-network-exposure
@@ -508,23 +507,22 @@ modules:
     title: Host Firewalls With iptables And ufw
     path: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
   - type: reading
-    title: Allow A Node Port Only From The Worker With iptables — Task
+    title: Block A Host Port With ufw — Task
     path: sections/section-030/module-01/labs/lab-02/question.md
   - type: lab
-    title: Allow A Node Port Only From The Worker With iptables
+    title: Block A Host Port With ufw
     path: sections/section-030/module-01/labs/lab-02
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 10m
     topic: host-firewall
     task_kind: build
     learning_goals:
-    - Add iptables INPUT rules on a node so that only the worker node reaches a host-network listener.
+    - Turn on ufw on a node with a rule that blocks pod traffic to a host-network listener while the node itself still reaches it.
     tags:
     - cks
     - host-firewall
   - type: reading
-    title: Allow A Node Port Only From The Worker With iptables — Solution
+    title: Block A Host Port With ufw — Solution
     path: sections/section-030/module-01/labs/lab-02/solution.md
   - type: reading
     title: NetworkPolicy For Pod Traffic
@@ -638,7 +636,6 @@ modules:
   - type: lab
     title: Bind The Scheduler To Loopback
     path: sections/section-030/module-03/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 10m
     topic: control-plane-listeners
@@ -660,7 +657,6 @@ modules:
   - type: lab
     title: Remove Anonymous Access From RBAC Bindings
     path: sections/section-030/module-03/labs/lab-02
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 10m
     topic: anonymous-api-access
@@ -682,7 +678,6 @@ modules:
   - type: lab
     title: Close The Kubelet API To Anonymous Callers
     path: sections/section-030/module-03/labs/lab-03
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
     topic: kubelet-api
@@ -704,7 +699,6 @@ modules:
   - type: lab
     title: Restrict The etcd Data Directory
     path: sections/section-030/module-03/labs/lab-04
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 6m
     topic: etcd-data-directory

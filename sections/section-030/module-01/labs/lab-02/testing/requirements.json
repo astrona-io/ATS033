@@ -1,6 +1,7 @@
 {
-  "context": "kind-astro-ats-033-lab-030-01-02",
+  "context": "kubernetes-admin@astro-ats-033-lab-030-01-02",
   "cluster": "astro-ats-033-lab-030-01-02",
+  "runtime": "qemu",
   "namespace": "starfleet-033-030-01-02",
   "resources": [
     {
@@ -21,17 +22,6 @@
       "expected": {
         "metadata": {
           "name": "shuttle"
-        }
-      },
-      "state": "pod"
-    },
-    {
-      "kind": "pod",
-      "name": "scout",
-      "namespace": "starfleet-033-030-01-02",
-      "expected": {
-        "spec": {
-          "hostNetwork": true
         }
       },
       "state": "pod"

@@ -4,16 +4,18 @@ exam_objectives:
 ---
 # Remove Anonymous Access From RBAC Bindings Solution
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Open a shell on the lab VM (virtual machine) and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-030-03-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-030-03-02" || exit 1
-node_name="astro-ats-033-lab-030-03-02-control-plane"
-worker_name="astro-ats-033-lab-030-03-02-worker"
+astrona ssh astro-ats-033-lab-030-03-02
+kubectl config current-context
 ```
 
-Keep this connection selected.
+```text
+kubernetes-admin@astro-ats-033-lab-030-03-02
+```
+
+You are logged in as the `student` user, which has a kubeconfig file for the cluster.
 
 ## Step 1: Find the bindings that name anonymous callers
 
@@ -28,23 +30,23 @@ The output below is shortened to the header lines and the lines that name `syste
 
 ```text
 NAME                                                            ROLE                                                                               AGE   USERS                            GROUPS                                            SERVICEACCOUNTS
-namespace-reader                                                ClusterRole/namespace-reader                                                       0s    system:anonymous                 ops-team
-system:public-info-viewer                                       ClusterRole/system:public-info-viewer                                              21s                                    system:authenticated, system:unauthenticated
+namespace-reader                                                ClusterRole/namespace-reader                                                       20s   system:anonymous                 ops-team
+system:public-info-viewer                                       ClusterRole/system:public-info-viewer                                              37s                                    system:authenticated, system:unauthenticated
 NAMESPACE                 NAME                                                ROLE                                                  AGE   USERS                                                   GROUPS                                                          SERVICEACCOUNTS
-kube-public               kubeadm:bootstrap-signer-clusterinfo                Role/kubeadm:bootstrap-signer-clusterinfo             21s   system:anonymous
-starfleet-033-030-03-02   pod-reader                                          Role/pod-reader                                       1s                                                            system:unauthenticated                                          starfleet-033-030-03-02/shuttle
+kube-public               kubeadm:bootstrap-signer-clusterinfo                Role/kubeadm:bootstrap-signer-clusterinfo             36s   system:anonymous
+starfleet-033-030-03-02   pod-reader                                          Role/pod-reader                                       20s                                                           system:unauthenticated                                          starfleet-033-030-03-02/shuttle
 ```
 
 Two of these bindings are built in. `system:public-info-viewer` lets anyone read `/healthz` and `/version`, which is what keeps health checks working. `kubeadm:bootstrap-signer-clusterinfo` lets new nodes read the public `cluster-info` ConfigMap in `kube-public` when they join. The other two are the problem: `namespace-reader` gives `system:anonymous` the ClusterRole `namespace-reader`, and `pod-reader` gives the group `system:unauthenticated` the Role `pod-reader`.
 
 ## Step 2: Prove the access without credentials
 
-`curl` without a client certificate or token sends an anonymous request. Run it on the control-plane node against the API server. `-o /dev/null -w '%{http_code}\n'` prints only the HTTP status code:
+`curl` without a client certificate or token sends an anonymous request. Run it on the node against the API server. `-o /dev/null -w '%{http_code}\n'` prints only the HTTP status code:
 
 ```sh
-podman exec "$node_name" curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces
-podman exec "$node_name" curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces/starfleet-033-030-03-02/pods
-podman exec "$node_name" curl -sk https://127.0.0.1:6443/healthz
+curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces
+curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces/starfleet-033-030-03-02/pods
+curl -sk https://127.0.0.1:6443/healthz
 ```
 
 ```text
@@ -121,18 +123,18 @@ Then check the result. Read both bindings, repeat the anonymous requests, and ch
 ```sh
 kubectl get clusterrolebinding namespace-reader -o wide
 kubectl -n starfleet-033-030-03-02 get rolebinding pod-reader -o wide
-podman exec "$node_name" curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces
-podman exec "$node_name" curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces/starfleet-033-030-03-02/pods
-podman exec "$node_name" curl -sk https://127.0.0.1:6443/healthz
+curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces
+curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:6443/api/v1/namespaces/starfleet-033-030-03-02/pods
+curl -sk https://127.0.0.1:6443/healthz
 kubectl auth can-i list namespaces --as=ops-user --as-group=ops-team
 kubectl auth can-i list pods -n starfleet-033-030-03-02 --as=system:serviceaccount:starfleet-033-030-03-02:shuttle
 ```
 
 ```text
 NAME               ROLE                           AGE   USERS   GROUPS     SERVICEACCOUNTS
-namespace-reader   ClusterRole/namespace-reader   62s           ops-team
+namespace-reader   ClusterRole/namespace-reader   20s           ops-team
 NAME         ROLE              AGE   USERS   GROUPS   SERVICEACCOUNTS
-pod-reader   Role/pod-reader   62s                    starfleet-033-030-03-02/shuttle
+pod-reader   Role/pod-reader   20s                    starfleet-033-030-03-02/shuttle
 403
 403
 ok
@@ -145,7 +147,7 @@ yes
 The anonymous requests now get `403 Forbidden`: the API server still accepts them as `system:anonymous`, but RBAC no longer allows the list. `/healthz` still answers `ok` through `system:public-info-viewer`. The group `ops-team` and the ServiceAccount `shuttle` keep their access. The body of a refused request names the user and the missing permission:
 
 ```sh
-podman exec "$node_name" curl -sk https://127.0.0.1:6443/api/v1/namespaces
+curl -sk https://127.0.0.1:6443/api/v1/namespaces
 ```
 
 ```text

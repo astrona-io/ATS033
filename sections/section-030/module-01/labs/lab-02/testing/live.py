@@ -7,12 +7,19 @@ def node_address(node):
 
 NODE_IP = node_address(NODE)
 
-# Guards for every outcome: the server still listens, and the test clients run where the task says.
-assert get('pod', 'node-metrics-server')['spec'].get('nodeName') == NODE, 'node-metrics-server must run on the control-plane node'
-assert node_exec(NODE, 'ss', '-tlnH', 'sport = :' + PORT).stdout.strip(), 'The control-plane node must still have a listener on port 19091'
-assert get('pod', 'shuttle')['spec'].get('nodeName') == NODE, 'shuttle must run on the control-plane node'
-assert get('pod', 'scout')['spec'].get('nodeName') == WORKER, 'scout must run on the worker node'
+# Guards for every outcome: the server still listens on every address, and
+# the node itself still reaches it through its own InternalIP.
+assert get('pod', 'node-metrics-server')['spec'].get('nodeName') == NODE, 'node-metrics-server must run on the node'
+listeners = node_exec(NODE, 'ss', '-tlnH', 'sport = :' + PORT).stdout
+assert listeners.strip(), 'The node must still have a listener on port 19091'
+assert '127.0.0.1:' + PORT not in listeners, 'Keep the bind address of node-metrics-server; block the port with ufw'
+local = node_exec(NODE, 'curl', '-s', '-m', '5', 'http://' + NODE_IP + ':' + PORT + '/', success=False)
+assert 'Directory listing for /' in local.stdout, 'A request from the node itself to ' + NODE_IP + ':19091 must still return the page'
 
-if wants('worker-only-access'):
-    behavior_check({'args': ['kubectl', '-n', NAMESPACE, 'exec', 'shuttle', '--', 'wget', '-q', '-T', '3', '-O-', 'http://' + NODE_IP + ':' + PORT + '/'], 'denied': True, 'failure_markers': ['timed out']})
-    behavior_check({'args': ['kubectl', '-n', NAMESPACE, 'exec', 'scout', '--', 'wget', '-q', '-T', '3', '-O-', 'http://' + NODE_IP + ':' + PORT + '/'], 'contains': ['Directory listing for /']})
+if wants('ufw-deny-rule'):
+    status = node_exec(NODE, 'ufw', 'status').stdout
+    assert 'Status: active' in status, 'ufw must be active'
+    rules = [line for line in status.splitlines() if line.split() and line.split()[0] in ('19091/tcp', '19091')]
+    assert any(' DENY ' in ' ' + line + ' ' or ' REJECT ' in ' ' + line + ' ' for line in rules), 'ufw must have a DENY or REJECT rule for TCP port 19091'
+if wants('pod-access-blocked'):
+    behavior_check({'args': ['kubectl', '-n', NAMESPACE, 'exec', 'shuttle', '--', 'wget', '-q', '-T', '3', '-O-', 'http://' + NODE_IP + ':' + PORT + '/'], 'denied': True, 'failure_markers': ['timed out', 'connection refused']})

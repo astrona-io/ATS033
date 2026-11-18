@@ -320,14 +320,14 @@ sections:
       objective: Keep a node-local management-style service reachable locally while
         closing its node-address listener.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-02
       path: sections/section-030/module-01/labs/lab-02
       after_reading: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
-      objective: Add iptables INPUT rules on a node so that only the worker node reaches
-        a host-network listener.
+      objective: Turn on ufw on a node with a rule that blocks pod traffic to a host-network
+        listener while the node itself still reaches it.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-03
       path: sections/section-030/module-01/labs/lab-03
       after_reading: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
@@ -410,29 +410,29 @@ sections:
       path: sections/section-030/module-03/labs/lab-01
       after_reading: sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
       objective: Restore --bind-address=127.0.0.1 in the kube-scheduler static pod
-        manifest and prove that port 10259 is closed to other nodes.
+        manifest and prove that port 10259 is closed to pods.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-02
       path: sections/section-030/module-03/labs/lab-02
       after_reading: sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
       objective: Remove system:anonymous and system:unauthenticated from RBAC bindings
         while keeping the intended subjects.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-03
       path: sections/section-030/module-03/labs/lab-03
       after_reading: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
       objective: Turn off anonymous access and AlwaysAllow authorization on a kubelet
         and restart it.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-04
       path: sections/section-030/module-03/labs/lab-04
       after_reading: sections/section-030/module-03/course-04-etcd-client-access.md
       objective: Set the etcd data directory back to mode 700 while etcd keeps running.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     practice_readings: []
 - id: section-040
   title: Appropriately use kernel hardening tools such as AppArmor, seccomp

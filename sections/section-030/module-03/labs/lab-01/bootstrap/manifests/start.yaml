@@ -11,13 +11,6 @@ metadata:
   labels:
     app: shuttle
 spec:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: node-role.kubernetes.io/control-plane
-            operator: DoesNotExist
   containers:
   - name: client
     image: docker.io/library/busybox:1.37.0
