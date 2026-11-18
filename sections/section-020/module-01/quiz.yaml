@@ -176,6 +176,29 @@ questions:
     correct_option: a
     explanation: "Turning off the automatic mount removes the token from pods that do not need it."
 
+  - id: ats033-020-01-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make an auditd watch rule persistent and load it without a reboot."
+    source_readings:
+      - sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
+    prompt: "An administrator writes `-w /etc/sudoers.d -p wa -k sudoers-change` to `/etc/audit/rules.d/40-sudoers.rules`. `auditctl -l` still prints `No rules`. What loads the rule into the kernel without a reboot and keeps it after the next restart of `auditd`?"
+    options:
+      - id: a
+        text: "Run `auditctl -w /etc/sudoers.d -p wa -k sudoers-change`."
+        explanation: "This loads the rule into the kernel only. The rule file is still not built into `/etc/audit/audit.rules`, and `augenrules --check` still reports a change."
+      - id: b
+        text: "Run `augenrules --load`."
+        explanation: "Correct. It builds `/etc/audit/audit.rules` from the files in `rules.d` and loads it, and `auditd` loads the same file at every start."
+      - id: c
+        text: "Rename the file to `40-sudoers.conf`."
+        explanation: "`augenrules` reads only files whose names end in `.rules`, so the rule would be ignored."
+      - id: d
+        text: "Run `ausearch --input-logs -k sudoers-change`."
+        explanation: "`ausearch` only reads the audit log. It does not load rules."
+    correct_option: b
+    explanation: "A file in `rules.d` does nothing until `augenrules --load` builds and loads `/etc/audit/audit.rules`."
+
   - id: ats033-020-01-q14
     type: single_choice
     difficulty: beginner

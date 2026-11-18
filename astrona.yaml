@@ -312,8 +312,31 @@ modules:
     title: Audit Trails On The Node And In The Cluster
     path: sections/section-020/module-01/course-05-audit-trails-on-the-node-and-in-the-cluster.md
   - type: reading
+    title: Persistent Audit Rules With augenrules
+    path: sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
+  - type: reading
+    title: Record Every Change To The Sudo Rules — Task
+    path: sections/section-020/module-01/labs/lab-04/question.md
+  - type: lab
+    title: Record Every Change To The Sudo Rules
+    path: sections/section-020/module-01/labs/lab-04
+    difficulty: intermediate
+    estimated_duration: 10m
+    topic: audit-rules
+    task_kind: build
+    learning_goals:
+    - Add a persistent auditd watch rule in /etc/audit/rules.d and load it with augenrules
+      without a reboot.
+    - Add a narrow sudoers rule and find the audit record of the change with ausearch.
+    tags:
+    - cks
+    - audit-rules
+  - type: reading
+    title: Record Every Change To The Sudo Rules — Solution
+    path: sections/section-020/module-01/labs/lab-04/solution.md
+  - type: reading
     title: Summary
-    path: sections/section-020/module-01/course-06-summary.md
+    path: sections/section-020/module-01/course-07-summary.md
   - type: reading
     title: Least-Privilege RBAC Roles And Bindings
     path: sections/section-020/module-02/course.md
@@ -467,7 +490,7 @@ modules:
   - type: quiz
     title: 'Knowledge Check: Using least-privilege identity and access management'
     path: sections/section-020/module-01/quiz.yaml
-    question_count: 10
+    question_count: 11
     pass_score: 70
 - id: module-030
   title: Minimize external access to the network

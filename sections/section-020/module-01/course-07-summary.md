@@ -13,6 +13,8 @@ In Kubernetes, a pod acts as a ServiceAccount, and RBAC decides what that Servic
 
 Access must be revocable and visible. Revocation removes each layer: group membership, sudoers rules, keys, the account and the Kubernetes bindings. Records of use come from the authentication log, the journal, `auditd` and the Kubernetes API server audit log, which needs an audit policy to exist.
 
+An `auditd` rule added with `auditctl` lasts only until `auditd` restarts or the node reboots. A persistent rule goes in a file ending in `.rules` under `/etc/audit/rules.d/`. `augenrules` joins those files into `/etc/audit/audit.rules`, and `augenrules --load` puts the rules into the kernel without a reboot. The kernel records only events that match a rule that is already loaded, so the watch must be active before the change it should record. `ausearch --input-logs -k` with a key and `-f` with a path finds the record later.
+
 Key facts:
 
 - Linux applies the owner bits, or the group bits, or the other bits, never a mix.
@@ -20,5 +22,6 @@ Key facts:
 - RBAC only adds permissions; deleting the binding removes the access.
 - The `default` ServiceAccount should have no bindings.
 - A secret value must not reach the audit log; use the `Metadata` level for Secrets.
+- `augenrules --check` reports whether the rule files differ from the generated `/etc/audit/audit.rules`.
 
 <!-- astrona:playground:destroy -->

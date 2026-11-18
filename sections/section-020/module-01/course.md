@@ -9,7 +9,7 @@ An account that can do more than its job needs turns a small mistake or a stolen
 
 Keep one sentence in mind for this module: **grant each identity the smallest permission that completes its task, and be able to take it back and to see when it was used.** You will give a Linux account read access to one file through a group, review how `sudo` and account locks limit administrative access, grant a Kubernetes ServiceAccount a narrow Role, and then revoke and audit access.
 
-The module has five parts. **Users, Groups And File Permissions** shows how Linux decides whether an account may read a file, and how a group grants one report without granting root. **Privilege Elevation And Account Locking** covers `sudo`, `sudoers`, locked accounts and SSH login settings. **Kubernetes Identities And RBAC** creates a ServiceAccount with a Role that allows one verb on one resource and checks it with `kubectl auth can-i`. **Revoking Host And Kubernetes Access** removes group membership and a RoleBinding and checks that access is gone. **Audit Trails On The Node And In The Cluster** reads the sudo and SSH records, adds an `auditd` watch rule on the sudoers files, and names the settings the API server needs for its audit log.
+The module has six parts. **Users, Groups And File Permissions** shows how Linux decides whether an account may read a file, and how a group grants one report without granting root. **Privilege Elevation And Account Locking** covers `sudo`, `sudoers`, locked accounts and SSH login settings. **Kubernetes Identities And RBAC** creates a ServiceAccount with a Role that allows one verb on one resource and checks it with `kubectl auth can-i`. **Revoking Host And Kubernetes Access** removes group membership and a RoleBinding and checks that access is gone. **Audit Trails On The Node And In The Cluster** reads the sudo and SSH records, adds an `auditd` watch rule on the sudoers files, and names the settings the API server needs for its audit log. **Persistent Audit Rules With augenrules** writes an audit rule to a file in `/etc/audit/rules.d/`, loads it without a reboot, and finds the record of one new sudoers file.
 
 ## Learning objectives
 
@@ -20,6 +20,7 @@ After this module you can:
 - Describe what a `sudoers` rule allows and why an unrestricted rule is dangerous.
 - Create a ServiceAccount, a Role and a RoleBinding, and verify them with `kubectl auth can-i`.
 - Revoke host and Kubernetes access and confirm that it no longer works.
+- Make an `auditd` rule persistent, load it without a reboot and find the record of a change with `ausearch`.
 
 ## Before you start
 

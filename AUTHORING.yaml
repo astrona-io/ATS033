@@ -161,6 +161,7 @@ sections:
     - Kubernetes Identities And RBAC
     - Revoking Host And Kubernetes Access
     - Audit Trails On The Node And In The Cluster
+    - Persistent Audit Rules With augenrules
     - Summary
     playground: true
     module_lab: true
@@ -174,6 +175,8 @@ sections:
     - reading: sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
       adapted_from: 
     - reading: sections/section-020/module-01/course-05-audit-trails-on-the-node-and-in-the-cluster.md
+      adapted_from: 
+    - reading: sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
       adapted_from: 
     labs:
     - id: lab-01
@@ -195,6 +198,13 @@ sections:
       after_reading: sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
       objective: Remove one person's group membership, sudoers rule, RBAC bindings
         and SSH key, and lock the host account.
+      status: alpha
+      runtime_verification: passed 2026-11-18
+    - id: lab-04
+      path: sections/section-020/module-01/labs/lab-04
+      after_reading: sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
+      objective: Add a persistent auditd watch rule on /etc/sudoers.d, load it without
+        a reboot, add a narrow sudo rule and find its audit record.
       status: alpha
       runtime_verification: passed 2026-11-18
     practice_readings: []

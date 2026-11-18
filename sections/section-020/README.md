@@ -20,12 +20,13 @@ Read the module goals, teaching and closing summary in order. YAML checks are in
 
 ## Module
 
-**Apply Least Privilege To Identities** has a landing page, five deep-dive parts, a summary and a knowledge check:
+**Apply Least Privilege To Identities** has a landing page, six deep-dive parts, a summary and a knowledge check:
 
 - Users, Groups And File Permissions
 - Privilege Elevation And Account Locking
 - Kubernetes Identities And RBAC
 - Revoking Host And Kubernetes Access
 - Audit Trails On The Node And In The Cluster
+- Persistent Audit Rules With augenrules
 - Summary
-- Knowledge check (10 questions)
+- Knowledge check (11 questions)

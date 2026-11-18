@@ -1,0 +1,66 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-033-lab-020-01-04
+  docs:
+    prerequisites: docs/prerequisites.md
+    examQuestion: question.md
+    caseStudy: docs/case-study.md
+    guide: solution.md
+runtime:
+  # The lab works on auditd rules, the audit log and sudoers files of the
+  # node, so it runs a real one-node kubeadm cluster in a VM instead of a kind
+  # node container.
+  type: qemu
+  qemu:
+  - image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-cks
+      checksums:
+        amd64: sha256:dc3348c725b6b36d08888acdcbda44cc34894b76d5b56a594f7ce253b6d2e773
+        arm64: sha256:31798490219e2ee856d7f8c2cb9df83182bbac64c7d8ce7c15e81445527d7898
+    cpus: 2
+    memoryMB: 4096
+    diskSizeGB: 25
+    display: false
+bootstrap:
+  init:
+  - name: seed-private-environment
+    type: file
+    source: vm/install.sh
+teardown:
+  keepCluster: false
+testing:
+  init:
+  - name: verify-start
+    description: Verify the starting state and reject the unfinished lab
+    type: file
+    source: vm/verify-start.sh
+  - name: reference-result
+    type: file
+    source: vm/apply-solution.sh
+  - name: wait-solved
+    description: Wait until the reference solution settles and every outcome passes
+    type: file
+    source: vm/wait-solved.sh
+validation:
+  scripts:
+  - name: watch-persistent
+    description: /etc/audit/rules.d/40-sudoers.rules holds the watch on /etc/sudoers.d with the key sudoers-change, and augenrules --check reports no change
+    type: file
+    source: vm/validate-watch-persistent.sh
+    points: 1
+  - name: watch-loaded
+    description: auditctl -l lists -w /etc/sudoers.d -p wa -k sudoers-change, and the watch on /etc/sudoers is still loaded
+    type: file
+    source: vm/validate-watch-loaded.sh
+    points: 1
+  - name: oncall-rule-added
+    description: /etc/sudoers.d/40-oncall is root:root mode 440, visudo -c passes and sudo -l -U oncall lists journalctl --unit kubelet
+    type: file
+    source: vm/validate-oncall-rule-added.sh
+    points: 1
+  - name: change-recorded
+    description: ausearch --input-logs -k sudoers-change -f /etc/sudoers.d/40-oncall finds a record
+    type: file
+    source: vm/validate-change-recorded.sh
+    points: 1

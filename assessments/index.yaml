@@ -13,7 +13,7 @@ banks:
   - section-010
 - id: ats033-020-01
   path: sections/section-020/module-01/quiz.yaml
-  question_count: 10
+  question_count: 11
   placement:
     position: after
     reading: sections/section-020/module-03/course-04-summary.md
