@@ -71,8 +71,12 @@ def node_exec(node, *args, success=True):
 
 def get(kind, name, namespace=NAMESPACE):
     scope = ['-n', namespace] if namespace else []
-    result = command(['kubectl', *scope, 'get', kind, name, '-o', 'json'], success=False)
-    assert result.returncode == 0, f'Missing {kind} {name}' + (f' in namespace {namespace}' if namespace else '')
+    # --ignore-not-found turns a missing object into empty output, so a non-zero
+    # exit is an API or connection error, not unfinished work.
+    result = command(['kubectl', *scope, 'get', kind, name, '--ignore-not-found', '-o', 'json'], success=False)
+    if result.returncode != 0:
+        raise RuntimeError(f'Cannot read {kind} {name}: {result.stderr.strip()}')
+    assert result.stdout.strip(), f'Missing {kind} {name}' + (f' in namespace {namespace}' if namespace else '')
     return json.loads(result.stdout)
 
 
@@ -144,3 +148,8 @@ if __name__ == '__main__':
     except (AssertionError, KeyError, ValueError, subprocess.SubprocessError) as error:
         print('FAIL: ' + str(error))
         sys.exit(1)
+    except (OSError, RuntimeError) as error:
+        # The grader could not look at the lab (missing tool, API not answering):
+        # report an error, not a failed outcome.
+        print('ERROR: ' + str(error))
+        sys.exit(2)

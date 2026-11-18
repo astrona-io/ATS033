@@ -64,6 +64,8 @@ jobs:
         run: python3 -m pip install -r scripts/ci/requirements.txt
       - name: Test course structure failure cases
         run: python3 scripts/ci/test-course-structure.py
+      - name: Test grader error handling
+        run: python3 scripts/ci/test-grading-runtime.py
       - name: Check course registration and lifecycle files
         run: python3 scripts/ci/check-course-structure.py
       - name: Test teaching coverage failure cases
@@ -197,8 +199,8 @@ jobs:
           DIAGNOSTICS_DIR: ${{ runner.temp }}/diagnostics
         run: scripts/ci/test-playground.sh "${{ matrix.env.path }}"
 
-      - name: Upload diagnostics
-        if: failure()
+      - name: Upload test evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: diagnostics-${{ strategy.job-index }}
