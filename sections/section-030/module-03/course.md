@@ -25,7 +25,9 @@ After this module you can:
 
 You need basic Kubernetes knowledge (nodes, pods, static pods, kubeconfig), basic TLS knowledge (certificate, certificate authority) and the idea of a listener and a bind address.
 
-Your playground is a `kind` cluster running Kubernetes 1.35 with one control-plane node and one worker node. `kind` runs each node as a Podman container, and you run a command inside a node with `podman exec`. Every node command in this module names the node containers of this playground only. The kubelet on the worker node is deliberately set to an unsafe configuration, which you will find and repair.
+Your playground is a VM (virtual machine) that runs a one-node Kubernetes 1.35 cluster built with kubeadm. kubeadm is the standard tool that installs a cluster on a Linux machine. The single node is the control plane and also runs the pods, so the static pod manifests, the kubelet configuration file and the etcd data directory are real files on that VM.
+
+You open a shell on it with `astrona ssh`, work as the `student` user, and run node commands with `sudo`. The kubelet on the node is deliberately set to an unsafe configuration, which you will find and repair.
 
 | Namespace | What is in it |
 | --- | --- |

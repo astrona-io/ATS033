@@ -7,16 +7,25 @@ metadata:
     caseStudy: docs/case-study.md
     guide: solution.md
 runtime:
-  type: kind
-  kind:
-    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    nodes:
-      workers: 1
+  # The grader sends requests from the control-plane node, so the lab runs a
+  # real one-node kubeadm cluster in a VM instead of kind node containers.
+  type: qemu
+  qemu:
+  - image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-cks-20261118-{ARCH}
+      checksums:
+        amd64: sha256:dc3348c725b6b36d08888acdcbda44cc34894b76d5b56a594f7ce253b6d2e773
+        arm64: sha256:31798490219e2ee856d7f8c2cb9df83182bbac64c7d8ce7c15e81445527d7898
+    cpus: 2
+    memoryMB: 4096
+    diskSizeGB: 25
+    display: false
 bootstrap:
   init:
   - name: seed-private-environment
     type: file
-    source: bootstrap/setup.sh
+    source: vm/install.sh
 teardown:
   keepCluster: false
 testing:
@@ -24,23 +33,23 @@ testing:
   - name: verify-start
     description: Verify the starting state and reject the unfinished lab
     type: file
-    source: testing/verify-start.sh
+    source: vm/verify-start.sh
   - name: reference-result
     type: file
-    source: solution/apply.sh
+    source: vm/apply-solution.sh
   - name: wait-solved
     description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: testing/wait-solved.sh
+    source: vm/wait-solved.sh
 validation:
   scripts:
   - name: anonymous-namespace-list-denied
     description: A request without credentials cannot list namespaces, and no binding gives system:anonymous access to namespaces
     type: file
-    source: validation/validate-anonymous-namespace-list-denied.sh
+    source: vm/validate-anonymous-namespace-list-denied.sh
     points: 1
   - name: unauthenticated-pod-read-denied
     description: A request without credentials cannot list pods in starfleet-033-030-03-02, and no binding gives system:unauthenticated access to them
     type: file
-    source: validation/validate-unauthenticated-pod-read-denied.sh
+    source: vm/validate-unauthenticated-pod-read-denied.sh
     points: 1

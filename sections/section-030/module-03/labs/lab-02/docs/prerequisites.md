@@ -4,15 +4,11 @@ exam_objectives:
 ---
 # Prerequisites
 
-Use astrona, kubectl, Podman and a shell. The `curl` requests run inside the control-plane node container of this lab with `podman exec`.
-
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Use astrona and a shell. The lab runs in a VM (virtual machine) with a one-node Kubernetes cluster built with kubeadm. Open a shell on the VM and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-030-03-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-030-03-02" || exit 1
-node_name="astro-ats-033-lab-030-03-02-control-plane"
-worker_name="astro-ats-033-lab-030-03-02-worker"
+astrona ssh astro-ats-033-lab-030-03-02
+kubectl config current-context
 ```
 
-Keep this connection selected.
+The second command prints `kubernetes-admin@astro-ats-033-lab-030-03-02`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. The `curl` requests run on the node and reach the API server on `127.0.0.1:6443`.

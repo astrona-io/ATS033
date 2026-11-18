@@ -4,15 +4,11 @@ exam_objectives:
 ---
 # Prerequisites
 
-Use astrona, kubectl, Podman and a shell. Node commands run inside the node containers of this environment, not on the physical host. The node image ships `iptables`, the Linux command that manages packet filter rules.
-
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Use astrona and a shell. The lab runs in a VM (virtual machine) with a one-node Kubernetes cluster built with kubeadm. The node has `ufw` (Uncomplicated Firewall), a front end that writes host firewall rules into the packet filter of the Linux kernel. Open a shell on the VM and check that `kubectl` uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-030-01-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-030-01-02" || exit 1
-node_name="astro-ats-033-lab-030-01-02-control-plane"
-worker_name="astro-ats-033-lab-030-01-02-worker"
+astrona ssh astro-ats-033-lab-030-01-02
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+The second command prints `kubernetes-admin@astro-ats-033-lab-030-01-02`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Firewall commands need `sudo`. They change only the lab VM, not your own computer.
