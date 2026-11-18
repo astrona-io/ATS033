@@ -17,4 +17,4 @@ Outcomes (1 point each):
 - `profile-enforced`: `/sys/kernel/security/apparmor/profiles` on the node lists `k8s-deny-etc-write (enforce)`.
 - `scout-etc-write-denied`: `/proc/1/attr/current` in the pod reads `k8s-deny-etc-write (enforce)`, and `touch /etc/scout-check` fails with `Permission denied`.
 
-Runtime status: passed on 2026-11-18 on Apple silicon (QEMU with HVF, image `24.04-cks-20261118`). `astrona test` printed `PROCTOR: PASS` with 2 of 2 outcomes; verify-start rejected the unfinished lab; the run took about 72 seconds (bootstrap 19 seconds, wait-solved 36 seconds).
+Runtime status: passed on 2026-11-18 on Apple silicon (QEMU with HVF, image `24.04-cks` build 20261118). `astrona test` printed `PROCTOR: PASS` with 2 of 2 outcomes; verify-start rejected the unfinished lab; the run took about 72 seconds (bootstrap 19 seconds, wait-solved 36 seconds).
