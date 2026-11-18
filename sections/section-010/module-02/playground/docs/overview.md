@@ -5,98 +5,124 @@ exam_objectives:
 ---
 # Guided Practice: Harden SSH Access And Unused Accounts
 
-Use a host shell with the private kubeconfig for this module playground. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+This playground is one Ubuntu 24.04 virtual machine (VM). kubeadm installed Kubernetes v1.35.10 on it as a single node. The node runs a real SSH daemon, `sshd`, and an old image build left settings that allow root logins and password logins. It also left an account, `olduser`, that nobody uses. In this practice you close those login paths and prove that the node still works.
+
+Open a shell on the VM and confirm that `kubectl` points at this playground:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-010-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-010-02" || exit 1
-node_name="astro-ats-033-playground-010-02-control-plane"
-worker_name="astro-ats-033-playground-010-02-worker"
+astrona ssh astro-ats-033-playground-010-02
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+```text
+kubernetes-admin@astro-ats-033-playground-010-02
+```
 
-## Inspect And Explain
+You are logged in as the `student` user, which has a kubeconfig file for the cluster. The SSH files and the account database belong to root, so commands that read or change them start with `sudo`. Keep this shell open until the end: if a change blocks new logins, you can still repair it from here.
 
-Read the effective SSH settings before you change anything. The shell expands the file names in sorted order, which is the order the daemon reads them, because the first line of the main file includes the drop-in directory.
+## Read the effective SSH settings
+
+`sshd` reads the main file `/etc/ssh/sshd_config`, and its `Include` line reads the drop-in files in `/etc/ssh/sshd_config.d/` first. For most keywords the first value wins. `sshd -T` prints the effective value of every keyword after the daemon applied this rule:
 
 ```sh
-podman exec "$node_name" sh -c 'cat /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config'
-podman exec "$node_name" getent passwd opsadmin olduser
+sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|pubkeyauthentication|allowusers) '
+sudo grep -H . /etc/ssh/sshd_config.d/50-cloud-init.conf
 ```
 
-The drop-in file comes first and sets `PasswordAuthentication yes`. The daemon uses the first value it reads for a setting, so the later `PasswordAuthentication no` in the main file has no effect. This is the fault to repair, together with the root login, the missing `AllowUsers` line and the shell of `olduser`.
-
-Change only the control-plane node of this environment.
-
-1. Set `PermitRootLogin` to `no`.
-2. Make the first `PasswordAuthentication` value that sshd reads `no`. Keep `PubkeyAuthentication` set to `yes`.
-3. Allow only the account `opsadmin` with an `AllowUsers` line.
-4. Give `olduser` the login shell `/usr/sbin/nologin` and lock its password. Do not delete the account and do not change `opsadmin`.
-5. Create the ConfigMap `node-access-review` in the `starfleet` namespace with the data `ssh: key-only`, `account: olduser` and `result: hardened`.
-
-The `kubelet` and `containerd` services must stay active and the API readiness endpoint must answer.
-
-Save this as `harden-ssh.py`:
-
-```python
-import subprocess
-CONTEXT="kind-astro-ats-033-playground-010-02"
-NODE="astro-ats-033-playground-010-02-control-plane"
-def run(*args):
-    result=subprocess.run(args,check=True,text=True,capture_output=True,timeout=30)
-    return result.stdout.strip()
-assert run('kubectl','config','current-context')==CONTEXT, 'Select the private environment'
-assert run('podman','inspect',NODE,'--format','{{index .Config.Labels "io.x-k8s.kind.cluster"}}')=='astro-ats-033-playground-010-02', 'Refusing an unrelated node container'
-def node(*args):return run('podman','exec',NODE,*args)
-
-node('sed','-i','s/^PermitRootLogin .*/PermitRootLogin no/','/etc/ssh/sshd_config')
-node('sed','-i','s/^PasswordAuthentication .*/PasswordAuthentication no/','/etc/ssh/sshd_config.d/50-cloud-init.conf')
-if 'AllowUsers' not in node('cat','/etc/ssh/sshd_config'):
-    node('sh','-c',"printf 'AllowUsers opsadmin\\n' >> /etc/ssh/sshd_config")
-node('usermod','--shell','/usr/sbin/nologin','--lock','olduser')
+```text
+permitrootlogin yes
+pubkeyauthentication yes
+passwordauthentication yes
+/etc/ssh/sshd_config.d/50-cloud-init.conf:PasswordAuthentication yes
 ```
 
-Save this as `configmap-node-access-review.yaml`:
+Root and password logins are allowed, and there is no `allowusers` line, so every account may log in. The `yes` for passwords comes from the drop-in file. `PermitRootLogin yes` comes from the main file, and no drop-in file sets it.
 
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: node-access-review
-  namespace: starfleet
-data:
-  ssh: key-only
-  account: olduser
-  result: hardened
-```
+## Fix the settings and reload the daemon
 
-Apply the scoped correction:
+Change the line that is read first for each keyword. Then add the allow list in its own drop-in file. A drop-in file is read above the `Match User backup` block at the end of the main file, so its lines are global. The list must contain `student` and `astrona`, the accounts the platform uses:
 
 ```sh
-python3 harden-ssh.py
-kubectl apply -f configmap-node-access-review.yaml
+sudo sed -i 's/^PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config.d/50-cloud-init.conf
+sudo sed -i 's/^PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
+echo "AllowUsers opsadmin student astrona" | sudo tee /etc/ssh/sshd_config.d/10-allow-users.conf
 ```
 
-## Verify The Result
+```text
+AllowUsers opsadmin student astrona
+```
 
-Read the settings again and check the accounts and the cluster. A node that still answers the readiness endpoint shows that the change did not touch Kubernetes.
+`sshd -t` checks the syntax of all files and prints nothing when they are valid. `systemctl reload` makes the running daemon read its files again and keeps open sessions:
 
 ```sh
-podman exec "$node_name" sh -c 'cat /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config'
-podman exec "$node_name" getent passwd olduser
-podman exec "$node_name" passwd -S olduser
-kubectl get --raw=/readyz
+sudo sshd -t
+sudo systemctl reload ssh.service
+sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|allowusers) '
 ```
 
-The first value of each setting must now be the required one, `olduser` must show `/usr/sbin/nologin` and the status letter `L`, and the readiness endpoint must answer `ok`.
+```text
+permitrootlogin no
+passwordauthentication no
+allowusers opsadmin
+allowusers student
+allowusers astrona
+```
+
+A test login with `PreferredAuthentications=none` makes the running daemon refuse the login and list the methods it offers. The journal of the `ssh` service shows why the daemon refused an account:
+
+```sh
+ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null olduser@127.0.0.1 true
+sudo journalctl --unit=ssh.service --since=-1min --no-pager --grep=AllowUsers
+```
+
+```text
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+olduser@127.0.0.1: Permission denied (publickey).
+Nov 18 09:09:09 astro-ats-033-playground-010-02 sshd[2961]: User olduser from 127.0.0.1 not allowed because not listed in AllowUsers
+```
+
+The daemon offers only `publickey`, and it refused `olduser` because the account is not on the list. The time and the process number in the journal line differ on your run.
+
+## Close the unused account
+
+`olduser` still has a login shell, a password and an SSH key. Give it the shell `/usr/sbin/nologin`, lock its password, and remove its key. Do not delete the account, because its files would then keep a user identifier without an owner name:
+
+```sh
+sudo usermod --shell /usr/sbin/nologin --lock olduser
+sudo rm /home/olduser/.ssh/authorized_keys
+getent passwd olduser
+sudo passwd -S olduser
+```
+
+```text
+olduser:x:1004:1004::/home/olduser:/usr/sbin/nologin
+olduser L 2026-11-18 0 99999 7 -1
+```
+
+The shell is now `nologin`, and the status letter `L` means the password is locked. The date shows when the password last changed, so it differs on your run.
+
+## Verify the node
+
+None of these changes may affect Kubernetes. Check the node services and the API server:
+
+```sh
+systemctl is-active kubelet.service containerd.service ssh.service
+kubectl get --raw=/readyz; echo
+```
+
+```text
+active
+active
+active
+ok
+```
 
 ## Common pitfalls
 
 > [!WARNING]
-> - Edit the file that holds the first value of a setting. A correct line later in the main file does not override an earlier drop-in.
-> - Do not remove `PubkeyAuthentication yes` while you turn passwords off. Key logins are the access path that remains.
-> - Do not delete `olduser` or change `opsadmin`. The task asks for a login restriction, not for account removal.
-> - Confirm the private context and the node container name before you change a file.
+> - **Editing the main file only.** A drop-in value that is read first wins. Check the result with `sshd -T`.
+> - **Appending `AllowUsers` to the end of the main file.** The line becomes part of the `Match User backup` block and applies to `backup` only.
+> - **Leaving out the platform accounts.** `AllowUsers opsadmin` alone blocks new logins as `student` and `astrona`.
+> - **Forgetting the reload.** The running daemon keeps its old settings until `systemctl reload ssh.service`.

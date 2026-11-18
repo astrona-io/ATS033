@@ -57,7 +57,6 @@ modules:
   - type: lab
     title: Close An Unneeded Listener On A Node
     path: sections/section-010/module-01/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
     topic: host-service-footprint
@@ -79,7 +78,6 @@ modules:
   - type: lab
     title: Purge An Unneeded Package From A Node
     path: sections/section-010/module-01/labs/lab-02
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
     topic: host-package-footprint
@@ -113,13 +111,12 @@ modules:
   - type: lab
     title: Restrict SSH Logins In sshd_config
     path: sections/section-010/module-02/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 10m
     topic: ssh-host-login
     task_kind: build
     learning_goals:
-    - Fix drop-in precedence in sshd_config so that root and password logins are refused and only one administrator account may log in.
+    - Fix drop-in precedence in sshd_config and reload sshd so that root and password logins are refused and only the listed accounts may log in.
     tags:
     - cks
     - ssh-host-login
@@ -135,7 +132,6 @@ modules:
   - type: lab
     title: Close Unused And Duplicate Root Accounts
     path: sections/section-010/module-02/labs/lab-02
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
     topic: unused-host-accounts

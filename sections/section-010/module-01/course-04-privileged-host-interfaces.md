@@ -17,32 +17,52 @@ The **kubelet** is the node agent that starts pods. Its API on port 10250 can ru
 
 ## Look at the runtime socket and the kubelet settings
 
-Select the environment and define the helper:
+The playground is one Ubuntu 24.04 virtual machine (VM) that is a single Kubernetes node. Open a shell on the VM and confirm that `kubectl` points at this playground:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-010-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-010-01" || exit 1
-node_name="astro-ats-033-playground-010-01-control-plane"
-run_on_node() { podman exec "$node_name" "$@"; }
+astrona ssh astro-ats-033-playground-010-01
+kubectl config current-context
 ```
 
-First, look at the owner and the permission bits of the containerd socket:
+```text
+kubernetes-admin@astro-ats-033-playground-010-01
+```
+
+You are logged in as the `student` user. Commands that read files only root may read start with `sudo`, which runs one command as root. First, look at the owner and the permission bits of the containerd socket:
 
 ```sh
-run_on_node ls -l /run/containerd/containerd.sock
+ls -l /run/containerd/containerd.sock
 ```
 
-The first column starts with `s` for a socket. Read the owner, the group and the mode. A mode that lets a group or all users write to the file would hand out runtime control, so the expected owner is `root`, and only `root` should be able to write.
+```text
+srw-rw---- 1 root root 0 Nov 18 09:03 /run/containerd/containerd.sock
+```
+
+The first character `s` marks a socket. The owner and the group are both `root`, and the mode `rw-rw----` gives read and write access to the owner and the group only. All other users, including `student`, have no access. Any account that you add to the `root` group would gain control of the container runtime, so the group of the socket matters as much as its owner.
 
 Next, read the kubelet configuration file. Three settings protect the kubelet API. `authentication.anonymous.enabled` must be `false`, so a caller without credentials gets a rejection. `authorization.mode` must be `Webhook`, so the kubelet asks the API server whether the caller may do the action, and the default `AlwaysAllow` must not be used. `readOnlyPort` must be `0` or absent, because port 10255 serves unauthenticated read-only data:
 
 ```sh
-run_on_node grep -A4 -E 'anonymous|authorization|readOnlyPort' /var/lib/kubelet/config.yaml
+sudo grep -A4 -E 'anonymous|authorization|readOnlyPort' /var/lib/kubelet/config.yaml
 ```
 
-Compare each setting with the rule above. A kubeadm-created node normally sets them as required. If your output differs, the node deviates from the secure defaults, and you would correct the file and restart the kubelet with `systemctl restart kubelet`.
+```text
+  anonymous:
+    enabled: false
+  webhook:
+    cacheTTL: 0s
+    enabled: true
+--
+authorization:
+  mode: Webhook
+  webhook:
+    cacheAuthorizedTTL: 0s
+    cacheUnauthorizedTTL: 0s
+```
+
+`grep -A4` prints each matching line and the four lines after it, and `--` separates the two matches. Anonymous authentication is `false`, and the authorization mode is `Webhook`. No line matches `readOnlyPort`, so the setting is absent and the read-only port stays off. kubeadm created this node, and it sets all three values as required. If your output differs on another node, correct the file and restart the kubelet with `sudo systemctl restart kubelet`.
 
 ## Find pods that use host namespaces
 
@@ -52,7 +72,22 @@ The cluster side of the inventory asks which pods share the host's namespaces. `
 kubectl get pods -A -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,HOSTNETWORK:.spec.hostNetwork,HOSTPID:.spec.hostPID
 ```
 
-Pods that do not set a field show `<none>`. In `kube-system` several control-plane pods show `true` in the `HOSTNETWORK` column, which is required for them. Pods in `starfleet` and `outpost` should show `<none>`. Any other pod with `true` is on the list for a justification.
+```text
+NAMESPACE     NAME                                                      HOSTNETWORK   HOSTPID
+kube-system   coredns-7d764666f9-6gcgh                                  <none>        <none>
+kube-system   coredns-7d764666f9-d5mw9                                  <none>        <none>
+kube-system   etcd-astro-ats-033-playground-010-01                      true          <none>
+kube-system   kube-apiserver-astro-ats-033-playground-010-01            true          <none>
+kube-system   kube-controller-manager-astro-ats-033-playground-010-01   true          <none>
+kube-system   kube-proxy-mkhsh                                          true          <none>
+kube-system   kube-scheduler-astro-ats-033-playground-010-01            true          <none>
+outpost       drifter                                                   <none>        <none>
+starfleet     probe-7db6ffd7d6-77vm6                                    <none>        <none>
+starfleet     probe-7db6ffd7d6-8278t                                    <none>        <none>
+starfleet     shuttle                                                   <none>        <none>
+```
+
+Pods that do not set a field show `<none>`. In `kube-system` the control-plane pods (`etcd`, `kube-apiserver`, `kube-controller-manager`, `kube-scheduler`) and `kube-proxy` show `true` in the `HOSTNETWORK` column, which is required for them. The `coredns` pods and the pods in `starfleet` and `outpost` show `<none>`. Any other pod with `true` is on the list for a justification.
 
 ## Read a host file from a pod
 
@@ -91,6 +126,10 @@ Apply it:
 kubectl apply -f pod-host-reader.yaml
 ```
 
+```text
+pod/host-reader created
+```
+
 Then check the result:
 
 ```sh
@@ -98,7 +137,12 @@ kubectl -n starfleet wait --for=condition=Ready pod/host-reader --timeout=120s
 kubectl -n starfleet exec host-reader -- cat /host-etc/hostname
 ```
 
-The command prints the host name of the node that runs the pod, not the name of the pod. The kubelet on that node, with the container runtime, mounted the node directory into the container. The pod only read a harmless file here, but the same mount without `readOnly` and with a path of `/` would allow it to change any file on the node.
+```text
+pod/host-reader condition met
+astro-ats-033-playground-010-01
+```
+
+The second command prints the host name of the node that runs the pod, `astro-ats-033-playground-010-01`, not the name of the pod. The kubelet on that node, with the container runtime, mounted the node directory into the container. The pod only read a harmless file here, but the same mount without `readOnly` and with a path of `/` would allow it to change any file on the node.
 
 ## Block it with Pod Security Admission
 
@@ -110,6 +154,12 @@ Remove the pod, label the namespace, and apply the same file again:
 kubectl -n starfleet delete pod host-reader
 kubectl label namespace starfleet pod-security.kubernetes.io/enforce=baseline
 kubectl apply -f pod-host-reader.yaml
+```
+
+```text
+pod "host-reader" deleted from starfleet namespace
+namespace/starfleet labeled
+Error from server (Forbidden): error when creating "pod-host-reader.yaml": pods "host-reader" is forbidden: violates PodSecurity "baseline:latest": hostPath volumes (volume "host-etc")
 ```
 
 The last command fails. The error message names `PodSecurity`, the `baseline` level and the `hostPath` volume `host-etc`. The rejection comes from the API server, so the pod never reaches a node. To undo the experiment, remove the label with `kubectl label namespace starfleet pod-security.kubernetes.io/enforce-`.

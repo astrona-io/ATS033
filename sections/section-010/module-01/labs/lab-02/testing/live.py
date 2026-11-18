@@ -18,9 +18,8 @@ def port_is_listening():
     return any(line.split()[3].rsplit(':', 1)[-1] == PORT for line in listeners if len(line.split()) > 3)
 
 
-for node in (NODE, WORKER):
-    states = node_exec(node, 'systemctl', 'is-active', 'kubelet.service', 'containerd.service', success=False).stdout.split()
-    assert states == ['active', 'active'], 'kubelet and containerd must stay active on ' + node
+states = node_exec(NODE, 'systemctl', 'is-active', 'kubelet.service', 'containerd.service', success=False).stdout.split()
+assert states == ['active', 'active'], 'kubelet and containerd must stay active on ' + NODE
 nodes = json.loads(kubectl('get', 'nodes', '-o', 'json'))['items']
 for item in nodes:
     ready = [condition['status'] for condition in item['status']['conditions'] if condition['type'] == 'Ready']

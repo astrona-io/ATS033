@@ -26,41 +26,113 @@ flowchart TB
 
 The diagram shows the first checks of the daemon: a deny match or a missing allow-list entry ends the login before any key is tried.
 
-## Close root login and set the allow list
+## Close root login and find the Match block
 
-The playground node still allows root login and any account. Select the environment and define the helper, then read the two lines that need to change:
+The playground is one Ubuntu 24.04 virtual machine (VM) that is a single Kubernetes node with a real SSH daemon. Its daemon still allows root login and every account. Open a shell on the VM and confirm that `kubectl` points at this playground:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-010-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-010-02" || exit 1
-node_name="astro-ats-033-playground-010-02-control-plane"
-run_on_node() { podman exec "$node_name" "$@"; }
-run_on_node grep -n -E '^(PermitRootLogin|AllowUsers|Match)' /etc/ssh/sshd_config
+astrona ssh astro-ats-033-playground-010-02
+kubectl config current-context
 ```
 
-The `grep` output shows `PermitRootLogin yes` and no `AllowUsers` and no `Match` line. The `Match` check matters, as the next section explains. Replace the root login value, then add the allow list as a new line at the end of the file:
+```text
+kubernetes-admin@astro-ats-033-playground-010-02
+```
+
+You are logged in as the `student` user. Keep this first shell open until the end of the part: if a change blocks new logins, you can still repair it from here. The SSH files belong to root, so commands that read or change them start with `sudo`. Read the lines of the main file that matter for this part:
 
 ```sh
-run_on_node sed -i 's/^PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
-run_on_node sh -c "printf 'AllowUsers opsadmin\n' >> /etc/ssh/sshd_config"
-run_on_node tail -n 3 /etc/ssh/sshd_config
+grep -n -E '^(Include|PermitRootLogin|AllowUsers|Match)' /etc/ssh/sshd_config
 ```
 
-The `printf` command writes the line and `>>` appends it to the file. With `PermitRootLogin no`, the `root` account cannot log in over SSH at all. Administrators log in as `opsadmin` and use `sudo` for tasks that need root. With `AllowUsers opsadmin`, an account such as `olduser` is refused even if it has a public key on the node.
+```text
+12:Include /etc/ssh/sshd_config.d/*.conf
+134:PermitRootLogin yes
+137:Match User backup
+```
+
+The main file has the `Include` line at line 12, `PermitRootLogin yes` at line 134, no `AllowUsers` line, and a `Match` line at line 137. No drop-in file sets `PermitRootLogin`, so line 134 is the value that applies. Replace it:
+
+```sh
+sudo sed -i 's/^PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
+```
+
+The command prints nothing. With `PermitRootLogin no`, the `root` account cannot log in over SSH at all. Administrators log in as `opsadmin` and use `sudo` for tasks that need root. The `Match` line found above decides where the allow list may go.
 
 ## Why a Match block changes the meaning of the last line
 
-A `Match` line in `sshd_config` starts a conditional block, for example `Match Address 10.0.0.0/8`. Every setting after it applies only to connections that match the condition, until the next `Match` line or the end of the file. A line appended to the end of a file that already contains a `Match` block therefore becomes part of that block. An `AllowUsers` line in the wrong place then limits only some connections and leaves the rest open. When a file has `Match` blocks, put global settings above the first `Match` line. The `grep` above is the check for this: this file has no `Match` line, so the appended line is global.
+A `Match` line in `sshd_config` starts a conditional block, for example `Match User backup` or `Match Address 10.0.0.0/8`. Every setting after it applies only to connections that match the condition, until the next `Match` line or the end of the file. A line appended to the end of a file that already contains a `Match` block therefore becomes part of that block.
+
+You can see this without touching the real file. `sshd -T -f` reads another main file, and `-C user=backup` prints the settings for a connection of the account `backup`. Copy the main file, append an allow list to the copy, and compare the two views:
+
+```sh
+sudo cp /etc/ssh/sshd_config /tmp/sshd_config.test
+echo "AllowUsers opsadmin student astrona" | sudo tee -a /tmp/sshd_config.test
+sudo sshd -T -f /tmp/sshd_config.test | grep '^allowusers'
+sudo sshd -T -f /tmp/sshd_config.test -C user=backup | grep '^allowusers'
+sudo rm /tmp/sshd_config.test
+```
+
+```text
+AllowUsers opsadmin student astrona
+allowusers opsadmin
+allowusers student
+allowusers astrona
+```
+
+The first `sshd -T` prints no `allowusers` line: for every account except `backup`, no allow list exists. Only the connections of `backup` get the list. An `AllowUsers` line in the wrong place therefore limits one account and leaves the rest open. Put global settings above the first `Match` line, or in a drop-in file: the `Include` line sits above the `Match` block, so every line in a drop-in file is global.
+
+## Set the allow list in a drop-in file
+
+The allow list must name every account that needs SSH access. On this VM, administrators use `opsadmin`, and the platform logs in as `student` and `astrona`. A list without those two would block the platform and your own next login. `AllowUsers` lines add up instead of using the first value, so the name of the drop-in file does not matter for this keyword:
+
+```sh
+echo "AllowUsers opsadmin student astrona" | sudo tee /etc/ssh/sshd_config.d/10-allow-users.conf
+```
+
+```text
+AllowUsers opsadmin student astrona
+```
+
+`tee` writes the line into the file and prints it. With this list, an account such as `olduser` is refused even if it has a public key on the node.
 
 ## Change a live daemon without locking yourself out
 
-Editing the file does not change a running daemon. The administrator must make the daemon read the file again, and a wrong line can cut off every future login. Three habits prevent that, and they apply on a real host where the daemon is installed.
+Editing a file does not change the running daemon, and a wrong line can block every future login. Three habits prevent that. First, check the syntax with `sshd -t`, which reads the files and reports an error without touching the running daemon. Second, reload the daemon with `systemctl reload ssh.service` and do not restart it. The service name is `ssh` on Debian and Ubuntu and `sshd` on Red Hat based systems. A reload keeps the sessions that are already open, so the session you work in survives a bad change. Third, keep that session open and test a new login before you close it:
 
-First, check the syntax with `sshd -t`, which reads the files and reports an error without touching the running daemon. Second, reload the daemon with `systemctl reload ssh` (the service name is `ssh` on Debian and Ubuntu and `sshd` on Red Hat based systems) and do not restart it. A reload keeps the sessions that are already open, so the session you work in survives a bad change. Third, keep that session open and test a new login from a second terminal. Close the first session only after the second one works.
+```sh
+sudo sshd -t
+sudo systemctl reload ssh.service
+sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|allowusers) '
+```
 
-The playground node has no running SSH daemon, so these steps need no command here. The file you changed is what the check in the lab reads.
+```text
+permitrootlogin no
+passwordauthentication no
+allowusers opsadmin
+allowusers student
+allowusers astrona
+```
+
+`sshd -t` and the reload print nothing. `sshd -T` prints one `allowusers` line for each account. Now test the running daemon with two accounts: `student`, which is on the list, and `olduser`, which is not. The test login tries no method, as in a check of the offered methods. The journal of the `ssh` service, read with `journalctl`, shows why the daemon refused a login:
+
+```sh
+ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null student@127.0.0.1 true
+ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null olduser@127.0.0.1 true
+sudo journalctl --unit=ssh.service --since=-1min --no-pager --grep=AllowUsers
+```
+
+```text
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+student@127.0.0.1: Permission denied (publickey).
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+olduser@127.0.0.1: Permission denied (publickey).
+Nov 18 09:09:09 astro-ats-033-playground-010-02 sshd[2961]: User olduser from 127.0.0.1 not allowed because not listed in AllowUsers
+```
+
+The client sees the same answer for both accounts, because the daemon does not tell a client why it refuses a login. The journal shows the real reason: `olduser` is not listed in `AllowUsers`. No line appears for `student`, so the list let that account through to the key check.
 
 You now know how to state who may log in and how to change the daemon safely. Accounts that are not on the list still exist, with login shells and passwords, and they can matter for other login paths, such as a local console or `su`. Those paths need their own changes.
 
@@ -69,5 +141,5 @@ You now know how to state who may log in and how to change the daemon safely. Ac
 > [!WARNING]
 > - **Appending after a `Match` block.** The new line belongs to that block. Put global settings above the first `Match` line.
 > - **Restarting instead of reloading.** A restart stops the daemon and starts it again, and a wrong file can keep it from starting. Check with `sshd -t`, reload, and test from a second session.
-> - **Allowing no one.** An `AllowUsers` list with a typo in the only account name refuses every login. Test before you close the first session.
+> - **Allowing too few.** An `AllowUsers` list without the platform accounts, or with a typo in the only account name, refuses new logins. Test before you close the first session.
 > - **Believing `AllowUsers` removes accounts.** It limits SSH logins only. The account, its password and its shell still exist.

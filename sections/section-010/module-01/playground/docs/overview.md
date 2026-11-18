@@ -5,81 +5,90 @@ exam_objectives:
 ---
 # Guided Practice: Disable An Unneeded Node Service
 
-Use a host shell with the private kubeconfig for this module playground. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+This playground is one Ubuntu 24.04 virtual machine (VM). kubeadm installed Kubernetes v1.35.10 on it as a single node, so the same machine runs the control plane, the kubelet and the workloads. The node runs a service named `training-extra.service` that has no purpose in the cluster. In this practice you find it, turn it off in a way that survives a reboot, and prove that the node still works.
+
+Open a shell on the VM and confirm that `kubectl` points at this playground:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-010-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-010-01" || exit 1
-node_name="astro-ats-033-playground-010-01-control-plane"
-worker_name="astro-ats-033-playground-010-01-worker"
+astrona ssh astro-ats-033-playground-010-01
+kubectl config current-context
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+```text
+kubernetes-admin@astro-ats-033-playground-010-01
+```
 
-## Inspect And Explain
+You are logged in as the `student` user. This user has a kubeconfig file, which tells `kubectl` which cluster to use and which credentials to send. Commands that change the node start with `sudo`, which runs one command as root. They change only this VM, not your own computer.
 
-The isolated environment has two healthy probe replicas, an internal Service and two client Pods. The required result has not been configured.
+## Find the service
 
-Inspect the current objects before changing them:
+systemd is the first process of the node, and it starts and supervises every service. `systemctl` asks systemd about its units. Read the unit file of the service and check what depends on it:
 
 ```sh
-kubectl -n starfleet get pods -o wide
-kubectl get nodes -o wide
+systemctl cat training-extra.service
+systemctl list-dependencies --reverse training-extra.service --no-pager
 ```
 
-Disable and stop only training-extra.service on this private control-plane container. Record host-review with service training-extra.service and result disabled. The extra service must be inactive and disabled, while kubelet and containerd remain active and API readiness succeeds. This is a scoped host-service exercise, not a full host hardening assessment.
+```text
+# /etc/systemd/system/training-extra.service
+[Unit]
+Description=Disposable training service
 
-Save this as `configmap-host-review.yaml`:
+[Service]
+ExecStart=/bin/sleep 3600
 
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: host-review
-  namespace: starfleet
-data:
-  service: training-extra.service
-  result: disabled
+[Install]
+WantedBy=multi-user.target
+training-extra.service
+● └─multi-user.target
+●   └─graphical.target
 ```
 
-Save this as `disable-service.py`:
+The service runs `/bin/sleep 3600`, and only the boot target `multi-user.target` wants it. No other service needs it, so it can go.
 
-```python
-import json,subprocess,tempfile
-from pathlib import Path
-CONTEXT="kind-astro-ats-033-playground-010-01"
-NODE="astro-ats-033-playground-010-01-control-plane"
-def run(*args):
-    result=subprocess.run(args,check=True,text=True,capture_output=True,timeout=30)
-    return result.stdout.strip()
-assert run('kubectl','config','current-context')==CONTEXT, 'Select the private environment'
-assert run('podman','inspect',NODE,'--format','{{index .Config.Labels "io.x-k8s.kind.cluster"}}')=='astro-ats-033-playground-010-01', 'Refusing an unrelated node container'
-def node(*args):return run('podman','exec',NODE,*args)
+## Disable and stop it
 
-node('systemctl','disable','--now','training-extra.service')
-```
-
-Apply the scoped correction:
+A service has two separate states: active (running now) and enabled (started at boot). `systemctl stop` changes only the first. `systemctl disable --now` removes the boot link and stops the process in one command:
 
 ```sh
-python3 disable-service.py
-kubectl apply -f configmap-host-review.yaml
+sudo systemctl disable --now training-extra.service
+systemctl is-active training-extra.service
+systemctl is-enabled training-extra.service
 ```
 
-## Verify The Result
+```text
+Removed "/etc/systemd/system/multi-user.target.wants/training-extra.service".
+inactive
+disabled
+```
 
-Observe the actual result. A denied request returns a nonzero status when the denial works, so run it separately from a shell sequence that stops on error. Status convergence and a successful request establish different parts of the result.
+The first line shows the boot link that systemd removed. `is-active` exits with a non-zero status when the answer is `inactive`, which is normal for this command.
+
+## Verify the node
+
+A change to a node service must not affect the kubelet or the container runtime. Check both, and ask the API server whether it is ready:
 
 ```sh
-kubectl get --raw=/readyz
+systemctl is-active kubelet.service containerd.service
+kubectl get --raw=/readyz; echo
+kubectl get nodes
 ```
 
-Remove a seeded extra service from active and enabled node services while preserving Kubernetes. The commands above deliberately target one environment. Keep its remaining components available so an unrelated failure cannot stand in for the required denial or correction. No example command output is presented as evidence of a completed run. A matching field alone does not establish that a process used it or that a controller reconciled it.
+```text
+active
+active
+ok
+NAME                              STATUS   ROLES           AGE   VERSION
+astro-ats-033-playground-010-01   Ready    control-plane   52s   v1.35.10
+```
 
+Both services are active, the API server answers `ok`, and the node is `Ready`. The value in the `AGE` column depends on when you run the command.
 
 ## Common pitfalls
 
 > [!WARNING]
-> Confirm the private context and exact node names before a change. Check the stated scope and live result. Do not change unrelated components to hide the original fault.
+> - **Stopping without disabling.** `systemctl stop` leaves the service enabled, so it runs again after the next reboot.
+> - **Checking only the changed service.** Also check `kubelet`, `containerd` and `/readyz`, because a change that looks local can affect the node.
+> - **Deleting a unit file that a package owns.** The next package update puts it back. Use `systemctl mask` for a packaged unit.
