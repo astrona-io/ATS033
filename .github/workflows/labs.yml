@@ -41,8 +41,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ASTRONA_VERSION: "0.5.16"
-  ASTRONA_SHA256: "0a6ff33057f57386101dc1784296eeac3d31b8662b931b885ced528d4d61bec2"
+  # 0.5.17 is the first version that picks the runner's arch out of a
+  # multi-arch qemu image index (ubuntu-qcow2-image:24.04-cks).
+  ASTRONA_VERSION: "0.5.17"
+  ASTRONA_SHA256: "3236d1d917eac9d096cd1cee1edfab41a4d2897fce96858fb9a09a22b9792600"
+  ORAS_VERSION: "1.4.0"
+  ORAS_SHA256: "d8e1dce2fd8ce996f1d901845b688eb0cf505a6082897606f053825bb47935d1"
   KIND_VERSION: "0.33.0"
   ASTRONA_NO_UPDATE_CHECK: "1"
   ASTRONA_CONTAINER_ENGINE: docker
@@ -150,6 +154,15 @@ jobs:
           test -r /dev/kvm && test -w /dev/kvm
           # QEMU user-mode networking originates traffic from the runner.
           sudo iptables -I OUTPUT -d 169.254.169.254 -j REJECT
+
+      # astrona pulls an "oci" qemu image (ghcr.io/...) with the oras CLI.
+      - name: Install oras
+        if: matrix.env.runtime == 'qemu'
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/oras.tar.gz" "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_amd64.tar.gz"
+          echo "${ORAS_SHA256}  $RUNNER_TEMP/oras.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/oras.tar.gz" -C "$HOME/bin" oras
+          oras version
 
       - name: Check the runner
         run: |

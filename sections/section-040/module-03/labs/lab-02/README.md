@@ -17,4 +17,4 @@ Outcomes (1 point each):
 - `console-tmp-write-works`: `/proc/1/attr/current` in `console` shows a profile in enforce mode other than `k8s-deny-tmp-write`, and `touch /tmp/console-check` works.
 - `logger-tmp-write-denied`: `/proc/1/attr/current` in `logger` reads `k8s-deny-tmp-write (enforce)`, and `touch /tmp/logger-check` fails with `Permission denied`.
 
-Runtime status: passed on 2026-11-18 on Apple silicon (QEMU with HVF, image `24.04-cks-20261118`). `astrona test` printed `PROCTOR: PASS` with 2 of 2 outcomes; verify-start rejected the unfinished lab; the run took about 106 seconds (bootstrap 57 seconds, reference-result 33 seconds). The containerd default profile is `cri-containerd.apparmor.d (enforce)`, captured live.
+Runtime status: passed on 2026-11-18 on Apple silicon (QEMU with HVF, image `24.04-cks` build 20261118). `astrona test` printed `PROCTOR: PASS` with 2 of 2 outcomes; verify-start rejected the unfinished lab; the run took about 106 seconds (bootstrap 57 seconds, reference-result 33 seconds). The containerd default profile is `cri-containerd.apparmor.d (enforce)`, captured live.

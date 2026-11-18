@@ -18,4 +18,4 @@ Outcomes (1 point each):
 - `scout-confined`: `/proc/1/attr/current` in `scout` reads `k8s-deny-tmp-write (enforce)`.
 - `scout-tmp-write-denied`: `touch /tmp/scout-check` in `scout` fails with `Permission denied`.
 
-Runtime status: passed on 2026-11-18 on Apple silicon (QEMU with HVF, image `24.04-cks-20261118`). `astrona test` printed `PROCTOR: PASS` with 3 of 3 outcomes; verify-start rejected the unfinished lab; the run took about 64 seconds (bootstrap 46 seconds).
+Runtime status: passed on 2026-11-18 on Apple silicon (QEMU with HVF, image `24.04-cks` build 20261118). `astrona test` printed `PROCTOR: PASS` with 3 of 3 outcomes; verify-start rejected the unfinished lab; the run took about 64 seconds (bootstrap 46 seconds).

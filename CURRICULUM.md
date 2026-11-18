@@ -22,7 +22,7 @@ AUTHORING.yaml records measurable goals and adaptation sources. Every objective 
 
 ## Hands-On Coverage
 
-This course has 12 ungraded module playgrounds and 36 graded labs. Each lab is registered right after the reading it practises. 20 labs and 7 playgrounds run on a kind cluster. 16 labs and 5 playgrounds that work on node files, services, packages, sshd, ufw, static Pods, the kubelet, etcd or AppArmor run in a one-node kubeadm virtual machine (QEMU) built from the pinned `ubuntu-qcow2-image:24.04-cks-20261118` image. 36 labs passed `astrona validate` and `astrona test` on their live runtime.
+This course has 12 ungraded module playgrounds and 36 graded labs. Each lab is registered right after the reading it practises. 20 labs and 7 playgrounds run on a kind cluster. 16 labs and 5 playgrounds that work on node files, services, packages, sshd, ufw, static Pods, the kubelet, etcd or AppArmor run in a one-node kubeadm virtual machine (QEMU) built from the multi-arch `ubuntu-qcow2-image:24.04-cks` image (astrona picks the image for the CPU architecture of the computer and checks it against a pinned checksum). 36 labs passed `astrona validate` and `astrona test` on their live runtime.
 
 | Module | Labs in teaching order |
 | --- | --- |
