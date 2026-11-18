@@ -4,14 +4,13 @@ exam_objectives:
 ---
 # Prerequisites
 
-Use `astrona`, `kubectl`, Podman and a shell. Node commands run inside the node container of this lab, not on your own machine.
+Use `astrona` and a shell. The lab runs in a virtual machine (VM), and the VM is the only node of a one-node Kubernetes cluster. You work inside that VM, not on your own machine.
 
-A kubeconfig is the file that tells `kubectl`, the Kubernetes command-line tool, which cluster to use and which credentials to send. Select the private kubeconfig of this lab:
+Open a shell on the VM and confirm the cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-020-01-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-01-02" || exit 1
-node_name="astro-ats-033-lab-020-01-02-control-plane"
+astrona ssh astro-ats-033-lab-020-01-02
+kubectl config current-context
 ```
 
-Keep this connection selected. Run node commands with `podman exec "$node_name" ...` and on no other container.
+The second command prints `kubernetes-admin@astro-ats-033-lab-020-01-02`. You are logged in as the `student` user, which has a kubeconfig file (the file that tells `kubectl` which cluster to use and which credentials to send). Node files belong to `root`, so run the commands that change them with `sudo`.

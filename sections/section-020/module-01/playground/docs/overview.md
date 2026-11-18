@@ -5,33 +5,72 @@ exam_objectives:
 ---
 # Guided Practice: Grant One Host Identity Scoped Read Access
 
-Use a host shell with the private kubeconfig for this module playground. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+This playground is a virtual machine (VM) that runs a one-node Kubernetes cluster built with kubeadm, so the VM is the node. The task is to give the account `training-reader` read access to one report file, without making the file public and without giving the account root. Open a shell on the VM and confirm the cluster:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-020-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-020-01" || exit 1
-node_name="astro-ats-033-playground-020-01-control-plane"
-worker_name="astro-ats-033-playground-020-01-worker"
+astrona ssh astro-ats-033-playground-020-01
+kubectl config current-context
+kubectl get nodes
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+```text
+kubernetes-admin@astro-ats-033-playground-020-01
+NAME                              STATUS   ROLES           AGE   VERSION
+astro-ats-033-playground-020-01   Ready    control-plane   58s   v1.35.10
+```
 
-## Inspect And Explain
+You are logged in as `student`. This user may run any command as `root` through `sudo`, and its kubeconfig file (the file that tells `kubectl` which cluster to use and which credentials to send) gives administrator access to the cluster. The changes stay inside this VM.
 
-The isolated environment has two healthy probe replicas, an internal Service and two client Pods. The required result has not been configured.
+## Inspect the start state
 
-Inspect the current objects before changing them:
+The setup created the account, the group `training-readers` and two files in `/var/lib/training-identity`. Look at the account and at the owner, group and mode of each file:
 
 ```sh
-kubectl -n starfleet get pods -o wide
-kubectl get nodes -o wide
+id training-reader
+sudo ls -l /var/lib/training-identity
 ```
 
-Add training-reader to training-readers so it can read public-report. Keep private-report root-only and both files owned by root. Record identity-review with identity training-reader and result scoped-read. The account must remain a non-root UID, must not join the root group and must be denied reading private-report.
+```text
+uid=1003(training-reader) gid=1004(training-reader) groups=1004(training-reader)
+total 8
+-rw------- 1 root root             26 Nov 18 09:02 private-report
+-rw-r----- 1 root training-readers 18 Nov 18 09:02 public-report
+```
 
-Save this as `configmap-identity-review.yaml`:
+`public-report` gives read access to the group `training-readers` (mode `-rw-r-----`). `private-report` gives access to `root` only. The account is not in the group yet, so the kernel applies the "other" bits, which are empty. Test it as the account with `runuser`, which starts a process as another user:
+
+```sh
+sudo runuser -u training-reader -- cat /var/lib/training-identity/public-report
+```
+
+```text
+cat: /var/lib/training-identity/public-report: Permission denied
+```
+
+## Grant the access and test it
+
+Add the account to the group. `--append` keeps the groups the account already has; without it, `usermod --groups` replaces the whole list. Then test both files as the account:
+
+```sh
+sudo usermod --append --groups training-readers training-reader
+sudo runuser -u training-reader -- cat /var/lib/training-identity/public-report
+sudo runuser -u training-reader -- cat /var/lib/training-identity/private-report
+id training-reader
+```
+
+```text
+disposable-report
+cat: /var/lib/training-identity/private-report: Permission denied
+uid=1003(training-reader) gid=1004(training-reader) groups=1004(training-reader),1003(training-readers)
+```
+
+The account reads `public-report` and is still denied `private-report`. Its UID (user ID) is not 0, and its groups do not include `root`. The file owners and modes did not change.
+
+## Record the review in the cluster
+
+Record the result as a ConfigMap, a Kubernetes object that stores key-value data. Save this as `configmap-identity-review.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -44,43 +83,31 @@ data:
   result: scoped-read
 ```
 
-Save this as `grant-read.py`:
-
-```python
-import json,subprocess,tempfile
-from pathlib import Path
-CONTEXT="kind-astro-ats-033-playground-020-01"
-NODE="astro-ats-033-playground-020-01-control-plane"
-def run(*args):
-    result=subprocess.run(args,check=True,text=True,capture_output=True,timeout=30)
-    return result.stdout.strip()
-assert run('kubectl','config','current-context')==CONTEXT, 'Select the private environment'
-assert run('podman','inspect',NODE,'--format','{{index .Config.Labels "io.x-k8s.kind.cluster"}}')=='astro-ats-033-playground-020-01', 'Refusing an unrelated node container'
-def node(*args):return run('podman','exec',NODE,*args)
-
-node('usermod','--append','--groups','training-readers','training-reader')
-```
-
-Apply the scoped correction:
+Apply it:
 
 ```sh
-python3 grant-read.py
 kubectl apply -f configmap-identity-review.yaml
 ```
 
-## Verify The Result
-
-Observe the actual result. A denied request returns a nonzero status when the denial works, so run it separately from a shell sequence that stops on error. Status convergence and a successful request establish different parts of the result.
-
-```sh
-kubectl -n starfleet get configmaps
-kubectl -n starfleet get deployment probe -o yaml
+```text
+configmap/identity-review created
 ```
 
-Grant a dedicated host identity access to one report without granting root access. The commands above deliberately target one environment. Keep its remaining components available so an unrelated failure cannot stand in for the required denial or correction. No example command output is presented as evidence of a completed run. A matching field alone does not establish that a process used it or that a controller reconciled it.
+Then check the result:
 
+```sh
+kubectl -n starfleet get configmap identity-review -o jsonpath='{.data}'
+```
+
+```text
+{"identity":"training-reader","result":"scoped-read"}
+```
+
+The account now has exactly one extra permission, and the cluster holds a record of the review. When you are done, leave the VM with `exit` and remove the playground with `astrona destroy ats-033-playground-020-01`.
 
 ## Common pitfalls
 
 > [!WARNING]
-> Confirm the private context and exact node names before a change. Check the stated scope and live result. Do not change unrelated components to hide the original fault.
+> - **Testing as `root` or `student`.** `root` reads every file, so a test with `sudo cat` proves nothing. Test with `sudo runuser -u training-reader --`.
+> - **Forgetting `--append`.** `usermod --groups` without it removes every other supplementary group.
+> - **Opening the file to everyone.** `chmod o+r` lets every account read the report. Use the group.

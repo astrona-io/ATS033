@@ -42,3 +42,16 @@ if wants('departed-expired'):
     assert result.returncode != 0, 'su to departed-user must be refused'
 if wants('departed-nologin'):
     assert departed[6] in NOLOGIN_SHELLS, 'Give departed-user a nologin shell'
+if wants('sshd-hardened'):
+    # sshd -T prints the settings sshd reads from its files now, after every
+    # Include and drop-in. The first value sshd reads for a setting wins.
+    assert on_node('sshd', '-t', success=False).returncode == 0, 'The sshd configuration must stay valid (sshd -t)'
+    settings = dict(line.split(' ', 1) for line in on_node('sshd', '-T').stdout.splitlines() if ' ' in line)
+    assert settings.get('permitrootlogin') == 'no', 'sshd -T must show permitrootlogin no'
+    assert settings.get('passwordauthentication') == 'no', 'sshd -T must show passwordauthentication no'
+    # The running daemon only uses a changed file after a reload. A login
+    # attempt without a key lists the methods the running daemon offers.
+    probe = command(['ssh', '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null',
+                     '-o', 'ConnectTimeout=5', '-o', 'PubkeyAuthentication=no', 'pilot@127.0.0.1', 'true'], success=False)
+    assert 'Permission denied (' in probe.stderr, 'The ssh service must be running and answer on 127.0.0.1'
+    assert 'password' not in probe.stderr.split('Permission denied (', 1)[1], 'The running sshd still offers password logins: reload the ssh service'

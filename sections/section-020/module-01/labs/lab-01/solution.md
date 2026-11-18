@@ -4,38 +4,42 @@ exam_objectives:
 ---
 # Grant Read Access Through A Group Solution
 
-Select the private cluster and define a small helper. The helper `run_on_node` runs one command inside the control-plane node container, so every command below changes only this lab's node.
+Open a shell on the lab VM. The VM is the only node of the cluster, so every command below runs on the node itself and changes only this lab.
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-020-01-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-01-01" || exit 1
-node_name="astro-ats-033-lab-020-01-01-control-plane"
-run_on_node() { podman exec "$node_name" "$@"; }
+astrona ssh astro-ats-033-lab-020-01-01
+kubectl config current-context
 ```
+
+```text
+kubernetes-admin@astro-ats-033-lab-020-01-01
+```
+
+You are logged in as `student`. This user may run any command as `root` through `sudo`, which the steps below need to change files that `root` owns.
 
 ## 1. Inspect the file, the accounts and the group
 
 Start by reading the current state. `ls -l` shows the owner, the group and the permission bits. `id` shows the groups of each account, and `getent group` shows the members of the group.
 
 ```sh
-run_on_node ls -l /srv/flight-logs
-run_on_node id navigator
-run_on_node id cadet
-run_on_node getent group flight-log-readers
+ls -l /srv/flight-logs
+id navigator
+id cadet
+getent group flight-log-readers
 ```
 
 ```text
 total 4
--rw-r--r--. 1 root root 21 Nov 17 21:46 telemetry.log
-uid=1000(navigator) gid=1001(navigator) groups=1001(navigator)
-uid=1001(cadet) gid=1002(cadet) groups=1002(cadet)
-flight-log-readers:x:1000:
+-rw-r--r-- 1 root root 21 Nov 18 08:50 telemetry.log
+uid=1003(navigator) gid=1004(navigator) groups=1004(navigator)
+uid=1004(cadet) gid=1005(cadet) groups=1005(cadet)
+flight-log-readers:x:1003:
 ```
 
-The mode `-rw-r--r--` gives read access to the owner, the group and all other accounts. The group `flight-log-readers` exists but has no members yet. Test the problem as the account, not as `root`, because `root` can read every file. `runuser -u <user> -- <command>` runs one command as that user:
+The mode `-rw-r--r--` gives read access to the owner, the group and all other accounts. The group `flight-log-readers` exists but has no members yet. Test the problem as the account, not as `root`, because `root` can read every file. `runuser -u <user> -- <command>` runs one command as that user. Only `root` may use `runuser`, so it runs under `sudo`:
 
 ```sh
-run_on_node runuser -u cadet -- cat /srv/flight-logs/telemetry.log
+sudo runuser -u cadet -- cat /srv/flight-logs/telemetry.log
 ```
 
 ```text
@@ -49,20 +53,20 @@ The read as `cadet` succeeds, so the file is open to every account on the node.
 `chgrp` sets the group of the file, and `chmod 0640` sets read and write for the owner, read for the group and nothing for other accounts. The owner stays `root`.
 
 ```sh
-run_on_node chgrp flight-log-readers /srv/flight-logs/telemetry.log
-run_on_node chmod 0640 /srv/flight-logs/telemetry.log
-run_on_node ls -l /srv/flight-logs/telemetry.log
+sudo chgrp flight-log-readers /srv/flight-logs/telemetry.log
+sudo chmod 0640 /srv/flight-logs/telemetry.log
+ls -l /srv/flight-logs/telemetry.log
 ```
 
 ```text
--rw-r-----. 1 root flight-log-readers 21 Nov 17 21:46 /srv/flight-logs/telemetry.log
+-rw-r----- 1 root flight-log-readers 21 Nov 18 08:50 /srv/flight-logs/telemetry.log
 ```
 
 Now test both accounts again:
 
 ```sh
-run_on_node runuser -u cadet -- cat /srv/flight-logs/telemetry.log
-run_on_node runuser -u navigator -- cat /srv/flight-logs/telemetry.log
+sudo runuser -u cadet -- cat /srv/flight-logs/telemetry.log
+sudo runuser -u navigator -- cat /srv/flight-logs/telemetry.log
 ```
 
 ```text
@@ -77,14 +81,14 @@ Both reads fail. The kernel checks the "other" bits for both accounts, because n
 `usermod --append --groups` adds one supplementary group and keeps the existing ones. Without `--append`, `usermod --groups` replaces the whole list.
 
 ```sh
-run_on_node usermod --append --groups flight-log-readers navigator
-run_on_node id navigator
-run_on_node getent group flight-log-readers
+sudo usermod --append --groups flight-log-readers navigator
+id navigator
+getent group flight-log-readers
 ```
 
 ```text
-uid=1000(navigator) gid=1001(navigator) groups=1001(navigator),1000(flight-log-readers)
-flight-log-readers:x:1000:navigator
+uid=1003(navigator) gid=1004(navigator) groups=1004(navigator),1003(flight-log-readers)
+flight-log-readers:x:1003:navigator
 ```
 
 The account now lists `flight-log-readers`, and the group lists `navigator` as a member.
@@ -94,8 +98,8 @@ The account now lists `flight-log-readers`, and the group lists `navigator` as a
 `runuser` starts a new process, and a new process reads the current group list. Read the file as both accounts:
 
 ```sh
-run_on_node runuser -u navigator -- cat /srv/flight-logs/telemetry.log
-run_on_node runuser -u cadet -- cat /srv/flight-logs/telemetry.log
+sudo runuser -u navigator -- cat /srv/flight-logs/telemetry.log
+sudo runuser -u cadet -- cat /srv/flight-logs/telemetry.log
 ```
 
 ```text
@@ -103,7 +107,7 @@ orbit=stable fuel=82
 cat: /srv/flight-logs/telemetry.log: Permission denied
 ```
 
-`navigator` reads the log through the group bits, and `cadet` is still denied. Submit with `astrona submit`. When you are done, remove the lab with `astrona destroy ats-033-lab-020-01-01`.
+`navigator` reads the log through the group bits, and `cadet` is still denied. Submit with `astrona submit`. When you are done, leave the VM with `exit` and remove the lab with `astrona destroy ats-033-lab-020-01-01`.
 
 ## Common pitfalls
 

@@ -1,5 +1,6 @@
 ROSTER = '/srv/flight-ops/roster'
 ROSTER_CONTENT = 'shift=night lead=crew-member'
+KEY = '/var/lib/astrona-lab-033-020-01-03/leaver_ed25519'
 CREW_RULE = 'crew-member ALL=(root) NOPASSWD: /usr/bin/journalctl --unit kubelet'
 
 
@@ -41,8 +42,9 @@ if wants('sudo-rule-removed'):
     assert result.returncode == 1 and not result.stdout.strip(), 'Remove every sudoers rule for leaver'
     result = on_node('grep', '-sw', 'leaver', '/etc/sudoers', success=False)
     assert not result.stdout.strip(), 'Remove every sudoers rule for leaver'
-    if on_node('sh', '-c', 'command -v visudo', success=False).returncode == 0:
-        assert on_node('visudo', '-c', success=False).returncode == 0, 'The sudoers files must pass visudo -c'
+    assert on_node('visudo', '-c', success=False).returncode == 0, 'The sudoers files must pass visudo -c'
+    # sudo itself answers which rules apply to the account.
+    assert 'is not allowed to run sudo' in on_node('sudo', '-l', '-U', 'leaver').stdout, 'sudo -l -U leaver must say that leaver may not run sudo'
 if wants('cluster-access-revoked'):
     bindings = json.loads(kubectl('get', 'rolebindings', '-A', '-o', 'json'))['items']
     bindings += json.loads(kubectl('get', 'clusterrolebindings', '-o', 'json'))['items']
@@ -52,3 +54,9 @@ if wants('cluster-access-revoked'):
     assert can_i('list', 'nodes', '--as=leaver') == 'no', 'leaver must not list nodes'
 if wants('account-locked'):
     assert on_node('passwd', '-S', 'leaver').stdout.split()[1] == 'L', 'Lock the password of leaver (passwd -S must show L)'
+    # A locked password does not stop a key login (sshd uses PAM), so log in
+    # with the private key of leaver: the running sshd must refuse it.
+    result = on_node('ssh', '-i', KEY, '-o', 'BatchMode=yes', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=no',
+                     '-o', 'UserKnownHostsFile=/dev/null', '-o', 'LogLevel=ERROR', '-o', 'ConnectTimeout=5',
+                     'leaver@127.0.0.1', 'true', success=False)
+    assert result.returncode == 255 and 'Permission denied' in result.stderr, 'An SSH key login as leaver must be refused'

@@ -4,6 +4,6 @@ exam_objectives:
 ---
 # Starting Environment
 
-The cluster has one control-plane node and no application workloads. The node holds the file `/srv/flight-logs/telemetry.log`, owned by `root:root` with mode `644`, so every account on the node can read it.
+The cluster runs in one virtual machine, and that machine is its only node. It has no application workloads. The node holds the file `/srv/flight-logs/telemetry.log`, owned by `root:root` with mode `644`, so every account on the node can read it.
 
 The node also has two normal accounts, `navigator` and `cadet`, and an empty group `flight-log-readers`. The task is to give read access to `navigator` only, through that group.

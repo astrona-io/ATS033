@@ -179,21 +179,21 @@ sections:
       objective: Give one host account read access to a file through a group, without
         making the file world-readable or granting root access.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-02
       path: sections/section-020/module-01/labs/lab-02
       after_reading: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
       objective: Lock, expire and remove the login shell of a host account without
-        deleting it.
+        deleting it, and turn off root and password logins in sshd.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-03
       path: sections/section-020/module-01/labs/lab-03
       after_reading: sections/section-020/module-01/course-04-revocation-and-audit.md
-      objective: Remove one person's group membership, sudoers rule and RBAC binding,
-        and lock the host account.
+      objective: Remove one person's group membership, sudoers rule, RBAC bindings
+        and SSH key, and lock the host account.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     practice_readings: []
   - id: module-02
     title: Least-Privilege RBAC Roles And Bindings

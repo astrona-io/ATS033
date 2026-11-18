@@ -4,34 +4,56 @@ exam_objectives:
 ---
 # Revoke A Leaver's Access Everywhere Solution
 
-Select the private cluster and define a small helper. The helper `run_on_node` runs one command inside the control-plane node container, so every node command below changes only this lab's node.
+Open a shell on the lab VM. The VM is the only node of the cluster, so every command below runs on the node itself and changes only this lab.
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-020-01-03)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-01-03" || exit 1
-node_name="astro-ats-033-lab-020-01-03-control-plane"
-run_on_node() { podman exec "$node_name" "$@"; }
-```
-
-## 1. Find every place that grants access
-
-A person can keep access through several separate systems. The Linux kernel checks group membership for files, sudo reads its rules from `/etc/sudoers` and `/etc/sudoers.d`, and the Kubernetes API server checks RBAC (role-based access control) bindings. Check each one.
-
-```sh
-run_on_node id leaver
-run_on_node getent group flight-ops
-run_on_node runuser -u leaver -- cat /srv/flight-ops/roster
-run_on_node grep -rw leaver /etc/sudoers.d
+astrona ssh astro-ats-033-lab-020-01-03
+kubectl config current-context
 ```
 
 ```text
-uid=1004(leaver) gid=1006(leaver) groups=1006(leaver),1005(flight-ops)
-flight-ops:x:1005:leaver,crew-member
-shift=night lead=crew-member
-/etc/sudoers.d/leaver:leaver ALL=(root) NOPASSWD: /usr/bin/systemctl restart kubelet.service
+kubernetes-admin@astro-ats-033-lab-020-01-03
 ```
 
-`leaver` is in `flight-ops`, reads the roster and has a sudo rule in its own file. This node image has no `sudo` program, but the rule file is still the configuration that sudo would use. Next, list the RBAC bindings. The `-o wide` output adds the USERS column. The output below is shortened to the lines for this lab's users:
+You are logged in as `student`. This user may run any command as `root` through `sudo`, and its kubeconfig file gives `kubectl` administrator access to the cluster.
+
+## 1. Find every place that grants access
+
+A person can keep access through several separate systems. The Linux kernel checks group membership for files. sudo reads its rules from `/etc/sudoers` and `/etc/sudoers.d`. The SSH daemon (sshd) accepts any key listed in `~/.ssh/authorized_keys`. The Kubernetes API server checks RBAC (role-based access control) bindings. Check each one, starting with the group and the sudo rules:
+
+```sh
+id leaver
+getent group flight-ops
+sudo runuser -u leaver -- cat /srv/flight-ops/roster
+sudo grep -rw leaver /etc/sudoers.d
+sudo -l -U leaver
+```
+
+```text
+uid=1003(leaver) gid=1004(leaver) groups=1004(leaver),1003(flight-ops)
+flight-ops:x:1003:leaver,crew-member
+shift=night lead=crew-member
+/etc/sudoers.d/leaver:leaver ALL=(root) NOPASSWD: /usr/bin/systemctl restart kubelet.service
+Matching Defaults entries for leaver on astro-ats-033-lab-020-01-03:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User leaver may run the following commands on astro-ats-033-lab-020-01-03:
+    (root) NOPASSWD: /usr/bin/systemctl restart kubelet.service
+```
+
+`leaver` is in `flight-ops` and reads the roster. `grep` finds the rule file, and `sudo -l -U leaver` shows what sudo itself would allow: a restart of the kubelet as `root`, without a password. Next, look for an SSH key. The private key of `leaver` is kept in `/var/lib/astrona-lab-033-020-01-03/leaver_ed25519` so that you can test a real key login:
+
+```sh
+sudo cat /home/leaver/.ssh/authorized_keys
+sudo ssh -i /var/lib/astrona-lab-033-020-01-03/leaver_ed25519 -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR leaver@127.0.0.1 id -un
+```
+
+```text
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPFerC+ppuvfmRAuvHoovRB6irs7Bz2qLb+xNRFlFoo8 leaver@laptop
+leaver
+```
+
+The key login works and runs `id -un` as `leaver`. Your key is different, because setup creates a new one for each lab. Last, list the RBAC bindings. The `-o wide` output adds the USERS column. kubeadm creates many system bindings, so the output below is shortened: it keeps the first five columns and only the lines for this lab's users.
 
 ```sh
 kubectl get rolebindings -A -o wide
@@ -39,11 +61,11 @@ kubectl get clusterrolebindings -o wide
 ```
 
 ```text
-NAMESPACE                 NAME                 ROLE                  AGE    USERS
-starfleet-033-020-01-03   crew-member-view     ClusterRole/view      67s    crew-member
-starfleet-033-020-01-03   leaver-edit          ClusterRole/edit      67s    leaver
-NAME                 ROLE                                    AGE    USERS
-leaver-node-reader   ClusterRole/node-reader-033-020-01-03   67s    leaver
+NAMESPACE                 NAME                 ROLE                AGE   USERS
+starfleet-033-020-01-03   crew-member-view     ClusterRole/view    10s   crew-member
+starfleet-033-020-01-03   leaver-edit          ClusterRole/edit    10s   leaver
+NAME                 ROLE                                    AGE   USERS
+leaver-node-reader   ClusterRole/node-reader-033-020-01-03   10s   leaver
 ```
 
 `leaver` has the RoleBinding `leaver-edit` in one namespace and the ClusterRoleBinding `leaver-node-reader` for the whole cluster. `kubectl auth can-i --as` asks the API server what that user may do:
@@ -65,15 +87,15 @@ yes
 `gpasswd --delete` removes one member from one group and leaves the other groups alone.
 
 ```sh
-run_on_node gpasswd --delete leaver flight-ops
-run_on_node id leaver
-run_on_node runuser -u leaver -- cat /srv/flight-ops/roster
-run_on_node runuser -u crew-member -- cat /srv/flight-ops/roster
+sudo gpasswd --delete leaver flight-ops
+id leaver
+sudo runuser -u leaver -- cat /srv/flight-ops/roster
+sudo runuser -u crew-member -- cat /srv/flight-ops/roster
 ```
 
 ```text
 Removing user leaver from group flight-ops
-uid=1004(leaver) gid=1006(leaver) groups=1006(leaver)
+uid=1003(leaver) gid=1004(leaver) groups=1004(leaver)
 cat: /srv/flight-ops/roster: Permission denied
 shift=night lead=crew-member
 ```
@@ -82,20 +104,29 @@ shift=night lead=crew-member
 
 ## 3. Remove the sudo rule
 
-The rule for `leaver` is the only line in `/etc/sudoers.d/leaver`, so delete the file. If a rule shared a file with other rules, you would delete only that line and check the file with `visudo -c`.
+The rule for `leaver` is the only line in `/etc/sudoers.d/leaver`, so delete the file. If a rule shared a file with other rules, you would edit that file with `visudo -f` and delete only that line. Then check every sudoers file with `visudo -c`, and ask sudo again:
 
 ```sh
-run_on_node rm /etc/sudoers.d/leaver
-run_on_node ls -l /etc/sudoers.d
-run_on_node grep -rw leaver /etc/sudoers.d
+sudo rm /etc/sudoers.d/leaver
+sudo visudo -c
+sudo -l -U leaver
+sudo -l -U crew-member
 ```
 
 ```text
-total 4
--r--r-----. 1 root root 68 Nov 17 21:46 crew-member
+/etc/sudoers: parsed OK
+/etc/sudoers.d/90-cloud-init-users: parsed OK
+/etc/sudoers.d/README: parsed OK
+/etc/sudoers.d/crew-member: parsed OK
+User leaver is not allowed to run sudo on astro-ats-033-lab-020-01-03.
+Matching Defaults entries for crew-member on astro-ats-033-lab-020-01-03:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User crew-member may run the following commands on astro-ats-033-lab-020-01-03:
+    (root) NOPASSWD: /usr/bin/journalctl --unit kubelet
 ```
 
-The last `grep` prints nothing and exits with code 1, so no rule names `leaver`. The rule for `crew-member` stays.
+Every file parses, `leaver` may run nothing with sudo, and the rule for `crew-member` stays.
 
 ## 4. Delete the RBAC bindings
 
@@ -131,23 +162,39 @@ yes
 
 `leaver` has no access left, and `crew-member` still lists Pods through `crew-member-view`. The ClusterRole `node-reader-033-020-01-03` stays, because a ClusterRole grants nothing without a binding.
 
-## 5. Lock the password
+## 5. Lock the password and remove the SSH key
+
+`usermod --lock` puts a `!` in front of the password hash, so no password can match it. Lock the password, then test the key login again:
 
 ```sh
-run_on_node usermod --lock leaver
-run_on_node passwd -S leaver
+sudo usermod --lock leaver
+sudo passwd -S leaver
+sudo ssh -i /var/lib/astrona-lab-033-020-01-03/leaver_ed25519 -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR leaver@127.0.0.1 id -un
 ```
 
 ```text
-leaver L 2026-11-17 0 99999 7 -1
+leaver L 2026-11-18 0 99999 7 -1
+leaver
 ```
 
-The status `L` shows a locked password. Submit with `astrona submit`. When you are done, remove the lab with `astrona destroy ats-033-lab-020-01-03`.
+The status is `L`, but the key login still works. sshd checks the key itself and does not use the password, so a lock does not stop it. Remove the key file and test again:
+
+```sh
+sudo rm /home/leaver/.ssh/authorized_keys
+sudo ssh -i /var/lib/astrona-lab-033-020-01-03/leaver_ed25519 -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR leaver@127.0.0.1 id -un
+```
+
+```text
+leaver@127.0.0.1: Permission denied (publickey).
+```
+
+sshd now refuses the key. Submit with `astrona submit`. When you are done, leave the VM with `exit` and remove the lab with `astrona destroy ats-033-lab-020-01-03`.
 
 ## Common pitfalls
 
 > [!WARNING]
 > - **Fixing one system only.** Locking the Linux account does not touch Kubernetes RBAC, and deleting a binding does not touch the node. Check each system.
+> - **Trusting the lock for SSH.** A locked password does not stop a key login. Remove the key from `authorized_keys` too, or expire the account.
 > - **Missing the ClusterRoleBinding.** `kubectl get rolebindings -A` does not list ClusterRoleBindings. Run both commands.
-> - **Breaking sudoers.** A syntax error in any file under `/etc/sudoers.d` can stop sudo for everyone. Delete whole files when you can, and run `visudo -c` when the node has it.
+> - **Breaking sudoers.** A syntax error in any file under `/etc/sudoers.d` can stop sudo for everyone. Delete whole files when you can, edit with `visudo -f`, and run `visudo -c` after every change.
 > - **Removing the wrong member.** `usermod --groups` without `--append` replaces the whole list. `gpasswd --delete` changes one membership only.
