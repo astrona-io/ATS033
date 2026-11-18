@@ -5,6 +5,8 @@ profile k8s-deny-etc-write flags=(attach_disconnected) {
 
   network,
   capability,
+  # Let the container runtime (runc) stop the container.
+  signal (receive) peer=runc,
 
   # Read, map and run every file.
   /** mrix,

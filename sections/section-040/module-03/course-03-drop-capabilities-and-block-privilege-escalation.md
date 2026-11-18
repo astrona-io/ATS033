@@ -41,13 +41,12 @@ The diagram shows the order of hardening: remove `privileged`, shrink the capabi
 
 ## Compare three containers
 
-Select the environment:
+The playground is a virtual machine (VM) with a one-node Kubernetes 1.35 cluster. Open a shell on it from your own machine. You are then the user `student`, and `kubectl` points to the playground cluster:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-playground-040-03)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-040-03" || exit 1
+astrona ssh astro-ats-033-playground-040-03
 ```
 
 Save this as `pods-capability-compare.yaml`. The first pod uses the runtime defaults, the second drops everything and the third drops everything and adds one capability back:
@@ -129,6 +128,21 @@ for pod_name in caps-default caps-none caps-bind; do
 done
 ```
 
+```text
+caps-default
+CapEff:	00000000a80425fb
+CapBnd:	00000000a80425fb
+NoNewPrivs:	0
+caps-none
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+NoNewPrivs:	1
+caps-bind
+CapEff:	0000000000000400
+CapBnd:	0000000000000400
+NoNewPrivs:	1
+```
+
 The pod `caps-default` shows a non-zero set and `NoNewPrivs: 0`, because the runtime default capabilities remain and escalation is allowed. The pod `caps-none` shows `CapBnd` and `CapEff` made of zeros and `NoNewPrivs: 1`. The pod `caps-bind` shows `0000000000000400` in both sets, which is the single bit for `NET_BIND_SERVICE`, and `NoNewPrivs: 1`. Each added capability appears as one more bit, so the masks let you check a manifest against the running process.
 
 Next, see what a dropped capability costs. The command below tries to change the owner of a file. In the pod with no capabilities, the root user no longer holds `CHOWN`, so it is expected to fail. Run it on its own:
@@ -137,7 +151,12 @@ Next, see what a dropped capability costs. The command below tries to change the
 kubectl -n starfleet exec caps-none -- sh -c 'touch /tmp/f && chown 1000 /tmp/f'
 ```
 
-The command fails with `Operation not permitted`. The same command in `caps-default` succeeds, because `CHOWN` is part of the default set. This shows that the user is root in both pods, and the capability set made the difference. Remove the pods:
+```text
+chown: /tmp/f: Operation not permitted
+command terminated with exit code 1
+```
+
+The same command in `caps-default` succeeds, because `CHOWN` is part of the default set. This shows that the user is root in both pods, and the capability set made the difference. Remove the pods:
 
 ```sh
 kubectl -n starfleet delete pod caps-default caps-none caps-bind

@@ -6,19 +6,27 @@ metadata:
     examQuestion: question.md
     caseStudy: docs/case-study.md
     guide: solution.md
+# AppArmor profiles live in the kernel of the node. A kind node uses the
+# kernel of the machine that runs Podman, which often has no AppArmor, so the
+# lab runs a real one-node kubeadm cluster in a VM with AppArmor enabled.
 runtime:
-  type: kind
-  kind:
-    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
-    preloadImages:
-    - docker.io/library/busybox:1.37.0
-    nodes:
-      workers: 1
+  type: qemu
+  qemu:
+  - image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-cks-20261118-{ARCH}
+      checksums:
+        amd64: sha256:dc3348c725b6b36d08888acdcbda44cc34894b76d5b56a594f7ce253b6d2e773
+        arm64: sha256:31798490219e2ee856d7f8c2cb9df83182bbac64c7d8ce7c15e81445527d7898
+    cpus: 2
+    memoryMB: 4096
+    diskSizeGB: 25
+    display: false
 bootstrap:
   init:
-  - name: seed-lab
+  - name: seed-private-environment
     type: file
-    source: bootstrap/setup.sh
+    source: vm/install.sh
 teardown:
   keepCluster: false
 testing:
@@ -26,28 +34,28 @@ testing:
   - name: verify-start
     description: Verify the starting state and reject the unfinished lab
     type: file
-    source: testing/verify-start.sh
+    source: vm/verify-start.sh
   - name: reference-result
     type: file
-    source: solution/apply.sh
+    source: vm/apply-solution.sh
   - name: wait-solved
     description: Wait until the reference solution settles and every outcome passes
     type: file
-    source: testing/wait-solved.sh
+    source: vm/wait-solved.sh
 validation:
   scripts:
-  - name: profile-loaded-on-every-node
-    description: k8s-deny-tmp-write is loaded in enforce mode on the control-plane node and on the worker node
+  - name: profile-loaded-in-enforce-mode
+    description: k8s-deny-tmp-write is loaded in enforce mode in the kernel of the node
     type: file
-    source: validation/validate-profile-loaded-on-every-node.sh
+    source: vm/validate-profile-loaded-in-enforce-mode.sh
     points: 1
   - name: scout-confined
     description: The main process of scout runs under k8s-deny-tmp-write in enforce mode
     type: file
-    source: validation/validate-scout-confined.sh
+    source: vm/validate-scout-confined.sh
     points: 1
   - name: scout-tmp-write-denied
     description: Writing a file under /tmp inside scout fails with Permission denied
     type: file
-    source: validation/validate-scout-tmp-write-denied.sh
+    source: vm/validate-scout-tmp-write-denied.sh
     points: 1

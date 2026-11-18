@@ -9,7 +9,7 @@ Seccomp decides which syscalls a process may call, but it cannot say which file 
 
 ## Profile modes and the tools
 
-A profile runs in one of two modes. In **enforce** mode the kernel blocks the violations and logs them. In **complain** mode the kernel only logs them, which is useful while you write a profile and learn what the program needs. Profiles are text files, normally under `/etc/apparmor.d` on the node, and they must be loaded into the kernel before they apply.
+A profile runs in one of two modes. In **enforce** mode the kernel blocks the violations and logs them. In **complain** mode the kernel allows and logs an access that no rule of the profile covers, which is useful while you write a profile and learn what the program needs. An explicit `deny` rule still blocks in complain mode. Profiles are text files, normally under `/etc/apparmor.d` on the node, and they must be loaded into the kernel before they apply.
 
 - `apparmor_parser -r <file>` loads a profile into the kernel or replaces a profile that is already loaded.
 - `aa-status` lists the loaded profiles, their modes and the processes that run under them.
@@ -36,7 +36,7 @@ securityContext:
     localhostProfile: k8s-deny-write
 ```
 
-The kubelet checks the profile when it admits the pod. If a `Localhost` profile is not loaded on the node, the kubelet does not start the container.
+The kubelet checks that AppArmor is enabled on the node when it admits the pod. If a `Localhost` profile is not loaded on the node, the container runtime (containerd) refuses to create the container, and the pod shows `CreateContainerError`.
 
 ```mermaid
 flowchart TB
@@ -71,7 +71,7 @@ Ask the kernel whether AppArmor is active:
 run_on_node cat /sys/module/apparmor/parameters/enabled
 ```
 
-The answer `Y` means the module is active. If the file does not exist or contains `N`, AppArmor is not available in this playground, and the rest of this part is reading material. That is a normal result on a machine whose kernel uses another security module, and it does not mean that the playground is broken. If AppArmor is active, list the loaded profiles with `aa-status`. The tool may be missing inside the node image, and the output of the next command then tells you so:
+The answer `Y` means the module is active. If the file does not exist or contains `N`, AppArmor is not available in this playground, and the rest of this part is reading material. That is a normal result on a machine whose kernel uses another security module, and it does not mean that the playground is broken. The graded task on the next page runs in a virtual machine whose kernel has AppArmor enabled, so you can practise these steps there. If AppArmor is active, list the loaded profiles with `aa-status`. The tool may be missing inside the node image, and the output of the next command then tells you so:
 
 ```sh
 run_on_node aa-status
@@ -90,12 +90,13 @@ profile k8s-deny-tmp-write flags=(attach_disconnected) {
   file,
   network,
   capability,
+  signal (receive) peer=runc,
 
   deny /tmp/** w,
 }
 ```
 
-The line `deny /tmp/** w,` forbids write access to every path under `/tmp`, and the three lines above it allow all other file, network and capability use. Load it on the node. This works only when the check above printed `Y` and the node image has `apparmor_parser`:
+The line `deny /tmp/** w,` forbids write access to every path under `/tmp`, and the `file`, `network` and `capability` lines allow all other file, network and capability use. The line `signal (receive) peer=runc,` lets the container runtime (`runc`) send the stop signal to the container. Without it, a deleted pod stays in `Terminating` on an Ubuntu node. Load it on the node. This works only when the check above printed `Y` and the node image has `apparmor_parser`:
 
 ```sh
 podman cp k8s-deny-tmp-write "$node_name:/etc/apparmor.d/k8s-deny-tmp-write"
