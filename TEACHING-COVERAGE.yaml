@@ -33,7 +33,7 @@ labs:
     - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
   sections/section-020/module-01/labs/lab-03:
     preparation:
-    - sections/section-020/module-01/course-04-revocation-and-audit.md
+    - sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
   sections/section-020/module-02/labs/lab-01:
     preparation:
     - sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
@@ -115,4 +115,5 @@ labs:
 additional_readings:
 - sections/section-010/module-01/course-04-privileged-host-interfaces.md
 - sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
+- sections/section-020/module-01/course-05-audit-trails-on-the-node-and-in-the-cluster.md
 - sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md

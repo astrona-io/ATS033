@@ -15,7 +15,7 @@ Developed reading explains mechanisms, responsible components, examples and limi
 | Section / module | Module | Teaching files |
 | --- | --- | --- |
 | 010 / 01 | Reduce The Host Operating-System Attack Surface | Inventory Services And Listeners; Stop, Disable And Mask Services; Remove Packages And Keep The Node Working; Privileged Host Interfaces |
-| 020 / 01 | Apply Least Privilege To Identities | Users, Groups And File Permissions; Privilege Elevation And Account Locking; Kubernetes Identities And RBAC; Revocation And Audit |
+| 020 / 01 | Apply Least Privilege To Identities | Users, Groups And File Permissions; Privilege Elevation And Account Locking; Kubernetes Identities And RBAC; Revoking Host And Kubernetes Access; Audit Trails On The Node And In The Cluster |
 | 030 / 01 | Minimize External Access To The Network | Listeners And Bind Addresses; Host Firewalls With iptables And ufw; NetworkPolicy For Pod Traffic; NodePorts, Control-Plane Ports And API Access |
 | 040 / 01 | Kernel Hardening With seccomp And AppArmor | Seccomp: Filtering System Calls; AppArmor: Profiles For Files And Capabilities; The Restricted Security Context; Diagnosing Profile Failures |
 

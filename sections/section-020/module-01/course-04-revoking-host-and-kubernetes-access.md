@@ -3,9 +3,9 @@ draft: true
 exam_objectives:
 - Using least-privilege identity and access management
 ---
-# Revocation And Audit
+# Revoking Host And Kubernetes Access
 
-Granting access is half of least privilege. The other half is taking it back when the task ends or an account is at risk, and knowing afterwards what the identity did. A person who leaves a team keeps a group membership. A RoleBinding stays long after the project that needed it. This part removes access on the host and in the cluster, confirms that it is gone, and shows where the records of actions are kept.
+Granting access is half of least privilege. The other half is taking it back when the task ends or an account is at risk. A person who leaves a team keeps a group membership. A RoleBinding stays long after the project that needed it. This part removes access on the host and in the cluster, and confirms that it is gone.
 
 ## Revoking host access
 
@@ -90,58 +90,7 @@ system:public-info-viewer                                       ClusterRole/syst
 
 The `USERS`, `GROUPS` and `SERVICEACCOUNTS` columns list the subjects. `cluster-admin` is bound to the group `system:masters`, and every member of that group has full control. The two other bindings give only discovery rights to every caller. Entries that name `default` ServiceAccounts, a broad group such as `system:authenticated` with a strong role, or the role `cluster-admin` are the first to question.
 
-## Where the actions are recorded
-
-An audit trail answers who did what, and when. On the node, `sudo` logs each use in the authentication log: `/var/log/auth.log` on Debian and Ubuntu, or the systemd journal. Each line names the account that ran sudo, the target user and the full command:
-
-```sh
-sudo grep -E 'sudo:.*COMMAND' /var/log/auth.log | tail -n 3
-```
-
-```text
-2026-11-18T08:58:22.475834+00:00 astro-ats-033-playground-020-01 sudo:  student : PWD=/home/student ; USER=root ; COMMAND=/usr/bin/gpasswd --delete training-reader training-readers
-2026-11-18T08:58:22.486609+00:00 astro-ats-033-playground-020-01 sudo:  student : PWD=/home/student ; USER=root ; COMMAND=/usr/sbin/runuser -u training-reader -- cat /var/lib/training-identity/public-report
-2026-11-18T08:58:22.598885+00:00 astro-ats-033-playground-020-01 sudo:  student : PWD=/home/student ; USER=root ; COMMAND=/usr/bin/grep -E sudo:.*COMMAND /var/log/auth.log
-```
-
-Your times differ. The last line is the `grep` itself, because it also ran through sudo. The SSH daemon writes each login to the systemd journal, with the account, the source address and the key fingerprint:
-
-```sh
-sudo journalctl --unit ssh -n 4 --no-pager
-```
-
-```text
-Nov 18 08:58:21 astro-ats-033-playground-020-01 sshd[2816]: pam_unix(sshd:session): session opened for user student(uid=1001) by student(uid=0)
-Nov 18 08:58:21 astro-ats-033-playground-020-01 sshd[2816]: pam_unix(sshd:session): session closed for user student
-Nov 18 08:58:21 astro-ats-033-playground-020-01 sshd[2889]: Accepted publickey for student from 10.0.2.2 port 51108 ssh2: ED25519 SHA256:2va+Gta7yUzekcs6fG/CWbtQdUbMfmjcHkt0102vcCQ
-Nov 18 08:58:21 astro-ats-033-playground-020-01 sshd[2889]: pam_unix(sshd:session): session opened for user student(uid=1001) by student(uid=0)
-```
-
-`last` reads the login history from `/var/log/wtmp`. The Linux audit framework (`auditd`) can record file access and system calls, and `ausearch` reads its log. The package is installed on this node, but it records nothing until someone adds rules:
-
-```sh
-sudo auditctl -l
-```
-
-```text
-No rules
-```
-
-An audit trail exists only where something was set up to write it.
-
-In the cluster, the API server writes an audit log only when it is started with an audit policy (`--audit-policy-file`) and a destination such as `--audit-log-path`. The policy chooses the level for each request: `None`, `Metadata` (who, what and when), `Request` (adds the request body) or `RequestResponse`. A common policy records `Metadata` for most resources and `RequestResponse` or `Request` for sensitive ones, but never logs the content of Secrets at a level above `Metadata`, because the body would hold the secret value.
-
-```mermaid
-flowchart TB
-    A["Caller sends a request"] --> B["API server: authentication"]
-    B --> C["API server: authorization (RBAC)"]
-    C --> D["API server: audit policy"]
-    D --> E["Audit log entry"]
-```
-
-The diagram shows the API server as the place where identity, permission and record come together for every request.
-
-You can now remove access at each layer and know where the proof of use lives. The module has followed one rule from the file system to the API: grant narrowly, test as the identity, and take access back as soon as the task ends.
+You can now remove access at each layer of the host and the cluster, and prove with a test as the identity that the access is gone. The question still open is how to find out afterwards what an identity did while it had access.
 
 ## Common pitfalls
 
@@ -149,4 +98,3 @@ You can now remove access at each layer and know where the proof of use lives. T
 > - **Removing a user from one place only.** Group membership, `sudoers` files, SSH keys and Kubernetes bindings are separate. Check each.
 > - **Expecting a running session to lose a group at once.** The processes keep the old groups until they restart. End the session.
 > - **Keeping a RoleBinding after the task.** The Role grants nothing without a binding, so delete the binding.
-> - **Logging Secrets with `Request` or `RequestResponse`.** The audit log would then contain secret values. Use `Metadata` for Secrets.

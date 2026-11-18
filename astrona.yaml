@@ -286,8 +286,8 @@ modules:
     title: Kubernetes Identities And RBAC
     path: sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
   - type: reading
-    title: Revocation And Audit
-    path: sections/section-020/module-01/course-04-revocation-and-audit.md
+    title: Revoking Host And Kubernetes Access
+    path: sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
   - type: reading
     title: Revoke A Leaver's Access Everywhere — Task
     path: sections/section-020/module-01/labs/lab-03/question.md
@@ -309,8 +309,11 @@ modules:
     title: Revoke A Leaver's Access Everywhere — Solution
     path: sections/section-020/module-01/labs/lab-03/solution.md
   - type: reading
+    title: Audit Trails On The Node And In The Cluster
+    path: sections/section-020/module-01/course-05-audit-trails-on-the-node-and-in-the-cluster.md
+  - type: reading
     title: Summary
-    path: sections/section-020/module-01/course-05-summary.md
+    path: sections/section-020/module-01/course-06-summary.md
   - type: reading
     title: Least-Privilege RBAC Roles And Bindings
     path: sections/section-020/module-02/course.md
