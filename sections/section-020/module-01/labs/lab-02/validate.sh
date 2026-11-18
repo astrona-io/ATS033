@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-context="${ASTRONA_KUBE_CONTEXT:-kind-astro-ats-033-lab-020-01-02}"
+context="${ASTRONA_KUBE_CONTEXT:-kubernetes-admin@astro-ats-033-lab-020-01-02}"
 if [[ "$(kubectl config current-context)" != "$context" ]]; then
   printf 'Refusing to operate on another Kubernetes context\n' >&2
   exit 1

@@ -25,12 +25,13 @@ After this module you can:
 
 You need basic Linux skills (files, owners, modes) and Kubernetes basics (namespaces, pods, `kubectl apply`). You do not need any earlier module.
 
-Your playground is a `kind` cluster running Kubernetes 1.35 with one control-plane node and one worker node. `kind` runs each node as a Podman container with systemd, and you run one command inside a node with `podman exec`. Every host-level command names the node containers of this playground only.
+Your playground is a virtual machine (VM) that runs Ubuntu 24.04 and a one-node Kubernetes 1.35 cluster built with kubeadm. The VM is the node: it runs the control plane and the workloads. You open a shell on it with `astrona ssh astro-ats-033-playground-020-01` and work as the `student` user. `student` may run any command as `root` through `sudo` and has a kubeconfig file with administrator access to the cluster. Every command changes only this VM, not your own computer.
 
 | Where | What is in it |
 | --- | --- |
-| Control-plane node, accounts | The user `training-reader` (UID is not zero, shell `/bin/sh`) and the group `training-readers`. The user is not yet a member of the group |
-| Control-plane node, files | `/var/lib/training-identity/public-report` (owner `root`, group `training-readers`, mode `0640`) and `/var/lib/training-identity/private-report` (owner `root`, group `root`, mode `0600`) |
+| Node, accounts | The user `training-reader` (UID is not zero, shell `/bin/sh`, a real password) and the group `training-readers`. The user is not yet a member of the group |
+| Node, files | `/var/lib/training-identity/public-report` (owner `root`, group `training-readers`, mode `0640`) and `/var/lib/training-identity/private-report` (owner `root`, group `root`, mode `0600`) |
+| Node, services | The SSH daemon (`ssh.service`), sudo and the audit daemon `auditd` from Ubuntu |
 | `starfleet` namespace | The `probe` Deployment, the `probe` Service and the `shuttle` client pod |
 | `outpost` namespace | The `drifter` client pod |
 

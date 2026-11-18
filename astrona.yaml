@@ -249,7 +249,6 @@ modules:
   - type: lab
     title: Grant Read Access Through A Group
     path: sections/section-020/module-01/labs/lab-01
-    examScope: cluster
     difficulty: intermediate
     estimated_duration: 6m
     topic: host-identity
@@ -272,14 +271,15 @@ modules:
   - type: lab
     title: Lock And Expire A Departed Account
     path: sections/section-020/module-01/labs/lab-02
-    examScope: cluster
     difficulty: intermediate
-    estimated_duration: 6m
+    estimated_duration: 10m
     topic: account-locking
     task_kind: build
     learning_goals:
     - Lock, expire and remove the login shell of a host account without deleting
       it.
+    - Turn off root and password logins in sshd and make the running service use
+      the change.
     tags:
     - cks
     - account-locking
@@ -298,14 +298,14 @@ modules:
   - type: lab
     title: Revoke A Leaver's Access Everywhere
     path: sections/section-020/module-01/labs/lab-03
-    examScope: cluster
     difficulty: intermediate
-    estimated_duration: 10m
+    estimated_duration: 12m
     topic: access-revocation
     task_kind: build
     learning_goals:
     - Remove one person's group membership, sudoers rule and RBAC binding, and lock
       the host account.
+    - Remove the person's SSH key, so that a key login is refused.
     tags:
     - cks
     - access-revocation

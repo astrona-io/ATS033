@@ -4,6 +4,6 @@ exam_objectives:
 ---
 # Starting Environment
 
-The cluster has one control-plane node and the namespace `starfleet-033-020-01-03`. The node has the group `flight-ops` with the members `leaver` and `crew-member`, and the file `/srv/flight-ops/roster` that the group can read. Each of the two accounts has its own sudo rule file in `/etc/sudoers.d`.
+The cluster runs in one virtual machine, and that machine is its only node. The cluster has the namespace `starfleet-033-020-01-03`. The node has the group `flight-ops` with the members `leaver` and `crew-member`, and the file `/srv/flight-ops/roster` that the group can read. Each of the two accounts has its own sudo rule file in `/etc/sudoers.d`. `leaver` also has an SSH key in `/home/leaver/.ssh/authorized_keys`, and its private key is kept in `/var/lib/astrona-lab-033-020-01-03/leaver_ed25519`.
 
 In Kubernetes, the user `leaver` has the RoleBinding `leaver-edit` to the ClusterRole `edit` and the ClusterRoleBinding `leaver-node-reader`. The user `crew-member` has the RoleBinding `crew-member-view` to the ClusterRole `view`. The task is to remove every access of `leaver` and keep every access of `crew-member`.

@@ -1,6 +1,7 @@
 {
-  "context": "kind-astro-ats-033-lab-020-01-02",
+  "context": "kubernetes-admin@astro-ats-033-lab-020-01-02",
   "cluster": "astro-ats-033-lab-020-01-02",
+  "runtime": "qemu",
   "namespace": "starfleet-033-020-01-02",
   "resources": [],
   "behavior": []
