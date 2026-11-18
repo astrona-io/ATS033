@@ -1,77 +1,79 @@
 # Node checks for this lab. check.py runs this file with its helpers in scope.
-# The kind node has no sshd, so this parser reads the files the way sshd does:
-# - Include files are read at the Include line, in sorted (lexical) order.
-# - Keywords are case-insensitive and may use "Keyword value" or "Keyword=value".
-# - For most keywords the first value read wins; AllowUsers lines add up.
-# - A Match line starts a conditional block that runs to the next Match line or
-#   to the end of the file. "Match all" ends it. Settings inside a conditional
-#   block are not global. An included file never changes the caller's state.
-import re
+# `sshd -T` makes the SSH server read its configuration files the way it does
+# at start and print the effective global settings, one "keyword value" line
+# each, in lower case. Settings inside a Match block are not global, so they
+# are not in this output. AllowUsers prints one line per account.
+# The files are not the running server: a reload is needed before a change
+# takes effect. Two outcomes also test the running server.
+import time
 
-MAIN_FILE = '/etc/ssh/sshd_config'
-LINE_PATTERN = re.compile(r'^(\S+?)(?:\s*=\s*|\s+)(.*)$')
-
-
-def read_node_file(path):
-    return node_exec(NODE, 'cat', path).stdout
-
-
-def expand_include(pattern):
-    if not pattern.startswith('/'):
-        pattern = '/etc/ssh/' + pattern
-    listing = node_exec(NODE, 'sh', '-c', 'for path in ' + pattern + '; do [ -f "$path" ] && printf "%s\\n" "$path"; done; true').stdout
-    return sorted(line for line in listing.splitlines() if line)
+ALLOWED_ACCOUNTS = {'opsadmin', 'student', 'astrona'}
+SSH_TEST_OPTIONS = [
+    '-o', 'BatchMode=yes',
+    '-o', 'PreferredAuthentications=none',
+    '-o', 'StrictHostKeyChecking=no',
+    '-o', 'UserKnownHostsFile=/dev/null',
+    '-o', 'ConnectTimeout=5',
+]
 
 
-def parse(path, global_scope, settings, allow_users, conditional_keywords):
-    for raw_line in read_node_file(path).splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith('#'):
-            continue
-        match = LINE_PATTERN.match(line)
-        if not match:
-            continue
-        keyword = match.group(1).lower()
-        value = match.group(2).strip()
-        if keyword == 'include':
-            for pattern in value.split():
-                for included in expand_include(pattern):
-                    parse(included, global_scope, settings, allow_users, conditional_keywords)
-            continue
-        if keyword == 'match':
-            global_scope = value.lower() == 'all'
-            continue
-        if not global_scope:
-            conditional_keywords.add(keyword)
-            continue
-        if keyword == 'allowusers':
-            allow_users.extend(value.split())
-        else:
-            settings.setdefault(keyword, value.split()[0].lower() if value else '')
+def effective_settings():
+    result = node_exec(NODE, 'sshd', '-T', success=False)
+    assert result.returncode == 0, 'sshd -T rejects the configuration: ' + (result.stderr or result.stdout).strip()
+    settings = {}
+    for line in result.stdout.splitlines():
+        keyword, _, value = line.partition(' ')
+        settings.setdefault(keyword, []).append(value.strip())
+    return settings
 
 
-for node in (NODE, WORKER):
-    states = node_exec(node, 'systemctl', 'is-active', 'kubelet.service', 'containerd.service', success=False).stdout.split()
-    assert states == ['active', 'active'], 'kubelet and containerd must stay active on ' + node
+def first(settings, keyword):
+    values = settings.get(keyword)
+    return values[0] if values else ''
+
+
+def advertised_methods(account):
+    """The login methods the running server offers this account, from the client's error line."""
+    result = command(['ssh', *SSH_TEST_OPTIONS, account + '@127.0.0.1', 'true'], success=False)
+    for line in result.stderr.splitlines():
+        if 'Permission denied (' in line:
+            return line.rsplit('(', 1)[1].rstrip(').').split(',')
+    return []
+
+
+states = node_exec(NODE, 'systemctl', 'is-active', 'kubelet.service', 'containerd.service', 'ssh.service', success=False).stdout.split()
+assert states == ['active', 'active', 'active'], 'kubelet, containerd and ssh must stay active on ' + NODE
 operator_account = node_exec(NODE, 'getent', 'passwd', 'opsadmin', success=False).stdout.strip().split(':')
 assert len(operator_account) == 7 and operator_account[6] == '/bin/bash', 'The opsadmin account must exist and keep the shell /bin/bash'
+match_block = node_exec(NODE, 'grep', '-c', '^Match User backup', '/etc/ssh/sshd_config', success=False).stdout.strip()
+assert match_block == '1', 'Keep the Match User backup block in /etc/ssh/sshd_config'
 
-effective = {}
-allowed_accounts = []
-conditional_only = set()
-parse(MAIN_FILE, True, effective, allowed_accounts, conditional_only)
+effective = effective_settings()
 
 if wants('root-login-refused'):
-    value = effective.get('permitrootlogin', 'prohibit-password (default)')
-    assert value == 'no', 'The first global PermitRootLogin value sshd reads is ' + value + ', not no'
+    value = first(effective, 'permitrootlogin')
+    assert value == 'no', 'sshd -T shows permitrootlogin ' + value + ', not no'
 
 if wants('password-login-refused'):
-    value = effective.get('passwordauthentication', 'yes (default)')
-    assert value == 'no', 'The first global PasswordAuthentication value sshd reads is ' + value + ', not no'
-    assert effective.get('pubkeyauthentication', 'yes') == 'yes', 'Key logins must stay on (PubkeyAuthentication yes)'
+    value = first(effective, 'passwordauthentication')
+    assert value == 'no', 'sshd -T shows passwordauthentication ' + value + ', not no'
+    assert first(effective, 'pubkeyauthentication') == 'yes', 'Key logins must stay on (pubkeyauthentication yes)'
+    methods = advertised_methods('opsadmin')
+    assert methods, 'The running SSH server did not answer a test login for opsadmin'
+    assert 'password' not in methods, 'The running SSH server still offers password logins (' + ','.join(methods) + '): reload ssh.service'
 
-if wants('allow-only-opsadmin'):
-    if not allowed_accounts and 'allowusers' in conditional_only:
-        raise AssertionError('AllowUsers appears only inside a Match block, so it is not a global setting')
-    assert allowed_accounts, 'No global AllowUsers line: every account may log in'
-    assert set(allowed_accounts) == {'opsadmin'}, 'The global AllowUsers list is ' + ' '.join(allowed_accounts) + ', not only opsadmin'
+if wants('allow-listed-accounts-only'):
+    allowed = set(effective.get('allowusers', []))
+    assert allowed, 'sshd -T shows no global allowusers line: every account may log in (a line inside a Match block is not global)'
+    assert allowed == ALLOWED_ACCOUNTS, 'sshd -T shows allowusers ' + ' '.join(sorted(allowed)) + ', not exactly opsadmin student astrona'
+    # ubuntu has a shell but is not on the list. The running server must refuse
+    # it and log why, which proves that the server has loaded the list.
+    for attempt in range(5):
+        started = node_exec(NODE, 'date', '+%Y-%m-%d %H:%M:%S').stdout.strip()
+        advertised_methods('ubuntu')
+        time.sleep(1)
+        log = node_exec(NODE, 'journalctl', '--unit=ssh.service', '--since=' + started, '--no-pager', '--quiet', success=False).stdout
+        if 'User ubuntu from 127.0.0.1 not allowed because not listed in AllowUsers' in log:
+            break
+    else:
+        raise AssertionError('The running SSH server does not refuse ubuntu with AllowUsers yet: reload ssh.service')

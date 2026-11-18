@@ -25,15 +25,13 @@ After this module you can:
 
 You need basic Linux skills (files, users, `grep`, running commands as root) and Kubernetes basics (nodes, namespaces, `kubectl get` and `kubectl apply`). You do not need any earlier module.
 
-Your playground is a `kind` cluster running Kubernetes 1.35 with one control-plane node and one worker node. `kind` runs each node as a Podman container that runs systemd, so a node behaves like a small Linux host. You reach a node with `podman exec`, which runs one command inside the node container as root. Every host-level command in this module names the node containers of this playground only.
+Your playground is one Ubuntu 24.04 virtual machine (VM). kubeadm installed Kubernetes v1.35.10 on it as a single node, so the same machine runs the control plane, the kubelet and the workloads. You open a shell on it with `astrona ssh astro-ats-033-playground-010-02` and work as the `student` user, which has a kubeconfig file for the cluster and may run commands as root with `sudo`. Every host-level command in this module changes this VM only, not your own computer.
 
 | Where | What is in it |
 | --- | --- |
 | `starfleet` namespace | The `probe` Deployment with two replicas, the `probe` Service and the `shuttle` client pod |
 | `outpost` namespace | The `drifter` client pod |
-| Control-plane node | A stand-in SSH server configuration in `/etc/ssh/sshd_config` and in the drop-in file `/etc/ssh/sshd_config.d/50-cloud-init.conf`, and the accounts `opsadmin` and `olduser` |
-
-The setup script writes the SSH files itself, so the exercises read and change real files with the real syntax without depending on an SSH server in the node image.
+| The node | A running SSH daemon whose main file `/etc/ssh/sshd_config` and drop-in file `/etc/ssh/sshd_config.d/50-cloud-init.conf` allow root and password logins, a `Match User backup` block, and the accounts `opsadmin` and `olduser` |
 
 Launch your playground now, and keep it running next to you while you read the parts:
 

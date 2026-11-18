@@ -6,18 +6,16 @@ exam_objectives:
 
 Solve this question on: `terminal`
 
-An account review of the control-plane node finds two problems. The account `olduser` belongs to a person who left the team years ago, but it still has a password and the shell `/bin/bash`. A second account, `toor`, has the user identifier (UID) 0, so the kernel treats it as root. Administrators use the account `opsadmin`, which must keep working.
+An account review of a Kubernetes node finds two problems. The account `olduser` belongs to a person who left the team years ago, but it still has a password and the shell `/bin/bash`. A second account, `toor`, has the user identifier (UID) 0, so the kernel treats it as root. Administrators use the account `opsadmin`, which must keep working.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+Open a shell on the lab VM (virtual machine) and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-02-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-02-02" || exit 1
-node_name="astro-ats-033-lab-010-02-02-control-plane"
-worker_name="astro-ats-033-lab-010-02-02-worker"
+astrona ssh astro-ats-033-lab-010-02-02
+kubectl config current-context
 ```
 
-Keep this connection selected. Each node of the cluster is a container on your machine, so `podman exec "$node_name" <command>` runs a command on the control-plane node. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+The second command prints `kubernetes-admin@astro-ats-033-lab-010-02-02`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Node files and services belong to root, so run commands that read passwords or change accounts with `sudo`. They change only the lab VM, not your own computer.
 
 Allow about 8 minutes for the tasks. Cluster startup adds time.
 
@@ -30,8 +28,8 @@ Allow about 8 minutes for the tasks. Cluster startup adds time.
 ## Constraints
 
 - Do not change `root` or `opsadmin`: `opsadmin` keeps its UID, the shell `/bin/bash` and its usable password.
-- `kubelet` and `containerd` must stay active on both nodes, and the API server readiness endpoint `/readyz` must answer `ok`.
+- `kubelet` and `containerd` must stay active, and the API server readiness endpoint `/readyz` must answer `ok`.
 
 ## How the answer is checked
 
-The grader reads the accounts with `getent passwd` on the control-plane node. The first check needs a refusing shell for `olduser` (`nologin` or `false`) and runs `su olduser -c true`, which must fail. The second check needs `passwd -S olduser` to report the status `L` (locked). The third check lists every account with UID 0 and needs only `root`. Every check also confirms that `opsadmin` still has a non-zero UID, `/bin/bash` and the status `P`, that `kubelet` and `containerd` are active on both nodes and that `/readyz` answers `ok`.
+The grader reads the accounts with `getent passwd` on the node. The first check needs a refusing shell for `olduser` (`nologin` or `false`) and runs `su olduser -c true`, which must fail. The second check needs `passwd -S olduser` to report the status `L` (locked). The third check lists every account with UID 0 and needs only `root`. Every check also confirms that `opsadmin` still has a non-zero UID, `/bin/bash` and the status `P`, that `kubelet` and `containerd` are active and that `/readyz` answers `ok`.

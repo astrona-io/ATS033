@@ -19,9 +19,8 @@ def password_status(name):
     return node_exec(NODE, 'passwd', '-S', name).stdout.split()[1]
 
 
-for node in (NODE, WORKER):
-    states = node_exec(node, 'systemctl', 'is-active', 'kubelet.service', 'containerd.service', success=False).stdout.split()
-    assert states == ['active', 'active'], 'kubelet and containerd must stay active on ' + node
+states = node_exec(NODE, 'systemctl', 'is-active', 'kubelet.service', 'containerd.service', success=False).stdout.split()
+assert states == ['active', 'active'], 'kubelet and containerd must stay active on ' + NODE
 operator_account = account('opsadmin')
 assert operator_account is not None, 'The opsadmin account must stay'
 assert operator_account[2] != '0', 'opsadmin must not have UID 0'

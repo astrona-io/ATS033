@@ -4,104 +4,170 @@ exam_objectives:
 ---
 # Restrict SSH Logins In sshd_config Solution
 
-Select the private environment and define a helper. The helper `run_on_node` runs one command on the control-plane node container, which is the same as running it in a shell on the node.
+Open a shell on the lab VM (virtual machine) and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-02-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-02-01" || exit 1
-node_name="astro-ats-033-lab-010-02-01-control-plane"
-worker_name="astro-ats-033-lab-010-02-01-worker"
-run_on_node() { podman exec "$node_name" "$@"; }
+astrona ssh astro-ats-033-lab-010-02-01
+kubectl config current-context
 ```
 
-## Read the settings in the order sshd reads them
+The second command prints `kubernetes-admin@astro-ats-033-lab-010-02-01`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Node files and services belong to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.
 
-The main file includes the drop-in directory on its second line, so `sshd` reads the drop-in files before the rest of the main file. The shell expands `*.conf` in alphabetical order, which is the order `sshd` uses. `grep -i` ignores upper and lower case, because `sshd` keywords do not depend on case, and `^ *` also catches indented lines inside a `Match` block:
+Keep this first shell open until the end. If a change locks out new logins, you can still repair it from this shell.
+
+## Read the files and the effective settings
+
+The SSH server, `sshd`, reads `/etc/ssh/sshd_config` from the top. `grep -v` with the pattern `^(#|$)` hides comment lines and empty lines, and `-n` prints the line numbers:
 
 ```sh
-run_on_node sh -c "grep -n -i -E '^ *(Include|PermitRootLogin|PasswordAuthentication|PubkeyAuthentication|AllowUsers|Match)' /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config"
+grep -n -v -E '^(#|$)' /etc/ssh/sshd_config
 ```
 
 ```text
-/etc/ssh/sshd_config.d/10-legacy-root.conf:2:permitrootlogin yes
-/etc/ssh/sshd_config.d/50-cloud-init.conf:1:PasswordAuthentication yes
-/etc/ssh/sshd_config:2:Include /etc/ssh/sshd_config.d/*.conf
-/etc/ssh/sshd_config:5:PermitRootLogin prohibit-password
-/etc/ssh/sshd_config:6:PubkeyAuthentication yes
-/etc/ssh/sshd_config:7:PasswordAuthentication no
-/etc/ssh/sshd_config:12:Match User backup
+12:Include /etc/ssh/sshd_config.d/*.conf
+71:KbdInteractiveAuthentication no
+94:UsePAM yes
+99:X11Forwarding yes
+103:PrintMotd no
+121:AcceptEnv LANG LC_*
+124:Subsystem	sftp	/usr/lib/openssh/sftp-server
+133:Match User backup
+134:    # The backup account may only copy files.
+135:    ForceCommand internal-sftp
+136:    AllowTcpForwarding no
 ```
 
-The output shows three problems. The first `PermitRootLogin` value is `yes`, written in lower case in `10-legacy-root.conf`, so the `prohibit-password` line in the main file never applies. The first `PasswordAuthentication` value is `yes`, from `50-cloud-init.conf`. There is no `AllowUsers` line, so every account may log in. The main file also ends with a `Match` block:
+The `Include` line on line 12 reads every file in `/etc/ssh/sshd_config.d/` that ends in `.conf`, in alphabetical order, at that position. So `sshd` reads the drop-in files before the rest of the main file. For most keywords, the first value that `sshd` reads wins. Every line after `Match User backup` belongs to that block, up to the end of the file. List the drop-in files and read them. One of them has the mode `600`, so only root can read it:
 
 ```sh
-run_on_node sed -n '10,16p' /etc/ssh/sshd_config
+ls -l /etc/ssh/sshd_config.d/
+sudo grep -H . /etc/ssh/sshd_config.d/10-legacy-root.conf /etc/ssh/sshd_config.d/50-cloud-init.conf /etc/ssh/sshd_config.d/60-cloudimg-settings.conf
 ```
 
 ```text
-Subsystem sftp internal-sftp
-
-Match User backup
-    # The backup account may only copy files.
-    ForceCommand internal-sftp
-    AllowTcpForwarding no
+total 12
+-rw-r--r-- 1 root root 84 Nov 18 08:58 10-legacy-root.conf
+-rw------- 1 root root 27 Nov 18 08:58 50-cloud-init.conf
+-rw-r--r-- 1 root root 26 Aug  1 13:01 60-cloudimg-settings.conf
+/etc/ssh/sshd_config.d/10-legacy-root.conf:# Added during the first install so that root could copy files.
+/etc/ssh/sshd_config.d/10-legacy-root.conf:permitrootlogin yes
+/etc/ssh/sshd_config.d/50-cloud-init.conf:PasswordAuthentication yes
+/etc/ssh/sshd_config.d/60-cloudimg-settings.conf:PasswordAuthentication no
 ```
 
-Every line after `Match User backup` belongs to that block, up to the end of the file. A line appended with `>>` would apply only to the `backup` account.
+`50-cloud-init.conf` sorts before `60-cloudimg-settings.conf`, so `PasswordAuthentication yes` wins over the later `no`. Keywords do not depend on case, so `permitrootlogin yes` in lower case counts too. Reading files by hand is easy to get wrong. `sshd -T` (test mode, extended) makes `sshd` read all the files itself and print the effective global value of every keyword, in lower case:
+
+```sh
+sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|pubkeyauthentication|allowusers) '
+```
+
+```text
+permitrootlogin yes
+pubkeyauthentication yes
+passwordauthentication yes
+```
+
+Root and password logins are allowed, and there is no `allowusers` line, so every account may log in. The files are not the whole story: the running server uses the settings it read when it last started or reloaded. A test login with `PreferredAuthentications=none` makes the server answer with the methods it offers. `BatchMode=yes` stops the client from asking for a password:
+
+```sh
+ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null opsadmin@127.0.0.1 true
+```
+
+```text
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+opsadmin@127.0.0.1: Permission denied (publickey,password).
+```
+
+The server offers `publickey` and `password`.
 
 ## Fix the values that sshd reads first
 
 Change the lines that win, which are the lines in the drop-in files. The `I` flag at the end of the first `sed` expression makes the pattern ignore case, so it matches `permitrootlogin`:
 
 ```sh
-run_on_node sed -i 's/^permitrootlogin .*/PermitRootLogin no/I' /etc/ssh/sshd_config.d/10-legacy-root.conf
-run_on_node sed -i 's/^PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config.d/50-cloud-init.conf
-run_on_node sed -i 's/^PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
+sudo sed -i 's/^permitrootlogin .*/PermitRootLogin no/I' /etc/ssh/sshd_config.d/10-legacy-root.conf
+sudo sed -i 's/^PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config.d/50-cloud-init.conf
 ```
 
-The commands print nothing when they succeed. The third command is optional: the main file value is read later and does not win, but making it say `no` as well keeps the files consistent for the next reader.
-
-## Add a global AllowUsers line above the Match block
-
-The `sed` command `i` inserts text before every line that matches the pattern. Here it inserts `AllowUsers opsadmin` and an empty line before `Match User backup`, so the new line stays global:
+The commands print nothing when they succeed. Next, add the `AllowUsers` line in its own drop-in file. The `Include` line sits above the `Match` block, so a line in a drop-in file is global. `AllowUsers` lines add up instead of using the first value, so the file name does not matter for this keyword. The list must contain `student` and `astrona` as well, or the platform loses its SSH access:
 
 ```sh
-run_on_node sed -i '/^Match User backup/i AllowUsers opsadmin\n' /etc/ssh/sshd_config
-```
-
-A drop-in file such as `/etc/ssh/sshd_config.d/00-allow.conf` with the line `AllowUsers opsadmin` also works, because the `Include` line sits above the `Match` block.
-
-## Verify the result
-
-Read the settings again in the same order:
-
-```sh
-run_on_node sh -c "grep -n -i -E '^ *(Include|PermitRootLogin|PasswordAuthentication|PubkeyAuthentication|AllowUsers|Match)' /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config"
-run_on_node getent passwd opsadmin
+echo "AllowUsers opsadmin student astrona" | sudo tee /etc/ssh/sshd_config.d/10-allow-users.conf
 ```
 
 ```text
-/etc/ssh/sshd_config.d/10-legacy-root.conf:2:PermitRootLogin no
-/etc/ssh/sshd_config.d/50-cloud-init.conf:1:PasswordAuthentication no
-/etc/ssh/sshd_config:2:Include /etc/ssh/sshd_config.d/*.conf
-/etc/ssh/sshd_config:5:PermitRootLogin no
-/etc/ssh/sshd_config:6:PubkeyAuthentication yes
-/etc/ssh/sshd_config:7:PasswordAuthentication no
-/etc/ssh/sshd_config:12:AllowUsers opsadmin
-/etc/ssh/sshd_config:14:Match User backup
+AllowUsers opsadmin student astrona
+```
+
+## Test and reload the server
+
+`sshd -t` checks the syntax of all the files and prints nothing when they are valid. Only then reload the server. `systemctl reload` makes the running `sshd` read its configuration again without closing open sessions:
+
+```sh
+sudo sshd -t
+sudo systemctl reload ssh.service
+```
+
+Both commands print nothing. Check the effective settings again, globally and for a connection of the `backup` account. The option `-C user=backup` applies the `Match` blocks for that account:
+
+```sh
+sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|pubkeyauthentication|allowusers) '
+sudo sshd -T -C user=backup | grep -E '^(allowusers|forcecommand) '
 ```
 
 ```text
-opsadmin:x:1000:1000::/home/opsadmin:/bin/bash
+permitrootlogin no
+pubkeyauthentication yes
+passwordauthentication no
+allowusers opsadmin
+allowusers student
+allowusers astrona
+forcecommand internal-sftp
+allowusers opsadmin
+allowusers student
+allowusers astrona
 ```
 
-The first value of each keyword is now the safe one, and `AllowUsers opsadmin` is on line 12, above the `Match` line on line 14. `opsadmin` keeps `/bin/bash`. On a node that runs `sshd`, you would now check the files with `sshd -t`, print the effective values with `sshd -T`, reload the daemon with `systemctl reload ssh` and test a new login from a second terminal before you close the first one. This node has no `sshd`, so the grader reads the files instead. Then submit.
+`sshd -T` prints one `allowusers` line for each account. The `backup` account still gets `forcecommand internal-sftp` from its `Match` block, and the same `AllowUsers` list applies to it.
 
-After recording your result, remove the independent lab with `astrona destroy ats-033-lab-010-02-01`.
+## Verify the running server
+
+Repeat the test login for `opsadmin`, then try `ubuntu`, an account with a shell that is not on the list:
+
+```sh
+ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null opsadmin@127.0.0.1 true
+ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@127.0.0.1 true
+sudo journalctl --unit=ssh.service --since=-1min --no-pager --grep=AllowUsers
+```
+
+```text
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+opsadmin@127.0.0.1: Permission denied (publickey).
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+ubuntu@127.0.0.1: Permission denied (publickey).
+Nov 18 08:58:43 astro-ats-033-lab-010-02-01 sshd[2629]: User ubuntu from 127.0.0.1 not allowed because not listed in AllowUsers
+```
+
+The running server now offers only `publickey`. The client sees the same answer for `ubuntu`, because `sshd` does not tell a client why it refuses a login. The journal of the `ssh` service shows the real reason. Finally check the node services:
+
+```sh
+systemctl is-active kubelet.service containerd.service ssh.service
+kubectl get --raw=/readyz; echo
+```
+
+```text
+active
+active
+active
+ok
+```
+
+Then submit.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - **Fixing only the main file.** The drop-in values are read first and win. Change the drop-in lines.
-> - **Searching with case.** `grep PermitRootLogin` misses `permitrootlogin yes`. Use `grep -i`.
-> - **Appending after a `Match` block.** `printf 'AllowUsers opsadmin\n' >> /etc/ssh/sshd_config` puts the line inside `Match User backup`, and the grader reports that `AllowUsers` appears only inside a `Match` block.
+> - **Fixing only the main file.** The drop-in values are read first and win. Check the result with `sshd -T`, not by reading one file.
+> - **Appending `AllowUsers` after a `Match` block.** A line added with `>>` to the end of `sshd_config` belongs to `Match User backup`. `sshd -T` then shows no global `allowusers` line.
+> - **Locking out the platform accounts.** `AllowUsers opsadmin` alone refuses `student` and `astrona`. New logins fail, and only an open session can repair the file.
+> - **Forgetting the reload.** `sshd -T` reads the files, but the running server keeps its old settings until `systemctl reload ssh.service`.

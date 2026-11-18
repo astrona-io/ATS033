@@ -25,13 +25,13 @@ After this module you can:
 
 You need basic Linux skills (files, users, running commands as root) and Kubernetes basics (nodes, pods, namespaces, `kubectl get` and `kubectl apply`). You do not need any earlier module.
 
-Your playground is a `kind` cluster running Kubernetes 1.35. It has one control-plane node and one worker node. `kind` runs each node as a Podman container that runs systemd, so a node behaves like a small Linux host. You reach a node with `podman exec`, which runs one command inside the node container as root. Every host-level command in this module names the node containers of this playground only.
+Your playground is a virtual machine (VM) that runs Ubuntu 24.04 and a one-node Kubernetes v1.35.10 cluster built with kubeadm, the standard tool that installs a cluster on a Linux machine. The node is the control plane and also runs the pods. It is a real Linux host with systemd, `apt` and an SSH server, so every command in this module runs on the node itself. You open a shell on it with `astrona ssh astro-ats-033-playground-010-01`. You log in as the `student` user, who has a kubeconfig file for the cluster and runs node commands with `sudo`. Those commands change only the playground VM, not your own computer.
 
 | Where | What is in it |
 | --- | --- |
 | `starfleet` namespace | The `probe` Deployment with two replicas, the `probe` Service and the `shuttle` client pod |
 | `outpost` namespace | The `drifter` client pod |
-| Control-plane node | The seeded systemd service `training-extra.service`, which is running and enabled but has no job in the cluster |
+| The node | The seeded systemd service `training-extra.service`, which is running and enabled but has no job in the cluster, and the seeded package `node-diag-tools`, which installs `/usr/bin/node-diag` |
 
 Launch your playground now, and keep it running next to you while you read the parts:
 

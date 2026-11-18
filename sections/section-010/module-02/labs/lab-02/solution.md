@@ -4,36 +4,38 @@ exam_objectives:
 ---
 # Close Unused And Duplicate Root Accounts Solution
 
-Select the private environment and define a helper. The helper `run_on_node` runs one command on the control-plane node container, which is the same as running it as root in a shell on the node.
+Open a shell on the lab VM (virtual machine) and check that kubectl uses this lab's cluster:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-033-lab-010-02-02)"
-test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-02-02" || exit 1
-node_name="astro-ats-033-lab-010-02-02-control-plane"
-worker_name="astro-ats-033-lab-010-02-02-worker"
-run_on_node() { podman exec "$node_name" "$@"; }
+astrona ssh astro-ats-033-lab-010-02-02
+kubectl config current-context
 ```
+
+The second command prints `kubernetes-admin@astro-ats-033-lab-010-02-02`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Node files and services belong to root, so run commands that read passwords or change accounts with `sudo`. They change only the lab VM, not your own computer.
 
 ## Review the accounts
 
 Each line of `/etc/passwd` has seven fields separated by colons: the name, a password placeholder, the UID, the group identifier (GID), a description, the home directory and the login shell. `getent passwd` reads the account database the way the system does. The `awk` filter prints the name, the UID and the shell of every account whose shell is not a refusing shell:
 
 ```sh
-run_on_node sh -c "getent passwd | awk -F: '\$7 !~ /(nologin|false)\$/ {print \$1 \":\" \$3 \":\" \$7}'"
+getent passwd | awk -F: '$7 !~ /(nologin|false)$/ {print $1 ":" $3 ":" $7}'
 ```
 
 ```text
 root:0:/bin/bash
 sync:4:/bin/sync
-opsadmin:1000:/bin/bash
-olduser:1001:/bin/bash
+ubuntu:1000:/bin/bash
+student:1001:/bin/bash
+astrona:1002:/bin/bash
+opsadmin:1003:/bin/bash
+olduser:1004:/bin/bash
 toor:0:/bin/bash
 ```
 
-`sync` is a system account whose shell is `/bin/sync`, a program that writes the disk buffers and ends, so it cannot start a session. `olduser` has `/bin/bash`, and `toor` has UID 0. A second check lists every account with UID 0, because the kernel checks the number and not the name:
+`sync` is a system account whose shell is `/bin/sync`, a program that writes the disk buffers and ends, so it cannot start a session. `ubuntu` is the default account of the cloud image, and `student` and `astrona` are the accounts the lab platform logs in with. `olduser` has `/bin/bash`, and `toor` has UID 0. A second check lists every account with UID 0, because the kernel checks the number and not the name:
 
 ```sh
-run_on_node sh -c "awk -F: '\$3 == 0 {print \$1}' /etc/passwd"
+awk -F: '$3 == 0 {print $1}' /etc/passwd
 ```
 
 ```text
@@ -41,16 +43,16 @@ root
 toor
 ```
 
-`passwd -S` prints the password status of one account. The second field is `P` for a usable password, `L` for a locked password and `NP` for no password:
+`passwd -S` prints the password status of one account. It reads `/etc/shadow`, which only root can read, so it needs `sudo`. The second field is `P` for a usable password, `L` for a locked password and `NP` for no password:
 
 ```sh
-run_on_node passwd -S olduser
-run_on_node passwd -S opsadmin
+sudo passwd -S olduser
+sudo passwd -S opsadmin
 ```
 
 ```text
-olduser P 2026-11-17 0 99999 7 -1
-opsadmin P 2026-11-17 0 99999 7 -1
+olduser P 2026-11-18 0 99999 7 -1
+opsadmin P 2026-11-18 0 99999 7 -1
 ```
 
 Both accounts have a usable password. Your date will be the day the environment started.
@@ -60,24 +62,34 @@ Both accounts have a usable password. Your date will be the day the environment 
 `usermod --shell` changes the seventh field of the account, and `--lock` puts an exclamation mark in front of the password hash in `/etc/shadow`, so no password can match it. One command does both:
 
 ```sh
-run_on_node usermod --shell /usr/sbin/nologin --lock olduser
-run_on_node getent passwd olduser
-run_on_node passwd -S olduser
+sudo usermod --shell /usr/sbin/nologin --lock olduser
+getent passwd olduser
+sudo passwd -S olduser
 ```
 
 ```text
-olduser:x:1001:1001::/home/olduser:/usr/sbin/nologin
-olduser L 2026-11-17 0 99999 7 -1
+olduser:x:1004:1004::/home/olduser:/usr/sbin/nologin
+olduser L 2026-11-18 0 99999 7 -1
 ```
 
-The shell is now `/usr/sbin/nologin` and the status is `L`. The account and its home directory stay, so files that belong to UID 1001 still show the name `olduser`.
+The shell is now `/usr/sbin/nologin` and the status is `L`. `su` starts the shell of the target account, so it shows the effect of the new shell:
+
+```sh
+sudo su olduser -c true
+```
+
+```text
+This account is currently not available.
+```
+
+`nologin` prints this message and exits with status 1. The account and its home directory stay, so files that belong to UID 1004 still show the name `olduser`.
 
 ## Remove the second UID 0 account
 
 The first attempt with `userdel` fails:
 
 ```sh
-run_on_node userdel toor
+sudo userdel toor
 ```
 
 ```text
@@ -87,7 +99,7 @@ userdel: user toor is currently used by process 1
 `userdel` refuses to delete an account while a process runs with its UID. Process 1 is `systemd`, which runs as UID 0, the same number that `toor` has. The process belongs to `root`, not to `toor`, so deleting the `toor` entry is safe. The option `--force` tells `userdel` to go on despite the running process:
 
 ```sh
-run_on_node userdel --force toor
+sudo userdel --force toor
 ```
 
 ```text
@@ -101,23 +113,23 @@ With `--force`, the same message is only a warning, and the command exits with s
 Check the UID 0 accounts, the administrator account and the node services that Kubernetes needs:
 
 ```sh
-run_on_node sh -c "awk -F: '\$3 == 0 {print \$1}' /etc/passwd"
-run_on_node getent passwd root
-run_on_node passwd -S opsadmin
-run_on_node systemctl is-active kubelet.service containerd.service
+awk -F: '$3 == 0 {print $1}' /etc/passwd
+getent passwd root
+sudo passwd -S opsadmin
+systemctl is-active kubelet.service containerd.service
+kubectl get --raw=/readyz; echo
 ```
 
 ```text
 root
 root:x:0:0:root:/root:/bin/bash
-opsadmin P 2026-11-17 0 99999 7 -1
+opsadmin P 2026-11-18 0 99999 7 -1
 active
 active
+ok
 ```
 
-Only `root` has UID 0, its entry is unchanged, and `opsadmin` keeps a usable password. Then submit.
-
-After recording your result, remove the independent lab with `astrona destroy ats-033-lab-010-02-02`.
+Only `root` has UID 0, its entry is unchanged, and `opsadmin` keeps a usable password. `kubelet` and `containerd` are `active`, and the API server answers `ok`. Then submit.
 
 ## Common pitfalls
 

@@ -59,13 +59,13 @@ sections:
       after_reading: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
       objective: Stop and disable a seeded systemd service so that its port closes, while kubelet and containerd keep running.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-02
       path: sections/section-010/module-01/labs/lab-02
       after_reading: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
       objective: Purge an unneeded Debian package and its configuration files from a node without breaking Kubernetes.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     practice_readings: []
   - id: module-02
     title: Harden Node Access With SSH And Host Login Paths
@@ -91,15 +91,15 @@ sections:
     - id: lab-01
       path: sections/section-010/module-02/labs/lab-01
       after_reading: sections/section-010/module-02/course-02-limit-who-can-log-in.md
-      objective: Fix drop-in precedence in sshd_config so that root and password logins are refused and only one administrator account may log in.
+      objective: Fix drop-in precedence in sshd_config and reload sshd so that root and password logins are refused and only the listed accounts may log in.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     - id: lab-02
       path: sections/section-010/module-02/labs/lab-02
       after_reading: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
       objective: Lock an unused account, give it a refusing shell and remove a second account with UID 0.
       status: alpha
-      runtime_verification: passed 2026-11-17
+      runtime_verification: passed 2026-11-18
     practice_readings: []
   - id: module-03
     title: Restrict Workload Access To The Host
