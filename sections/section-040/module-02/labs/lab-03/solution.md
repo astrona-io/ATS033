@@ -9,9 +9,11 @@ Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-02-03)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-02-03" || exit 1
+cluster="${ASTRONA_KIND_CLUSTER:-astro-ats-033-lab-040-02-03}"
+engine="${ASTRONA_CONTAINER_ENGINE:-podman}"
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context. Each kind node is a container, so `"$engine" exec "$cluster-control-plane" ...` runs a command on the control plane node.
 
 ## Find The Failing Operation
 
@@ -44,7 +46,7 @@ Check which profile the pod template uses, then read that file on the node. The 
 
 ```sh
 kubectl -n starfleet-033-040-02-03 get deployment shuttle -o jsonpath='{.spec.template.spec.securityContext.seccompProfile}{"\n"}'
-podman exec astro-ats-033-lab-040-02-03-control-plane cat /var/lib/kubelet/seccomp/profiles/cargo-guard.json
+"$engine" exec "$cluster-control-plane" cat /var/lib/kubelet/seccomp/profiles/cargo-guard.json
 ```
 
 ```text
@@ -83,8 +85,8 @@ Save this as `cargo-guard.json`:
 Copy it over the old file on the node, and read it back to make sure the node has the new content:
 
 ```sh
-podman cp cargo-guard.json astro-ats-033-lab-040-02-03-control-plane:/var/lib/kubelet/seccomp/profiles/cargo-guard.json
-podman exec astro-ats-033-lab-040-02-03-control-plane cat /var/lib/kubelet/seccomp/profiles/cargo-guard.json
+"$engine" cp cargo-guard.json "$cluster-control-plane":/var/lib/kubelet/seccomp/profiles/cargo-guard.json
+"$engine" exec "$cluster-control-plane" cat /var/lib/kubelet/seccomp/profiles/cargo-guard.json
 ```
 
 ```text

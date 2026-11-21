@@ -197,6 +197,65 @@ Strict guidelines:
   names that say what they do (`check_route`, `count_versions`,
   `$SERVICE_URL`), never single letters.
 
+## Exam-ready labs (CKS trainings ATS031–ATS036)
+
+Graded labs in the CKS trainings also run in the full lab exam, where several
+labs share one kind cluster. The full convention, with a before and after
+example, is `authoring/exam-ready-labs.md` in `astrona-io/astrona-content`.
+ATS020 (CNPE: Observability and Operations) is the model training format:
+where this repo and ATS020 differ on grader layout, check style or the time
+line, follow ATS020. The context guard is the exception: ATS020 has none,
+the CKS labs keep theirs. ATS031 applies it to the CKS labs; copy from it. In short:
+
+- **Own namespaces.** Name each namespace `<role>-<training>-<section>-<module>-<lab>`
+  from the lab's `metadata.name`: `starfleet-033-040-01-04`,
+  `outpost-033-040-01-04`. Never a bare `starfleet`, `outpost` or `dock`.
+- **Keep the context guard; no hardcoded cluster.** Every script and helper
+  refuses to run unless `kubectl config current-context` is the lab's own
+  context, read from `${ASTRONA_KUBE_CONTEXT:-kind-astro-<lab>}` so the guard
+  also passes on an exam cluster (a qemu lab falls back to
+  `kubernetes-admin@astro-<lab>`). Never remove the guard to make a lab
+  portable. Scripts that exec into a node read `ASTRONA_KIND_CLUSTER` and
+  `ASTRONA_CONTAINER_ENGINE` with the lab mode value as fallback and run
+  `"$engine" exec "$cluster-worker"` (or `"$cluster-control-plane"`), never
+  `podman exec astro-<lab>-worker`. A solution page that runs a command on a
+  kind node sets `cluster` and `engine` the same way in its first command
+  block. `live.py` uses `NODE`, `WORKER`,
+  `ENGINE` and `node_exec()`. A qemu lab runs its scripts inside its one-node
+  VM: `bootstrap/helpers.sh` (`run_on_node`, `run_on_worker`) and `node_exec()`
+  run node commands with `sudo`.
+- **One grader per outcome.** `config.yaml` lists `validation.scripts`, one
+  per outcome, each with `description` and `points`, sourced from
+  `validation/validate-<outcome>.sh` (ATS020's layout; a qemu lab sources the
+  generated `vm/validate-<outcome>.sh`, which runs that file inside the VM).
+  Each is the same wrapper that runs `validate.sh <outcome>` and
+  `testing/check.py`, which prints one `PASS:` or `FAIL:` line (exit 0 or 1).
+  When the grader cannot look at the lab at all (a missing tool, an API server
+  that does not answer), `check.py` prints `ERROR:` and exits 2 instead, so a
+  broken environment is not reported as unfinished work. `check.py`,
+  `verify-start.sh`, `wait-solved.sh` and the wrappers are identical in every
+  lab and match `scripts/ci/lab-files/`; do not edit them per lab. Tag
+  `requirements.json` entries with `"outcome"` and put `live.py` checks under
+  `if wants('<id>'):`. Checks without an outcome are guards and run with every
+  outcome. Every outcome fails on the unsolved lab and passes for the
+  reference solution.
+- **`testing.init`.** `testing/verify-start.sh` (every outcome fails at the
+  start with exit 1 and a `FAIL:` line; an `ERROR:` or a crash is rejected),
+  then `solution/apply.sh`, then `testing/wait-solved.sh`. A qemu lab uses
+  the generated `vm/verify-start.sh`, `vm/apply-solution.sh` and
+  `vm/wait-solved.sh`, which run the same files inside the VM.
+- **Time line.** `question.md` has `Allow about N minutes for the tasks.`
+  under its title, as in ATS020: the exam time for a prepared student. Over
+  20 minutes cannot join an exam.
+- **`examScope`.** Set `namespace` or `cluster` on the lab's `astrona.yaml`
+  entry only when its `runtime.kind` fits the exam profile in
+  `exams/kubestronaut/cks.yaml` (one control plane, one worker, kindnet).
+  Anything that changes nodes, static pods, the kubelet or other cluster-wide
+  state is `cluster`.
+- **Verify end to end.** `astrona validate <lab-dir>` and
+  `astrona test <lab-dir> --accept-terms --headless` must both pass.
+- **Hands off** `task_kind`, `tags` and `topic`: other tooling owns them.
+
 ## About this repo (ATS033 only)
 
 The course covers **System Hardening**, worth **10%** of
@@ -237,9 +296,8 @@ secure or official exam questions.
 ### Review and authoring checks
 
 Preserve the shared CLAUDE.md prefix copied from ATS015. Keep course IDs, official
-domain weights and ATP links unchanged. Technical pages have `draft: true` in
-Markdown front matter until review; a module-level flag alone is insufficient.
-The ATP registration remains draft until publication is approved.
+domain weights and ATP links unchanged. Technical pages carry no `draft: true`
+front matter. The course registration in `astrona-content` is published (ATP007 version 1.0.0, approved 2026-11-21); maturity stays `alpha`.
 
 Primary author sources are recorded in `SOURCES.md`. The objective list was
 verified on 2026-10-11. Detailed reading expansions were written on 2026-10-11.

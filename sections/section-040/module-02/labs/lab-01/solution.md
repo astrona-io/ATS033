@@ -9,9 +9,11 @@ Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-02-01)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-02-01" || exit 1
+cluster="${ASTRONA_KIND_CLUSTER:-astro-ats-033-lab-040-02-01}"
+engine="${ASTRONA_CONTAINER_ENGINE:-podman}"
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context. Each kind node is a container, so `"$engine" exec "$cluster-control-plane" ...` runs a command on the control plane node.
 
 ## Check Every Pod
 
@@ -33,7 +35,7 @@ Seccomp:	0
 No pod has a filter. `bridge` sets no profile, and the kubelet of this cluster does not set `seccompDefault`, so it treats a missing profile as `Unconfined`. You can confirm this on the node. The command prints nothing and exits with code 1, because the kubelet configuration file does not mention seccomp:
 
 ```sh
-podman exec astro-ats-033-lab-040-02-01-control-plane grep -i seccomp /var/lib/kubelet/config.yaml
+"$engine" exec "$cluster-control-plane" grep -i seccomp /var/lib/kubelet/config.yaml
 ```
 
 ## See Why scout Needs More Than A Profile
