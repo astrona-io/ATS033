@@ -2,7 +2,7 @@
 
 Read CLAUDE.md before editing. Its shared prefix is copied from ATS015, while the custom portion describes ATS033: Certified Kubernetes Security Specialist (CKS), System Hardening (10%), part of ATP007.
 
-Preserve IDs, weights and existing track registration. Develop self-contained explanations with mechanisms, examples, prerequisites and failure reasoning. Start each section with an introduction and end each module with its own Summary. Keep technical Markdown draft until review.
+Preserve IDs, weights and existing track registration. Develop self-contained explanations with mechanisms, examples, prerequisites and failure reasoning. Start each section with an introduction and end each module with its own Summary. Technical pages carry no `draft: true` front matter.
 
 The maintainer explicitly requires reading-only material: no labs, playgrounds, runtime configurations or lifecycle markers. Do not claim executed results. YAML questions use the local schema and separate index; preserve stable identities and supported per-option feedback.
 

@@ -18,7 +18,7 @@ The [official objectives](https://training.linuxfoundation.org/certification/cer
 | 030 / 01 | Minimizing External Access To Host Services | Minimizing External Access To Host Services |
 | 040 / 01 | Seccomp And AppArmor As Different Kernel Boundaries | Seccomp And AppArmor As Different Kernel Boundaries |
 
-AUTHORING.yaml records measurable goals and adaptation sources. Every objective retains its section ID. All technical readings remain draft. Question banks are separate from the reading manifest and follow their declared summaries. Each module has a private playground, and graded labs follow the readings they practise.
+AUTHORING.yaml records measurable goals and adaptation sources. Every objective retains its section ID. Question banks are separate from the reading manifest and follow their declared summaries. Each module has a private playground, and graded labs follow the readings they practise.
 
 ## Hands-On Coverage
 

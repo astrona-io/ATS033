@@ -8,7 +8,7 @@
 
 Certified Kubernetes Security Specialist (CKS): System Hardening, worth 10% of the official curriculum. This course belongs to ATP007.
 
-Developed reading explains mechanisms, responsible components, examples and limits. Every section has an introduction and every module closes with a summary. Reusable YAML checks contain 5–15 questions per bank. Technical readings remain draft. Private playgrounds and graded labs are included.
+Developed reading explains mechanisms, responsible components, examples and limits. Every section has an introduction and every module closes with a summary. Reusable YAML checks contain 5–15 questions per bank. Private playgrounds and graded labs are included.
 
 ## Course Outline
 

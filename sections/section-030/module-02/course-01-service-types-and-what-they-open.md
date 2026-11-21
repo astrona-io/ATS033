@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Minimize external access to the network
 ---
