@@ -94,7 +94,7 @@ questions:
     text: The `Node` authorizer, which allows every request from a node address.
     explanation: The `Node` authorizer allows each kubelet to read what its own pods need. It does not allow by address.
   - id: c
-    text: The option `--insecure`, which sends the admin credentials.
+    text: The option `--insecure`, which sends the credentials of the administrator.
     explanation: "`--insecure` only skips the certificate check of the server. It sends no credential."
   - id: d
     text: The mode `AlwaysAllow`, which kubeadm sets by default.
@@ -119,7 +119,7 @@ questions:
     text: The anonymous user may list namespaces.
     explanation: The error does not answer the question about namespaces at all.
   - id: d
-    text: Impersonation is not allowed for the admin user.
+    text: Impersonation is not allowed for the administrator.
     explanation: The `--as` option works. The forbidden step is the review request sent as the anonymous user.
   correct_option: b
   explanation: "`kubectl auth can-i` sends a SelfSubjectAccessReview as the impersonated user, and `system:anonymous` cannot create one."

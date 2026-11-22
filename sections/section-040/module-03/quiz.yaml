@@ -101,7 +101,7 @@ questions:
         explanation: "The profile `k8s-write-tmp-only` allows writes only under `/tmp`, so no rule covers this write to `/etc`."
       - id: c
         text: "AppArmor is not enabled in the kernel."
-        explanation: "The kernel wrote the message, so the AppArmor module is active."
+        explanation: "The kernel wrote the message, so AppArmor is active in the kernel."
       - id: d
         text: "The profile is in complain mode, no rule covers this access, and enforce mode would deny it."
         explanation: "Correct. This is the line you read to decide which rule to add."
@@ -150,8 +150,8 @@ questions:
         text: "Loaded profiles live in kernel memory, and the file was not in `/etc/apparmor.d`, so the boot service did not load it again."
         explanation: "Correct. Keep the file in `/etc/apparmor.d`, or use a DaemonSet that loads the profiles on each node."
       - id: d
-        text: "A restart turns off the AppArmor module."
-        explanation: "The module stays active. Only profiles that no boot service reloads are missing."
+        text: "A restart turns off AppArmor in the kernel."
+        explanation: "AppArmor stays active. Only profiles that no boot service reloads are missing."
     correct_option: c
     explanation: "A restart removes loaded profiles unless a boot service loads them again. On Ubuntu the `apparmor` service reads `/etc/apparmor.d` at boot."
 

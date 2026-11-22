@@ -258,7 +258,7 @@ questions:
         explanation: "The kubelet and the container runtime run as root and do not depend on any interactive account."
       - id: b
         text: "The SSH daemon refuses to start, because `AllowUsers` names an account that no longer exists."
-        explanation: "The page does not describe such a failure. The risk it names is about the files of the old account."
+        explanation: "The risk of `userdel` is not about the SSH daemon. It is about the files that the old account still owns."
       - id: c
         text: "The account comes back at the next reboot."
         explanation: "A deleted account does not come back by itself."

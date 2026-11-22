@@ -94,7 +94,7 @@ questions:
     options:
       - id: a
         text: "Set `readOnlyRootFilesystem: false` again."
-        explanation: "This works but gives up the hardening. The page shows a way to keep the root read-only."
+        explanation: "This works but gives up the hardening. A writable volume fixes the error and keeps the root read-only."
       - id: b
         text: "Add `privileged: true` so that the process may write anywhere."
         explanation: "This gives almost every capability and access to the devices of the node. It is the setting you want to avoid."

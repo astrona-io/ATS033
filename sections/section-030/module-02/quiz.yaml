@@ -135,7 +135,7 @@ questions:
     explanation: No load balancer exists to read the field, so nothing applies it.
   - id: b
     text: The API server rejects the Service.
-    explanation: The page does not describe a rejection. The field simply has no effect on a `NodePort` Service.
+    explanation: The field applies to `LoadBalancer` Services only. On a `NodePort` Service no load balancer reads it, so it has no effect.
   - id: c
     text: Nothing changes; the node ports need a firewall or a cloud security group on the nodes.
     explanation: Correct. Only a load balancer reads the field.
@@ -198,7 +198,7 @@ questions:
   options:
   - id: a
     text: The Ingress controller cannot route to a Service that also has a node port.
-    explanation: The page does not describe such a limit. The problem is the open port, not the routing.
+    explanation: The routing is not the problem. The problem is the node port that the old Service still opens.
   - id: b
     text: The Ingress rules now also apply to the node port, so clients get errors.
     explanation: Ingress rules do not apply to a node port.
@@ -248,7 +248,7 @@ questions:
     explanation: No Service is created. The pod listens on the node directly.
   - id: c
     text: A host-network pod disables `kube-proxy` on its node.
-    explanation: The page does not describe this, and `kube-proxy` keeps working.
+    explanation: "`kube-proxy` keeps working on the node. The risk is that the listeners of the pod are on the node itself."
   - id: d
     text: The pod is reachable only from other pods on the same node, so it must be moved.
     explanation: Its listeners are on the node, so the node address can expose them.

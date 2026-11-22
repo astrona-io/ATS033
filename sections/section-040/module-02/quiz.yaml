@@ -141,7 +141,7 @@ questions:
     options:
       - id: a
         text: "`rename` is not a real syscall, so the rule is ignored."
-        explanation: "`rename` is a real syscall, but it exists only on older architectures."
+        explanation: "`rename` is a real syscall, and the rule does block it. The weakness is the other calls that do the same job."
       - id: b
         text: "A deny list cannot block file operations."
         explanation: "A deny list can block any syscall that it names."

@@ -146,7 +146,7 @@ questions:
         explanation: "A RoleBinding never grants outside its own namespace, even when it names a ClusterRole."
       - id: c
         text: "It is not too wide, because `admin` only allows reading."
-        explanation: "`admin` is not a read-only role. The `can-i` checks show that it reads Secrets and creates RoleBindings."
+        explanation: "`admin` is not a read-only role. Inside its namespace it reads every Secret and creates RoleBindings."
       - id: d
         text: "It makes the ServiceAccount a member of the group `system:masters`."
         explanation: "A binding does not change group membership."
