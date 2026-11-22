@@ -123,6 +123,20 @@ class StructureTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Allow about N minutes'):
             module.validate(self.root)
 
+    def test_generic_question_title(self):
+        question = self.lab / 'question.md'
+        question.write_text(module.re.sub(r'^# .+$', '# Question', question.read_text(), count=1, flags=module.re.M))
+        with self.assertRaisesRegex(ValueError, 'title must be the lab title'):
+            module.validate(self.root)
+
+    def test_time_line_not_under_title(self):
+        question = self.lab / 'question.md'
+        text = question.read_text()
+        line = module.re.search(r'^Allow about \d+ minutes for the tasks\.\n\n', text, module.re.M).group(0)
+        question.write_text(text.replace(line, '', 1).replace('## Tasks', line + '## Tasks', 1))
+        with self.assertRaisesRegex(ValueError, 'under its title'):
+            module.validate(self.root)
+
     def test_duration_drift(self):
         course = self.course()
         next(e for e in self.content_of(course, LAB) if e['path'] == LAB)['estimated_duration'] = '25m'

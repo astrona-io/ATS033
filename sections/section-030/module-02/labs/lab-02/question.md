@@ -2,7 +2,9 @@
 exam_objectives:
 - Minimize external access to the network
 ---
-# Question
+# Answer A NodePort Only On Nodes With Endpoints
+
+Allow about 8 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -19,7 +21,7 @@ worker_name="astro-ats-033-lab-030-02-02-worker"
 
 Keep this connection selected.
 
-Allow about 8 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 
