@@ -172,7 +172,9 @@ if [[ "$profile_loaded" == yes ]]; then
   kubectl -n starfleet wait --for=condition=Ready pod/apparmor-localhost --timeout=120s
   attr_current="$(kubectl -n starfleet exec apparmor-localhost -- cat /proc/1/attr/current)"
   printf '%s\n' "$attr_current"
-  expect_match 'the pod runs under k8s-deny-tmp-write followed by its mode in parentheses' "$attr_current" '^k8s-deny-tmp-write \([a-z]+\)$'
+  # Live CI (job 137364969248) printed "k8s-deny-tmp-write//&unconfined (enforce)":
+# the kernel stacks the pod profile on the kind node container's label.
+expect_match 'the pod runs under k8s-deny-tmp-write in enforce mode' "$attr_current" '^k8s-deny-tmp-write(//&[^ ]+)? \(enforce\)$'
   expect_failure 'the /tmp write fails under the profile' kubectl -n starfleet exec apparmor-localhost -- sh -c 'echo test > /tmp/file'
   expect 'the /tmp write fails with Permission denied' "$failure_output" 'Permission denied'
   kubectl -n starfleet delete pod apparmor-localhost --timeout=120s
