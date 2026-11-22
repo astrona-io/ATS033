@@ -1,0 +1,292 @@
+# Module quiz for section 010, module 02. Contract: schemas/question-bank.schema.json.
+# Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-010-02
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-010/module-02
+  title: Harden Node Access With SSH And Host Login Paths
+placement:
+  position: after
+  reading: sections/section-010/module-02/course-04-summary.md
+questions:
+  - id: ats033-010-02-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the command that prints the effective value of every sshd setting."
+    source_readings:
+      - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+    prompt: "A node has a main sshd file and three drop-in files. You want to know which value of `PasswordAuthentication` the SSH daemon would use, without reading every file by hand. Which command do you run?"
+    options:
+      - id: a
+        text: "`sudo sshd -t`"
+        explanation: "The lower-case `-t` only checks the syntax. It prints nothing when the files are valid."
+      - id: b
+        text: "`grep PasswordAuthentication /etc/ssh/sshd_config`"
+        explanation: "This reads the main file only. A drop-in file that the daemon reads first can set a different value."
+      - id: c
+        text: "`sudo sshd -T`"
+        explanation: "Correct. The upper-case `-T` makes the daemon read all its files itself and print the effective value of every keyword."
+      - id: d
+        text: "`systemctl status ssh.service`"
+        explanation: "This shows whether the service runs. It does not list the values of the settings."
+    correct_option: c
+    explanation: "`sshd -T` (test mode, extended) prints the values the daemon uses, in lower case. It reads the files from disk, so it does not describe the daemon that runs now."
+
+  - id: ats033-010-02-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Identify the file line that must be changed when drop-in files set a value first."
+    source_readings:
+      - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+    prompt: "`/etc/ssh/sshd_config` has `Include /etc/ssh/sshd_config.d/*.conf` at line 12 and `PasswordAuthentication no` at line 135. The drop-in file `50-cloud-init.conf` sets `PasswordAuthentication yes`, and `60-cloudimg-settings.conf` sets `PasswordAuthentication no`. `sshd -T` prints `passwordauthentication yes`. Which change turns passwords off?"
+    options:
+      - id: a
+        text: "Change the line in `50-cloud-init.conf` to `PasswordAuthentication no`."
+        explanation: "Correct. The daemon reads the drop-in files in alphabetical order at the Include line, so this file gives the first value, and the first value wins."
+      - id: b
+        text: "Add a second `PasswordAuthentication no` line at the end of the main file."
+        explanation: "A later line never overrides an earlier one in sshd. The `yes` from the drop-in file is still read first."
+      - id: c
+        text: "Change the line in `60-cloudimg-settings.conf`."
+        explanation: "This file already says `no`, and it is read after `50-cloud-init.conf`, so its value is ignored."
+      - id: d
+        text: "Delete `60-cloudimg-settings.conf`, because it repeats the keyword."
+        explanation: "Repeated keywords are allowed. `50-cloud-init.conf` is still read first, so the value stays `yes`."
+    correct_option: a
+    explanation: "For each keyword, sshd uses the first value it reads. Fix the line that is read first, then check the result with `sshd -T`."
+
+  - id: ats033-010-02-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a file change does not reach the running SSH daemon until a reload."
+    source_readings:
+      - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+    prompt: "You fix the drop-in file. `sshd -T` now prints `passwordauthentication no`. A test login with `PreferredAuthentications=none` still prints `Permission denied (publickey,password)`. What is the reason?"
+    options:
+      - id: a
+        text: "`sshd -T` prints default values and ignores the drop-in files."
+        explanation: "`sshd -T` reads all the files, including the drop-in files."
+      - id: b
+        text: "The client cached the list of methods from an earlier login."
+        explanation: "The list comes from the running daemon on every login attempt."
+      - id: c
+        text: "Keyboard-interactive authentication is still on and shows up as `password`."
+        explanation: "In this case the daemon simply has not read the new files yet. The fix is a reload."
+      - id: d
+        text: "The running daemon reads its files only when it starts or reloads, so it still uses the old value."
+        explanation: "Correct. Run `sshd -t` to check the syntax, then `systemctl reload ssh.service`, and test again."
+    correct_option: d
+    explanation: "`sshd -T` checks the files on disk. The running daemon keeps its old settings until `systemctl reload ssh.service`."
+
+  - id: ats033-010-02-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the settings that together give key-only SSH access."
+    source_readings:
+      - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+    prompt: "`sshd -T` shows `passwordauthentication no` and `pubkeyauthentication yes`, but users still get a password prompt when they connect. Which setting should you check next?"
+    options:
+      - id: a
+        text: "`PermitRootLogin`"
+        explanation: "This controls the `root` account only. It does not offer a password prompt to other accounts."
+      - id: b
+        text: "`KbdInteractiveAuthentication`"
+        explanation: "Correct. Keyboard-interactive authentication is a second mechanism that can ask for a password even when `PasswordAuthentication` is `no`."
+      - id: c
+        text: "`AllowUsers`"
+        explanation: "This limits which accounts may log in. It does not decide which authentication methods the daemon offers."
+      - id: d
+        text: "`PubkeyAuthentication`"
+        explanation: "This is already `yes`, which turns key login on. It does not cause a password prompt."
+    correct_option: b
+    explanation: "Key-only access means `PasswordAuthentication no` and `PubkeyAuthentication yes`, with keyboard-interactive authentication checked as well."
+
+  - id: ats033-010-02-q05
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "State what each value of PermitRootLogin allows."
+    source_readings:
+      - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+    prompt: "A node uses the default of current OpenSSH versions, `PermitRootLogin prohibit-password`. What does this allow?"
+    options:
+      - id: a
+        text: "Root may log in with a password or a key."
+        explanation: "That is the value `yes`."
+      - id: b
+        text: "Root may not log in over SSH at all."
+        explanation: "That is the value `no`."
+      - id: c
+        text: "Root may log in with a key only."
+        explanation: "Correct. `prohibit-password` refuses a password for root but accepts a key."
+      - id: d
+        text: "Root may log in only with a key that is restricted to one command."
+        explanation: "That is the value `forced-commands-only`."
+    correct_option: c
+    explanation: "Root is the one account name every attacker knows, so the hardened value is `no`. Administrators log in as a named account and use `sudo`."
+
+  - id: ats033-010-02-q06
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Predict the effect of a setting appended after a Match block."
+    source_readings:
+      - sections/section-010/module-02/course-02-limit-who-can-log-in.md
+    prompt: "The main sshd file ends with a `Match User backup` block. An administrator appends `AllowUsers opsadmin student astrona` to the end of the file and reloads. What is the result?"
+    options:
+      - id: a
+        text: "The allow list applies only to connections of the account `backup`. Every other account can still log in."
+        explanation: "Correct. Every line after a `Match` line belongs to that block until the next `Match` line or the end of the file."
+      - id: b
+        text: "The allow list applies to every account, because `AllowUsers` is always global."
+        explanation: "No keyword escapes a `Match` block by position. `sshd -T` without `-C` prints no `allowusers` line in this case."
+      - id: c
+        text: "The daemon refuses to reload, because `AllowUsers` is not allowed inside a `Match` block."
+        explanation: "The daemon accepts the line. The problem is that it limits only one account."
+      - id: d
+        text: "Only `backup` is refused, because it is not on the list, and every other account is checked against the list."
+        explanation: "The list only exists for `backup` connections. For the other accounts no allow list exists."
+    correct_option: a
+    explanation: "Put global settings above the first `Match` line, or in a drop-in file: the `Include` line sits above the `Match` block, so every line in a drop-in file is global."
+
+  - id: ats033-010-02-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Order the steps that change a live SSH daemon without a lockout."
+    source_readings:
+      - sections/section-010/module-02/course-02-limit-who-can-log-in.md
+    prompt: "You added an `AllowUsers` drop-in file on a remote node, and you are logged in through SSH. Which sequence is the safe way to make the daemon use it?"
+    options:
+      - id: a
+        text: "`systemctl restart ssh.service`, then log out and log in again to test."
+        explanation: "A restart stops the daemon, and a wrong file can keep it from starting. Logging out first removes your way to repair it."
+      - id: b
+        text: "`sshd -T`, then `systemctl restart ssh.service`, then close the session."
+        explanation: "A restart is riskier than a reload, and closing the session before a test can lock you out."
+      - id: c
+        text: "Reboot the node so that every service reads its files again."
+        explanation: "A reboot drops your session and gives no chance to repair a wrong file."
+      - id: d
+        text: "`sshd -t`, then `systemctl reload ssh.service`, then test a new login from a second session before you close the first."
+        explanation: "Correct. The syntax check finds errors, the reload keeps open sessions, and the open session lets you repair a mistake."
+    correct_option: d
+    explanation: "Check the syntax, reload instead of restart, and keep the first session open until a new login works."
+
+  - id: ats033-010-02-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the reason for a refused SSH login in the journal of the SSH service."
+    source_readings:
+      - sections/section-010/module-02/course-02-limit-who-can-log-in.md
+    prompt: "`AllowUsers opsadmin student astrona` is active. Test logins as `student` and as `olduser` both print `Permission denied (publickey)`. How do you see why `olduser` was refused?"
+    options:
+      - id: a
+        text: "Run the `ssh` command again with `-o BatchMode=no`, so the client prints the reason."
+        explanation: "The daemon does not tell a client why it refuses a login, whatever the client options."
+      - id: b
+        text: "Read the journal of the `ssh` service, for example `journalctl --unit=ssh.service --grep=AllowUsers`."
+        explanation: "Correct. The daemon logs a line such as `User olduser from 127.0.0.1 not allowed because not listed in AllowUsers`."
+      - id: c
+        text: "Run `sshd -T -C user=olduser` and look for a `denied` line."
+        explanation: "`sshd -T` prints settings. It does not report why a past login failed."
+      - id: d
+        text: "Read `/etc/passwd`, because a refused account has no entry there."
+        explanation: "`AllowUsers` limits SSH logins only. The account still exists in `/etc/passwd`."
+    correct_option: b
+    explanation: "The client sees the same answer for every refused login. The daemon writes the real reason to the journal of the service."
+
+  - id: ats033-010-02-q09
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Change the login shell of an account so that an interactive login is refused."
+    source_readings:
+      - sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+    prompt: "`getent passwd olduser` prints `olduser:x:1004:1004::/home/olduser:/bin/bash`. Nobody uses this account. Which command makes a login through `su`, a console or SSH start a program that refuses the login?"
+    options:
+      - id: a
+        text: "`sudo usermod --lock olduser`"
+        explanation: "This locks the password only. The login shell stays `/bin/bash`."
+      - id: b
+        text: "`sudo passwd -S olduser`"
+        explanation: "This prints the password status. It changes nothing."
+      - id: c
+        text: "`sudo usermod --shell /usr/sbin/nologin olduser`"
+        explanation: "Correct. This changes the seventh field of `/etc/passwd`, so a login starts `nologin`, which prints a message and ends."
+      - id: d
+        text: "`sudo rm /home/olduser/.ssh/authorized_keys`"
+        explanation: "This removes the key credential. It does not change the login shell, so `su` still starts `/bin/bash`."
+    correct_option: c
+    explanation: "The seventh field of `/etc/passwd` is the login shell. `/usr/sbin/nologin` or `/bin/false` refuses an interactive login."
+
+  - id: ats033-010-02-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Recognise an account with user identifier 0 as a hidden root account."
+    source_readings:
+      - sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+    prompt: "`awk -F: '$3 == 0 {print $1}' /etc/passwd` prints two names: `root` and `toor`. What does this mean?"
+    options:
+      - id: a
+        text: "The kernel treats `toor` as root, so it is a second root account that needs an explanation or removal."
+        explanation: "Correct. The kernel looks at the user identifier (UID), not the name. Every account with UID 0 is root."
+      - id: b
+        text: "`toor` is a normal account, because only the name `root` has root rights."
+        explanation: "Root rights come from UID 0, whatever the account name."
+      - id: c
+        text: "`toor` is a system account for a daemon and is expected on every node."
+        explanation: "The expected output is the single name `root`. Any other name needs an explanation."
+      - id: d
+        text: "The command lists accounts with no password, so `toor` should be locked."
+        explanation: "The third field of `/etc/passwd` is the UID. The command lists accounts with UID 0."
+    correct_option: a
+    explanation: "Look for every account with UID 0, not only the one named `root`."
+
+  - id: ats033-010-02-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why an unused account is locked instead of deleted."
+    source_readings:
+      - sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+    prompt: "A colleague wants to run `userdel olduser` instead of locking the account, because it looks cleaner. The account still owns files on the node. What is the risk?"
+    options:
+      - id: a
+        text: "The kubelet stops, because it runs as `olduser`."
+        explanation: "The kubelet and the container runtime run as root and do not depend on any interactive account."
+      - id: b
+        text: "The SSH daemon refuses to start, because `AllowUsers` names an account that no longer exists."
+        explanation: "The page does not describe such a failure. The risk it names is about the files of the old account."
+      - id: c
+        text: "The account comes back at the next reboot."
+        explanation: "A deleted account does not come back by itself."
+      - id: d
+        text: "The files keep the old UID with no owner name, and a new account can later receive the same UID and inherit them."
+        explanation: "Correct. Locking the account and giving it a refusing shell removes every login path and keeps the files traceable."
+    correct_option: d
+    explanation: "Lock the account, review or move its files, and delete it only after that review."
+
+  - id: ats033-010-02-q12
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the status letter that passwd -S prints."
+    source_readings:
+      - sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+    prompt: "After a change, `sudo passwd -S olduser` prints `olduser L 2026-11-18 0 99999 7 -1`. What does the letter `L` tell you?"
+    options:
+      - id: a
+        text: "The account has a usable password."
+        explanation: "A usable password shows the letter `P`."
+      - id: b
+        text: "The password is locked, so no password matches it."
+        explanation: "Correct. `usermod --lock` puts an exclamation mark in front of the password hash in `/etc/shadow`, and `passwd -S` then shows `L`."
+      - id: c
+        text: "The account has no password."
+        explanation: "No password shows the letters `NP`."
+      - id: d
+        text: "The account has a `nologin` shell."
+        explanation: "`passwd -S` reports the password only. Read the shell with `getent passwd olduser`."
+    correct_option: b
+    explanation: "A locked password closes the password path only. The login shell and the keys in `authorized_keys` are separate paths."

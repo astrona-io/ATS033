@@ -1,0 +1,246 @@
+# Module quiz for section 020, module 02. Contract:
+# schemas/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-020-02
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-020/module-02
+  title: Least-Privilege RBAC Roles And Bindings
+placement:
+  position: after
+  reading: sections/section-020/module-02/course-04-summary.md
+questions:
+  - id: ats033-020-02-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict which requests a rule with `resourceNames` allows."
+    source_readings:
+      - sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
+    prompt: "A Role in `starfleet` has one role-based access control (RBAC) rule: `apiGroups: [\"\"]`, `resources: [\"configmaps\"]`, `resourceNames: [\"probe-code\"]`, `verbs: [\"get\", \"list\"]`. A RoleBinding gives it to the ServiceAccount `report-reader`. What does `kubectl auth can-i list configmaps --as=system:serviceaccount:starfleet:report-reader -n starfleet` print?"
+    options:
+      - id: a
+        text: "`yes`, because the rule names the verb `list`."
+        explanation: "The verb is in the rule, but the rule also has `resourceNames`, and a `list` request carries no object name to match."
+      - id: b
+        text: "`yes`, but the API server returns only the ConfigMap `probe-code`."
+        explanation: "RBAC does not filter a list. It allows or refuses the whole request."
+      - id: c
+        text: "An error, because `resourceNames` cannot be used together with `list`."
+        explanation: "The API server accepts the Role. The rule simply never matches a `list` request."
+      - id: d
+        text: "`no`, because a `list` request has no object name, so a rule with `resourceNames` never matches it."
+        explanation: "Correct. `resourceNames` only works for verbs that name one object, such as `get`."
+    correct_option: d
+    explanation: "`resourceNames` does not restrict `list`, `watch` or `create`. These requests have no object name, so the rule does not match them."
+
+  - id: ats033-020-02-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Write the correct API group for a core resource in an RBAC rule."
+    source_readings:
+      - sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
+    prompt: "You write a Role rule that must allow `get` on pods. Which value belongs in `apiGroups`?"
+    options:
+      - id: a
+        text: "The empty string `\"\"`."
+        explanation: "Correct. The empty string means the core API group, where `pods`, `secrets` and `configmaps` live."
+      - id: b
+        text: "`\"v1\"`."
+        explanation: "`v1` is a version, not an API group name. A rule with it does not match pods."
+      - id: c
+        text: "`\"apps\"`."
+        explanation: "The `apps` group holds Deployments, not pods."
+      - id: d
+        text: "`\"*\"`, because pods have no API group."
+        explanation: "A wildcard matches every group, including groups installed later. That grants far more than the task needs."
+    correct_option: a
+    explanation: "Core resources such as pods need the empty string in `apiGroups`."
+
+  - id: ats033-020-02-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Fix a RoleBinding that references the wrong role."
+    source_readings:
+      - sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
+    prompt: "A RoleBinding `report-reader-view` has a `roleRef` that names the wrong ClusterRole. You edit the YAML file to name the correct ClusterRole and run `kubectl apply` again. The API server refuses the change. What do you do?"
+    options:
+      - id: a
+        text: "Restart the API server so that it accepts the new `roleRef`."
+        explanation: "A restart does not change the rule. The `roleRef` of a binding is fixed for its whole life."
+      - id: b
+        text: "Add the correct ClusterRole as a second `roleRef` in the same binding."
+        explanation: "A binding has exactly one `roleRef`."
+      - id: c
+        text: "Delete the RoleBinding and create it again with the correct `roleRef`."
+        explanation: "Correct. The reference of a binding to a role cannot change after creation."
+      - id: d
+        text: "Edit the ClusterRole so that it has the name the binding expects."
+        explanation: "Renaming or rewriting a shared ClusterRole changes the access of every other subject bound to it."
+    correct_option: c
+    explanation: "The `roleRef` of a binding cannot be changed. Delete the binding and create it again."
+
+  - id: ats033-020-02-q04
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Explain how the API server blocks privilege escalation through bindings."
+    source_readings:
+      - sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+    prompt: "The user `jane` holds `create` on `rolebindings` in `outpost` and nothing else. She tries to create a RoleBinding in `outpost` that gives the ClusterRole `cluster-admin` to herself. What does the API server do?"
+    options:
+      - id: a
+        text: "It creates the binding, because `jane` may create RoleBindings."
+        explanation: "The verb `create` on `rolebindings` alone is not enough to grant power."
+      - id: b
+        text: "It refuses the binding, because `jane` does not hold all permissions of `cluster-admin` and does not hold the verb `bind` on it."
+        explanation: "Correct. A user can bind a role only if they already hold its permissions or hold `bind` on that role."
+      - id: c
+        text: "It creates the binding but limits it to read-only verbs."
+        explanation: "The API server never changes the rules of a binding. It allows or refuses the request."
+      - id: d
+        text: "It refuses the binding, because a RoleBinding can never reference a ClusterRole."
+        explanation: "A RoleBinding can reference a ClusterRole. That is how a ClusterRole is limited to one namespace."
+    correct_option: b
+    explanation: "The escalation check allows a binding only to a role whose permissions the user already holds, unless the user holds the verb `bind`."
+
+  - id: ats033-020-02-q05
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Identify a permission that indirectly lets the holder act as another ServiceAccount."
+    source_readings:
+      - sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+    prompt: "A Role in `starfleet` contains no rules on Secrets, `roles` or `rolebindings`. Which rule in it still lets the holder act as any ServiceAccount in `starfleet`?"
+    options:
+      - id: a
+        text: "`get` and `list` on `configmaps`."
+        explanation: "Reading ConfigMaps does not give access to ServiceAccount tokens."
+      - id: b
+        text: "`get` on `deployments` in the `apps` group."
+        explanation: "Reading a Deployment shows its spec, not the token of a ServiceAccount."
+      - id: c
+        text: "`get` on `services`."
+        explanation: "Reading a Service gives no identity."
+      - id: d
+        text: "`create` on `pods`."
+        explanation: "Correct. The holder can start a pod that runs as any ServiceAccount in the namespace and receives its token."
+    correct_option: d
+    explanation: "Creating pods is an indirect path to more power, because the new pod can use the token of any ServiceAccount in its namespace."
+
+  - id: ats033-020-02-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Measure what the built-in ClusterRole `admin` grants inside one namespace."
+    source_readings:
+      - sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+    prompt: "A deployment tool only needs to restart one Deployment in `outpost`. A RoleBinding in `outpost` gives its ServiceAccount the ClusterRole `admin`. Why is this binding too wide?"
+    options:
+      - id: a
+        text: "In `outpost` it still lets the ServiceAccount read every Secret and create RoleBindings, while a restart needs only `get` and `patch` on Deployments."
+        explanation: "Correct. The RoleBinding limits `admin` to one namespace, but inside that namespace `admin` holds much more than the task needs."
+      - id: b
+        text: "It gives the ServiceAccount full access in every namespace."
+        explanation: "A RoleBinding never grants outside its own namespace, even when it names a ClusterRole."
+      - id: c
+        text: "It is not too wide, because `admin` only allows reading."
+        explanation: "`admin` is not a read-only role. The `can-i` checks show that it reads Secrets and creates RoleBindings."
+      - id: d
+        text: "It makes the ServiceAccount a member of the group `system:masters`."
+        explanation: "A binding does not change group membership."
+    correct_option: a
+    explanation: "Replace the `admin` binding with a Role that allows `get` and `patch` on `deployments`, then delete the old binding."
+
+  - id: ats033-020-02-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a wildcard rule grows in effect over time."
+    source_readings:
+      - sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+    prompt: "A ClusterRole created last year has the rule `apiGroups: [\"*\"]`, `resources: [\"*\"]`, `verbs: [\"get\"]`. Nobody has edited it since. This month a team installs a new custom resource. What is true about the ClusterRole now?"
+    options:
+      - id: a
+        text: "It does not cover the new resource until someone applies the ClusterRole again."
+        explanation: "A wildcard is matched at request time. It needs no reapply."
+      - id: b
+        text: "It covers the new resource only if the resource is in the core group."
+        explanation: "`apiGroups: [\"*\"]` matches every API group, not only the core group."
+      - id: c
+        text: "It allows `get` on the new custom resource, because a wildcard also matches resources that did not exist when the rule was written."
+        explanation: "Correct. The rule stays the same while its effect grows."
+      - id: d
+        text: "It is safe, because a rule with only `get` cannot read Secrets."
+        explanation: "`resources: [\"*\"]` includes Secrets, so `get` on Secrets is allowed."
+    correct_option: c
+    explanation: "A wildcard grants everything that exists now and everything installed later, so rules should list exact values."
+
+  - id: ats033-020-02-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Explain how an aggregated ClusterRole changes without an edit to the binding or the role."
+    source_readings:
+      - sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
+    prompt: "A ServiceAccount is bound to the ClusterRole `view`. Nobody changed the binding or `view`, but today `kubectl auth can-i --list` shows that the ServiceAccount can read a new custom resource. What is the most likely cause?"
+    options:
+      - id: a
+        text: "The API server gives `view` access to every new resource by default."
+        explanation: "New resources are not added to `view` by default. They are added through labels on other ClusterRoles."
+      - id: b
+        text: "Someone created a ClusterRole with the label `rbac.authorization.k8s.io/aggregate-to-view: \"true\"`, and a controller in `kube-controller-manager` copied its rules into `view`."
+        explanation: "Correct. `view` holds an `aggregationRule`, so its rules follow every ClusterRole that matches the label selector."
+      - id: c
+        text: "The kubelet refreshed the ServiceAccount token, and the new token has more permissions."
+        explanation: "A token proves identity. The bindings and roles decide the permissions."
+      - id: d
+        text: "Someone edited the rules of `view` by hand."
+        explanation: "The controller overwrites hand edits to an aggregated role, so this cannot last."
+    correct_option: b
+    explanation: "Aggregated ClusterRoles such as `view`, `edit` and `admin` change when other ClusterRoles carry their labels."
+
+  - id: ats033-020-02-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why the group `system:masters` cannot be limited with RBAC."
+    source_readings:
+      - sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+    prompt: "A client certificate names the group `system:masters`. An administrator deletes every ClusterRoleBinding to `cluster-admin` that names this group. What can a client with this certificate still do?"
+    options:
+      - id: a
+        text: "Nothing, because RBAC now has no binding for the group."
+        explanation: "The group `system:masters` does not depend on bindings."
+      - id: b
+        text: "Only read resources, because the write rules came from the binding."
+        explanation: "The group has full power. No binding limits it to reading."
+      - id: c
+        text: "Everything, because the group `system:masters` bypasses RBAC completely."
+        explanation: "Correct. No RBAC rule can restrict a certificate that names this group."
+      - id: d
+        text: "Only what a RoleBinding in the `default` namespace allows."
+        explanation: "The group is not limited to one namespace or to RoleBindings."
+    correct_option: c
+    explanation: "The built-in group `system:masters` has the same power as `cluster-admin` and bypasses RBAC, so no rule can restrict it."
+
+  - id: ats033-020-02-q10
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Run `kubectl auth can-i` in the namespace you mean to test."
+    source_readings:
+      - sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
+    prompt: "Your current context uses the namespace `starfleet`. You run `kubectl auth can-i delete secrets --as=system:serviceaccount:outpost:restarter` without `-n`. Which question does the API server answer?"
+    options:
+      - id: a
+        text: "Whether `restarter` may delete Secrets in `outpost`, the namespace of the ServiceAccount."
+        explanation: "The namespace in the user name only identifies the ServiceAccount. It does not set the namespace of the question."
+      - id: b
+        text: "Whether `restarter` may delete Secrets in every namespace."
+        explanation: "The command asks about one namespace, not all of them."
+      - id: c
+        text: "Whether you, the administrator, may delete Secrets in `starfleet`."
+        explanation: "The option `--as` sends the question as `restarter`, not as you."
+      - id: d
+        text: "Whether `restarter` may delete Secrets in `starfleet`, the namespace of your current context."
+        explanation: "Correct. Without `-n`, `kubectl` asks in the namespace of the current context."
+    correct_option: d
+    explanation: "Always add `-n <namespace>` so that the answer is about the namespace you mean to test."

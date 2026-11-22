@@ -1,0 +1,294 @@
+# Module quiz for section 040, module 03. Contract:
+# schemas/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-040-03
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-040/module-03
+  title: Confine Workloads With AppArmor And Capabilities
+placement:
+  position: after
+  reading: sections/section-040/module-03/course-04-summary.md
+questions:
+  - id: ats033-040-03-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Identify the name a pod uses to refer to an AppArmor profile."
+    source_readings:
+      - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+      - sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+    prompt: "The file `/etc/apparmor.d/web-guard` contains `profile k8s-web-readonly flags=(attach_disconnected) { ... }`. Which value goes in `appArmorProfile.localhostProfile`?"
+    options:
+      - id: a
+        text: "`web-guard`"
+        explanation: "That is the file name. The pod does not refer to the profile by its file name."
+      - id: b
+        text: "`k8s-web-readonly`"
+        explanation: "Correct. The pod uses the word after `profile` inside the file."
+      - id: c
+        text: "`/etc/apparmor.d/web-guard`"
+        explanation: "AppArmor `localhostProfile` names a profile loaded in the kernel, not a path to a file."
+      - id: d
+        text: "`localhost/web-guard`"
+        explanation: "The field takes the plain profile name, with no prefix."
+    correct_option: b
+    explanation: "The profile name, written after the word `profile` in the file, is what the kernel knows and what a pod refers to."
+
+  - id: ats033-040-03-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict how complain mode treats an explicit deny rule."
+    source_readings:
+      - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+    prompt: "The profile `k8s-deny-tmp-write` has the rule `deny /tmp/** w,`. You switch it to complain mode with `aa-complain` and run `aa-exec -p k8s-deny-tmp-write -- touch /tmp/apparmor-test`. What happens?"
+    options:
+      - id: a
+        text: "The write succeeds and the kernel logs `apparmor=\"ALLOWED\"`."
+        explanation: "Complain mode allows and logs only access that no rule covers. This access has a rule."
+      - id: b
+        text: "The write succeeds and nothing is logged, because complain mode turns the profile off."
+        explanation: "Complain mode keeps the profile loaded, and explicit `deny` rules still apply."
+      - id: c
+        text: "The write fails with `Permission denied`, because an explicit `deny` rule blocks in complain mode too."
+        explanation: "Correct. By default the kernel also writes no message for that denied access."
+      - id: d
+        text: "`aa-exec` refuses to run a profile that is in complain mode."
+        explanation: "`aa-exec` runs a command under any loaded profile, in either mode."
+    correct_option: c
+    explanation: "Complain mode only relaxes access that the profile does not mention. An explicit `deny` rule blocks in both modes."
+
+  - id: ats033-040-03-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the apparmor_parser option for a task."
+    source_readings:
+      - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+    prompt: "You want to load the new profile file `/etc/apparmor.d/k8s-write-tmp-only` into the kernel in complain mode. Which command does that?"
+    options:
+      - id: a
+        text: "`sudo apparmor_parser -r -C /etc/apparmor.d/k8s-write-tmp-only`"
+        explanation: "Correct. `-r` loads or replaces the profile, and `-C` loads it in complain mode."
+      - id: b
+        text: "`sudo apparmor_parser -R /etc/apparmor.d/k8s-write-tmp-only`"
+        explanation: "`-R` removes the profile from the kernel."
+      - id: c
+        text: "`sudo aa-status /etc/apparmor.d/k8s-write-tmp-only`"
+        explanation: "`aa-status` lists loaded profiles and their processes. It does not load a file."
+      - id: d
+        text: "`apparmor_parser -r /etc/apparmor.d/k8s-write-tmp-only` as the user `student`"
+        explanation: "This loads in enforce mode, and `apparmor_parser` needs root."
+    correct_option: a
+    explanation: "`apparmor_parser -r` loads or replaces a profile, `-C` sets complain mode and `-R` removes it. All AppArmor tools that change the kernel need `sudo`."
+
+  - id: ats033-040-03-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Interpret AppArmor audit messages."
+    source_readings:
+      - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+    prompt: "While you write a profile, `/var/log/audit/audit.log` shows `apparmor=\"ALLOWED\" operation=\"open\" class=\"file\" profile=\"k8s-write-tmp-only\" name=\"/etc/apparmor-test\"`. What does this line tell you?"
+    options:
+      - id: a
+        text: "The profile is in enforce mode and the write was blocked."
+        explanation: "In enforce mode a blocked access is logged as `apparmor=\"DENIED\"`."
+      - id: b
+        text: "The profile allows writes to `/etc` by an explicit rule."
+        explanation: "The profile `k8s-write-tmp-only` allows writes only under `/tmp`, so no rule covers this write to `/etc`."
+      - id: c
+        text: "AppArmor is not enabled in the kernel."
+        explanation: "The kernel wrote the message, so the AppArmor module is active."
+      - id: d
+        text: "The profile is in complain mode, no rule covers this access, and enforce mode would deny it."
+        explanation: "Correct. This is the line you read to decide which rule to add."
+    correct_option: d
+    explanation: "Audit messages contain `apparmor=\"DENIED\"` in enforce mode and `apparmor=\"ALLOWED\"` in complain mode, followed by the profile name and the path."
+
+  - id: ats033-040-03-q05
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Diagnose a pod that stays in Terminating under a custom AppArmor profile."
+    source_readings:
+      - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+      - sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+    prompt: "A pod uses a custom AppArmor profile. After `kubectl delete pod`, the pod stays in `Terminating`. The kernel log shows `apparmor=\"DENIED\" operation=\"signal\" ... signal=kill peer=\"runc\"`. What is the fix?"
+    options:
+      - id: a
+        text: "Switch the profile to complain mode for good."
+        explanation: "That relaxes every uncovered access in production, when only one rule is missing."
+      - id: b
+        text: "Add `signal (receive) peer=runc,` to the profile and reload it with `apparmor_parser -r`."
+        explanation: "Correct. The rule lets `runc` send the kill signal that stops the container."
+      - id: c
+        text: "Add the `KILL` capability to the container."
+        explanation: "The denial comes from the AppArmor signal check, not from a missing capability."
+      - id: d
+        text: "Remove the `attach_disconnected` flag."
+        explanation: "That flag is needed for container filesystems and has nothing to do with signals."
+    correct_option: b
+    explanation: "AppArmor also checks signals. A profile without a `signal` rule denies the kill signal from `runc`, so the container never stops."
+
+  - id: ats033-040-03-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a loaded AppArmor profile can disappear from a node."
+    source_readings:
+      - sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+    prompt: "An administrator loaded a profile with `apparmor_parser -r ~/k8s-guard` on every node. After the nodes restart, new pods that use it show `CreateContainerError`. What is the most likely cause?"
+    options:
+      - id: a
+        text: "The restart switched the profile to complain mode."
+        explanation: "A profile in complain mode is still loaded, and the pod would start."
+      - id: b
+        text: "The kubelet deletes all profiles when it starts."
+        explanation: "The kubelet does not load or remove profiles. It only checks that the node supports AppArmor."
+      - id: c
+        text: "Loaded profiles live in kernel memory, and the file was not in `/etc/apparmor.d`, so the boot service did not load it again."
+        explanation: "Correct. Keep the file in `/etc/apparmor.d`, or use a DaemonSet that loads the profiles on each node."
+      - id: d
+        text: "A restart turns off the AppArmor module."
+        explanation: "The module stays active. Only profiles that no boot service reloads are missing."
+    correct_option: c
+    explanation: "A restart removes loaded profiles unless a boot service loads them again. On Ubuntu the `apparmor` service reads `/etc/apparmor.d` at boot."
+
+  - id: ats033-040-03-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read the AppArmor profile that applies inside a container."
+    source_readings:
+      - sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+    prompt: "A pod sets `appArmorProfile.type: RuntimeDefault` at pod level. Container `general` sets nothing. Container `guarded` sets `type: Localhost` with `localhostProfile: k8s-deny-tmp-write`. What does `cat /proc/1/attr/current` print in `general` on a containerd node?"
+    options:
+      - id: a
+        text: "`cri-containerd.apparmor.d (enforce)`"
+        explanation: "Correct. `general` inherits the pod value, the default profile that containerd loads."
+      - id: b
+        text: "`k8s-deny-tmp-write (enforce)`"
+        explanation: "That is the output in `guarded`. The container override applies to that container only."
+      - id: c
+        text: "`unconfined`"
+        explanation: "The pod value gives `general` the runtime default profile."
+      - id: d
+        text: "`RuntimeDefault (enforce)`"
+        explanation: "The file shows the name of the loaded profile, not the type from the pod specification."
+    correct_option: a
+    explanation: "The container value replaces the pod value only for the container that sets it. `/proc/1/attr/current` shows the profile name and mode, or `unconfined`."
+
+  - id: ats033-040-03-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Distinguish the kubelet check from the container runtime check for AppArmor."
+    source_readings:
+      - sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+    prompt: "A pod asks for `appArmorProfile.type: Localhost` with `localhostProfile: k8s-not-loaded`. The node has AppArmor enabled, but no profile of that name is loaded. Which component stops the pod, and what do you see?"
+    options:
+      - id: a
+        text: "The scheduler; the pod stays `Pending` with no node assigned."
+        explanation: "The scheduler places the pod. It does not check AppArmor profiles."
+      - id: b
+        text: "The kubelet; it rejects the pod because the node does not support AppArmor."
+        explanation: "The kubelet rejects a pod only when the node kernel has no AppArmor. This node has it."
+      - id: c
+        text: "The API server; it refuses the manifest when the profile is unknown."
+        explanation: "The API server does not know which profiles a node has loaded."
+      - id: d
+        text: "The container runtime; the pod shows `CreateContainerError` with a `Failed` event that names the missing profile."
+        explanation: "Correct. containerd looks up the profile in the kernel, does not find it, and the container is not created."
+    correct_option: d
+    explanation: "The kubelet checks that the node supports AppArmor. The container runtime then looks up a `Localhost` profile in the kernel and fails when it is not loaded."
+
+  - id: ats033-040-03-q09
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the current way to set an AppArmor profile in a manifest."
+    source_readings:
+      - sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+    prompt: "An old manifest sets the annotation `container.apparmor.security.beta.kubernetes.io/shell`. You update it for Kubernetes 1.35. What should the new manifest use?"
+    options:
+      - id: a
+        text: "Keep only the annotation, because the field is still beta."
+        explanation: "The annotation is the deprecated form. The field is the current one."
+      - id: b
+        text: "Only the `appArmorProfile` field in the `securityContext`."
+        explanation: "Correct. If a pod has both, the field wins, and new manifests should use only the field."
+      - id: c
+        text: "Both the annotation and the field, so older nodes still work."
+        explanation: "When both are set the field wins, so the annotation adds nothing."
+      - id: d
+        text: "The `seccompProfile` field, because it replaced AppArmor."
+        explanation: "Seccomp filters syscalls. It does not replace AppArmor, which decides by path."
+    correct_option: b
+    explanation: "The annotation is deprecated. `appArmorProfile` exists at pod level and at container level."
+
+  - id: ats033-040-03-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain what allowPrivilegeEscalation false prevents."
+    source_readings:
+      - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+    prompt: "A container sets `allowPrivilegeEscalation: false`. Which line in `/proc/1/status` proves it, and what does it prevent?"
+    options:
+      - id: a
+        text: "`CapEff: 0000000000000000`; it removes all capabilities."
+        explanation: "Capabilities are changed by `capabilities.drop` and `add`, not by this field."
+      - id: b
+        text: "`Seccomp: 2`; it installs a seccomp filter."
+        explanation: "The seccomp filter comes from `seccompProfile`, not from this field."
+      - id: c
+        text: "`NoNewPrivs: 1`; a program the process starts cannot gain more rights than its parent, for example through a setuid file."
+        explanation: "Correct. The field sets the kernel flag `no_new_privs`."
+      - id: d
+        text: "`NoNewPrivs: 0`; it blocks the root user."
+        explanation: "`0` means escalation is allowed, which is the Kubernetes default."
+    correct_option: c
+    explanation: "Kubernetes allows escalation by default, so the field must be set to `false` explicitly. A privileged container, or one with `CAP_SYS_ADMIN`, always allows escalation."
+
+  - id: ats033-040-03-q11
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Fix a failure caused by a dropped capability with the least privilege."
+    source_readings:
+      - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+    prompt: "A container runs as root with `capabilities.drop: [ALL]`. Its startup script runs `chown 1000 /data/app` and fails with `Operation not permitted`. The same command works with the runtime defaults. What is the best fix?"
+    options:
+      - id: a
+        text: "Keep `drop: [ALL]` and add `CHOWN` to `capabilities.add`."
+        explanation: "Correct. The failing operation needs only the `CHOWN` capability."
+      - id: b
+        text: "Add `SYS_ADMIN`, because it covers most privileged operations."
+        explanation: "`SYS_ADMIN` is a very broad capability. Add the single one that the operation needs."
+      - id: c
+        text: "Set `privileged: true` for the container."
+        explanation: "That gives all capabilities and the devices of the node, and removes the default profiles."
+      - id: d
+        text: "Set `allowPrivilegeEscalation: true`."
+        explanation: "Escalation is about gaining rights through a new program. It does not give back a dropped capability."
+    correct_option: a
+    explanation: "A root process without a capability gets `Operation not permitted`. Drop `ALL` and add back only what the workload proves it needs."
+
+  - id: ats033-040-03-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Place the capabilities field at the correct level of a pod specification."
+    source_readings:
+      - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+    prompt: "A pod has five containers. An author puts `capabilities.drop: [ALL]` in the pod `securityContext` so that all containers drop their capabilities. What is wrong?"
+    options:
+      - id: a
+        text: "Nothing, the pod value applies to every container."
+        explanation: "That is true for fields such as `seccompProfile`, but not for `capabilities`."
+      - id: b
+        text: "`ALL` is only valid in `add`."
+        explanation: "`ALL` in `drop` removes every capability. It is the accepted pattern."
+      - id: c
+        text: "The author must also set `privileged: true` for the drop to work."
+        explanation: "The privileged flag overrides the drop, so it does the opposite."
+      - id: d
+        text: "The `capabilities` field exists only in the container `securityContext`, so each container must set it."
+        explanation: "Correct. Set it in every container that should drop its capabilities."
+    correct_option: d
+    explanation: "Some security fields exist at both levels, but `capabilities` belongs to the container `securityContext` only."
