@@ -39,22 +39,25 @@ PY
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 # kubectl auth can-i prints yes or no; a no ends with status 1.
@@ -266,4 +269,8 @@ expect_equal "$page: the ConfigMap is created" \
 expect_equal "$page: the ConfigMap holds the result" \
   "$(kubectl -n starfleet get configmap identity-review -o jsonpath='{.data}')" '{"identity":"training-reader","result":"scoped-read"}'
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'smoke: %s checks passed on %s\n' "$checks" "$cluster"

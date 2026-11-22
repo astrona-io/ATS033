@@ -37,26 +37,29 @@ PY
 # every VM, the column widths follow the longest address, and the line order
 # is not fixed.
 normalize_listeners() {
-  sed -E 's/pid=[0-9]+,fd=[0-9]+/pid,fd/g; s/ +/ /g' | sort
+  sed -E 's/pid=[0-9]+,fd=[0-9]+/pid,fd/g; s/ +/ /g; s/ $//' | sort
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 kubelet_status() {
@@ -133,13 +136,13 @@ expect_equal 'the anonymous namespace list is forbidden as the page shows' \
   "$(output_from_page "$page" '"$API_SERVER/api/v1/namespaces"')"
 if impersonated="$(kubectl get namespaces --as=system:anonymous 2>&1)"; then
   printf 'FAIL: system:anonymous may list namespaces\n%s\n' "$impersonated" >&2
-  exit 1
+  failures=$((failures + 1))
 fi
 expect 'kubectl as system:anonymous is forbidden' "$impersonated" 'Error from server (Forbidden): namespaces is forbidden: User "system:anonymous" cannot list resource "namespaces" in API group "" at the cluster scope'
 expect 'kubectl as system:anonymous reads /version' "$(kubectl get --raw /version --as=system:anonymous)" "$(printf '%s\n' "$version_page" | grep '"gitVersion":')"
 if can_i="$(kubectl auth can-i list namespaces --as=system:anonymous 2>&1)"; then
   printf 'FAIL: kubectl auth can-i worked for system:anonymous\n%s\n' "$can_i" >&2
-  exit 1
+  failures=$((failures + 1))
 fi
 expect 'kubectl auth can-i fails on the SelfSubjectAccessReview' "$can_i" 'Error from server (Forbidden): selfsubjectaccessreviews.authorization.k8s.io is forbidden: User "system:anonymous" cannot create resource "selfsubjectaccessreviews" in API group "authorization.k8s.io" at the cluster scope'
 binding="$(kubectl get clusterrolebinding system:public-info-viewer -o wide)"
@@ -207,4 +210,8 @@ expect 'guide: the webhook authentication stays enabled' "$authentication_block"
 expect 'guide: authorization mode is Webhook' "$authentication_block" '  mode: Webhook'
 expect_equal 'guide: the anonymous request returns 401' "$(curl -sk -o /dev/null -w '%{http_code}' https://127.0.0.1:10250/pods)" 401
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'PASS: every page command gave the expected result (%s checks)\n' "$checks"

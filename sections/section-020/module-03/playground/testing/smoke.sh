@@ -39,22 +39,25 @@ PY
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 # kubectl auth can-i prints yes or no; a no ends with status 1, as the pages say.
@@ -158,4 +161,8 @@ expect_equal 'guide: monitor has no token' "$(kubectl -n starfleet exec deploy/m
 expect_equal 'guide: default may not list pods' "$(can_i list pods --as="$default_account" -n starfleet)" no
 expect 'guide: no token Secret is left in starfleet' "$(kubectl -n starfleet get secrets --field-selector type=kubernetes.io/service-account-token 2>&1)" 'No resources found in starfleet namespace.'
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'PASS: every page command gave the expected result (%s checks)\n' "$checks"

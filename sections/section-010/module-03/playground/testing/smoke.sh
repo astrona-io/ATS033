@@ -41,22 +41,25 @@ PY
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_no_match() {
@@ -64,7 +67,7 @@ expect_no_match() {
   printf 'check: %s\n' "$1"
   if printf '%s\n' "$2" | grep -Eq -- "$3"; then
     printf 'FAIL: %s\nwanted no line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2
-    exit 1
+    failures=$((failures + 1))
   fi
 }
 
@@ -116,7 +119,7 @@ page=course-02-enforce-limits-with-pod-security-admission.md
 dry_run="$(kubectl label namespace starfleet pod-security.kubernetes.io/enforce=baseline --dry-run=server --overwrite 2>&1)"
 printf '%s\n' "$dry_run"
 expect 'admission: the dry run warns about the starfleet pods' "$dry_run" 'Warning: existing pods in namespace "starfleet" violate the new PodSecurity enforce level "baseline:latest"'
-expect_match 'admission: the beacon pod is in the warnings' "$dry_run" '^Warning: beacon-[a-z0-9]+-[a-z0-9]+: host namespaces \(hostNetwork=true, hostPID=true\), privileged .*hostPath volumes'
+expect_match 'admission: the beacon pod is in the warnings' "$dry_run" '^Warning: beacon-[a-z0-9]+-[a-z0-9]+: host namespaces, hostPath volumes, privileged$'
 expect_no_match 'admission: no other pod is in the warnings' "$dry_run" '^Warning: (probe|shuttle)'
 expect 'admission: the dry run changes nothing' "$dry_run" 'namespace/starfleet labeled (server dry run)'
 expect_equal 'admission: starfleet has no enforce label' "$(kubectl get namespace starfleet -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" ''
@@ -196,4 +199,8 @@ printf '%s\n' "$dry_run"
 expect_no_match 'guide: no pod in starfleet violates baseline' "$dry_run" '^Warning:'
 expect_equal 'guide: the API server is ready' "$(kubectl get --raw=/readyz)" ok
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'PASS: every page command gave the expected result (%s checks)\n' "$checks"

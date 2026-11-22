@@ -56,22 +56,25 @@ PY
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 # The node checks that close the guide and the service page.
@@ -157,7 +160,7 @@ manual="$(apt-mark showmanual)"
 for package in containerd kubeadm kubectl kubelet kubernetes-cni node-diag-tools; do
   expect_match "packages: $package is marked as manually installed" "$manual" "^$package$"
 done
-expect_equal 'packages: dpkg-query --list counts 738 lines' "$(dpkg-query --list | wc -l)" 738
+expect_equal 'packages: dpkg-query --list counts the lines the page shows' "$(dpkg-query --list | wc -l)" "$(output_from_page "$page" 'dpkg-query --list | wc -l')"
 expect_equal 'packages: dpkg -S names the owners' "$(dpkg -S "$(readlink -f "$(command -v systemctl)")"; dpkg -S "$(readlink -f "$(command -v node-diag)")")" "$(printf 'systemd: /usr/bin/systemctl\nnode-diag-tools: /usr/bin/node-diag')"
 local_sbin="$(ls -l /usr/local/sbin)"
 printf '%s\n' "$local_sbin"
@@ -208,4 +211,8 @@ expect_equal 'interfaces: label sets baseline' "$(kubectl label namespace starfl
 expect_equal 'interfaces: the API server rejects the hostPath pod' "$(kubectl apply -f pod-host-reader.yaml 2>&1 || true)" 'Error from server (Forbidden): error when creating "pod-host-reader.yaml": pods "host-reader" is forbidden: violates PodSecurity "baseline:latest": hostPath volumes (volume "host-etc")'
 expect_equal 'interfaces: removing the label undoes the experiment' "$(kubectl label namespace starfleet pod-security.kubernetes.io/enforce-)" 'namespace/starfleet unlabeled'
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'PASS: every page command gave the expected result (%s checks)\n' "$checks"

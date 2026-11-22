@@ -39,22 +39,25 @@ PY
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 # kubectl auth can-i prints yes or no; a no ends with status 1, as the pages say.
@@ -141,7 +144,7 @@ default_rules="$(kubectl auth can-i --list --as=system:serviceaccount:starfleet:
 printf '%s\n' "$default_rules"
 # Only the rules every authenticated caller receives: the self reviews and
 # non-resource URLs (lines with an empty first column).
-extra_rules="$(printf '%s\n' "$default_rules" | sed 1d | grep -Ev '^(selfsubject[a-z]*reviews\.[a-z.]+ |[[:space:]])' || true)"
+extra_rules="$(printf '%s\n' "$default_rules" | sed 1d | grep -Ev '^(selfsubject[a-z]*reviews\.[a-z0-9.]+ |[[:space:]])' || true)"
 expect_equal 'default in starfleet holds only the basic rules' "$extra_rules" ''
 
 # Guided Practice: Replace A Wildcard Role And cluster-admin Binding
@@ -197,4 +200,8 @@ expect_match 'guide: the list has get and list on pods' "$rules" '^pods +\[\] +\
 expect_match 'guide: the list has get on pods/log' "$rules" '^pods/log +\[\] +\[\] +\[get\]'
 expect_equal 'guide: the list has no wildcard rule left' "$(printf '%s\n' "$rules" | grep -c '^\*\.\*' || true)" 0
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'PASS: every page command gave the expected result (%s checks)\n' "$checks"

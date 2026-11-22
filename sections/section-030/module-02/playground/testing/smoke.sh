@@ -41,22 +41,25 @@ save_from_page() {
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 # The pages set node_name and worker_name to the two node containers of this
@@ -135,7 +138,13 @@ EDGE_PORT="$(kubectl -n starfleet get service probe-edge -o jsonpath='{.spec.por
 CONTROL_IP="$(node_address "$node_name")"
 WORKER_IP="$(node_address "$worker_name")"
 expect_match 'under Local, the worker address answers' "$(kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$WORKER_IP:$EDGE_PORT/")" '^version=v1'
-dropped="$(run_expecting_failure kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$CONTROL_IP:$EDGE_PORT/")"
+# kube-proxy writes the new rules a few seconds after the apply, so ask again
+# for up to 60 seconds before the control-plane request is expected to fail.
+for attempt in $(seq 1 20); do
+  dropped="$(run_expecting_failure kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$CONTROL_IP:$EDGE_PORT/")"
+  [[ "$dropped" == *failed ]] && break
+  sleep 3
+done
 printf '%s\n' "$dropped"
 expect 'under Local, the control-plane request fails' "$dropped" failed
 expect 'under Local, the control-plane request times out' "$dropped" 'timed out'
@@ -175,4 +184,8 @@ closed="$(run_expecting_failure kubectl -n outpost exec drifter -- wget -qO- -T 
 printf '%s\n' "$closed"
 expect 'guide: the request to port 30090 fails' "$closed" failed
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'PASS: every page command gave the expected result (%s checks)\n' "$checks"

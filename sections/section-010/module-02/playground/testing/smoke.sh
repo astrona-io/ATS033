@@ -45,28 +45,32 @@ PY
 }
 
 checks=0
+# A failed check is counted, and the script goes on, so one run shows every
+# difference between a page and the live playground. It exits 1 at the end.
+failures=0
 expect() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == *"$3"* ]] || { printf 'FAIL: %s\nwanted: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_equal() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  [[ "$2" == "$3" ]] || { printf 'FAIL: %s\nwanted exactly: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 expect_match() {
   checks=$((checks + 1))
   printf 'check: %s\n' "$1"
-  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; exit 1; }
+  printf '%s\n' "$2" | grep -Eq -- "$3" || { printf 'FAIL: %s\nwanted a line matching: %s\ngot: %s\n' "$1" "$3" "$2" >&2; failures=$((failures + 1)); }
 }
 
 # The test login of the pages: it tries no method, so the daemon refuses it
 # and lists the methods it offers. ssh exits 255 on a refused login.
 test_login() {
-  ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$1@127.0.0.1" true 2>&1 || true
+  # ssh ends its warning lines with a carriage return; the page shows plain lines.
+  { ssh -o BatchMode=yes -o PreferredAuthentications=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$1@127.0.0.1" true 2>&1 || true; } | tr -d '\r'
 }
 
 # The journal can write the refusal a moment after ssh returns, so read it
@@ -172,4 +176,8 @@ expect_match 'accounts: the olduser password is locked' "$(sudo passwd -S olduse
 expect_equal 'accounts: su starts nologin' "$(sudo su olduser -c true 2>&1 || true)" "$(sed -n 3p <<<"$page_lines")"
 expect_equal 'accounts: the key is gone and the node works' "$(sudo rm /home/olduser/.ssh/authorized_keys; sudo ls -l /home/olduser/.ssh; systemctl is-active kubelet.service containerd.service ssh.service; kubectl get --raw=/readyz; echo)" "$(output_from_page "$page" 'sudo rm /home/olduser/.ssh/authorized_keys')"
 
+if [[ "$failures" -gt 0 ]]; then
+  printf 'FAIL: %s of %s checks failed\n' "$failures" "$checks" >&2
+  exit 1
+fi
 printf 'PASS: every page command gave the expected result (%s checks)\n' "$checks"
