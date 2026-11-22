@@ -4,4 +4,4 @@ This ungraded playground runs one VM from the pinned `24.04-cks` QEMU image (`gh
 
 The guide is `docs/overview.md`. The configuration has no submission or grading fields. Learners connect with `astrona ssh astro-ats-033-playground-010-02`. The guided practice keeps `student` and `astrona` in `AllowUsers`, so the platform keeps its SSH access.
 
-Live runs on 2026-11-18 (QEMU, arm64, hvf): the second `astrona run` finished in 33 seconds (VM SSH-ready 15 s, seed 18 s). The output in `docs/overview.md` and in the module readings was captured in that VM as `student`. `scripts/ci/test-playground.sh` supports only kind playgrounds, because `astrona kubeconfig` works only for kind, so it does not cover this playground.
+Live runs on 2026-11-18 (QEMU, arm64, hvf): the second `astrona run` finished in 33 seconds (VM SSH-ready 15 s, seed 18 s). The output in `docs/overview.md` and in the module readings was captured in that VM as `student`. `scripts/ci/test-playground.sh` starts the VM, copies the module pages, `docs/` and `testing/` into it over SSH and runs `testing/smoke.sh` there as `student`.

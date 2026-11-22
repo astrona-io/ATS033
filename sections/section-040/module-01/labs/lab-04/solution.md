@@ -9,9 +9,11 @@ Use a host shell with this lab's private kubeconfig. A kubeconfig identifies the
 ```sh
 export KUBECONFIG="$(astrona kubeconfig ats-033-lab-040-01-04)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-01-04" || exit 1
+cluster="${ASTRONA_KIND_CLUSTER:-astro-ats-033-lab-040-01-04}"
+engine="${ASTRONA_CONTAINER_ENGINE:-podman}"
 ```
 
-Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
+Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context. Each kind node is a container, so `"$engine" exec "$cluster-control-plane" ...` runs a command on the control plane node.
 
 ## Find The Cause
 
@@ -45,7 +47,7 @@ The kubelet builds the full path from the kubelet seccomp directory, `/var/lib/k
 
 ```sh
 kubectl -n starfleet-033-040-01-04 get deployment shuttle -o jsonpath='{.spec.template.spec.securityContext.seccompProfile}{"\n"}'
-podman exec astro-ats-033-lab-040-01-04-control-plane ls /var/lib/kubelet/seccomp/profiles
+"$engine" exec "$cluster-control-plane" ls /var/lib/kubelet/seccomp/profiles
 ```
 
 ```text

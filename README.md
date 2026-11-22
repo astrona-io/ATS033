@@ -8,7 +8,7 @@
 
 Certified Kubernetes Security Specialist (CKS): System Hardening, worth 10% of the official curriculum. This course belongs to ATP007.
 
-Developed reading explains mechanisms, responsible components, examples and limits. Every section has an introduction and every module closes with a summary. Reusable YAML checks contain 5–15 questions per bank. Technical readings remain draft. Private playgrounds and graded labs are included.
+Developed reading explains mechanisms, responsible components, examples and limits. Every section has an introduction and every module closes with a summary. Reusable YAML checks contain 5–15 questions per bank. Private playgrounds and graded labs are included.
 
 ## Course Outline
 
@@ -25,7 +25,7 @@ See [curriculum coverage](CURRICULUM.md), [primary sources](SOURCES.md), [questi
 
 ## Hands-On Coverage
 
-This course has 12 ungraded module playgrounds and 37 graded labs. Each lab is registered right after the reading it practises. 20 labs and 7 playgrounds run on a kind cluster. 17 labs and 5 playgrounds that work on node files, services, packages, sshd, ufw, static Pods, the kubelet, etcd or AppArmor run in a one-node kubeadm virtual machine (QEMU) built from the multi-arch `ubuntu-qcow2-image:24.04-cks` image (astrona picks the image for the CPU architecture of the computer and checks it against a pinned checksum). 37 labs passed `astrona validate` and `astrona test` on their live runtime.
+This course has 12 ungraded module playgrounds and 37 graded labs. Each lab is registered right after the reading it practises. 20 labs and 7 playgrounds run on a kind cluster. 17 labs and 5 playgrounds that work on node files, services, packages, sshd, ufw, static Pods, the kubelet, etcd or AppArmor run in a one-node kubeadm virtual machine (QEMU) built from the multi-arch `ubuntu-qcow2-image:24.04-cks` image (astrona picks the image for the CPU architecture of the computer). 37 labs passed `astrona validate` and `astrona test` on their live runtime.
 
 | Module | Labs in teaching order |
 | --- | --- |

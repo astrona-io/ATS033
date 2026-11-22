@@ -2,7 +2,9 @@
 exam_objectives:
 - Using least-privilege identity and access management
 ---
-# Question
+# Replace Wildcard And Cluster-Admin Access
+
+Allow about 8 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-020-02-02" ||
 
 Keep this connection selected. Every script of the lab refuses a different context.
 
-Allow about 8 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 

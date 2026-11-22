@@ -26,6 +26,7 @@ MAX_MINUTES = 20
 # The exam-style question shape: these headings, in this order.
 QUESTION_PARTS = ('Solve this question on: `terminal`', '## Tasks', '## Constraints', '## How the answer is checked')
 DESTROY = '<!-- astrona:playground:destroy -->'
+PLAYGROUND_GRADER_FILES = ('validate.sh', 'solution', 'testing/check.py', 'testing/live.py', 'testing/requirements.json')
 
 
 def lab_suffix(name):
@@ -103,9 +104,14 @@ def check_lab(root, lab, entry):
         if 'ASTRONA_KUBE_CONTEXT' not in (directory / script).read_text():
             raise ValueError(f'{lab}: {script} needs the context guard')
     question = (directory / 'question.md').read_text()
-    minutes = re.search(r'^Allow about (\d+) minutes for the tasks\.( Cluster startup adds time\.)?$', question, re.M)
+    # The title names the technical task, as the lab entry in astrona.yaml does,
+    # and the exam time line sits right under it, as in ATS020 and ATS034.
+    title = re.search(r'^# (.+)$', question, re.M)
+    if not title or title.group(1) != entry.get('title'):
+        raise ValueError(f'{lab}: the question.md title must be the lab title in astrona.yaml ({entry.get("title")})')
+    minutes = re.search(r'^# [^\n]+\n\nAllow about (\d+) minutes for the tasks\.$', question, re.M)
     if not minutes or int(minutes.group(1)) > MAX_MINUTES:
-        raise ValueError(f'{lab}: question.md needs "Allow about N minutes for the tasks." with N <= {MAX_MINUTES}')
+        raise ValueError(f'{lab}: question.md needs "Allow about N minutes for the tasks." under its title with N <= {MAX_MINUTES}')
     if entry.get('estimated_duration') != f'{minutes.group(1)}m':
         raise ValueError(f'{lab}: estimated_duration in astrona.yaml must be {minutes.group(1)}m to match question.md')
     positions = [question.find(part) for part in QUESTION_PARTS]
@@ -152,6 +158,12 @@ def validate(root):
         if cfg['runtime']['type'] not in ('kind', 'qemu'):
             raise ValueError(f'{config}: unsupported runtime')
         check_sources(config, cfg)
+        if config.parent.name == 'playground':
+            # A playground is ungraded: its smoke test runs the page commands,
+            # so it carries no grader or reference solution.
+            leftovers = [path for path in PLAYGROUND_GRADER_FILES if (config.parent / path).exists()]
+            if leftovers:
+                raise ValueError(f'{config.parent.relative_to(root)}: an ungraded playground must not carry {leftovers}')
     # Report every broken lab at once, not only the first.
     errors = []
     for lab, entry in labs.items():

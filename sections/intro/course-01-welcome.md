@@ -4,7 +4,7 @@ This course develops the official System Hardening objectives for Certified Kube
 
 Each section starts with its own introduction and learning outcomes. Each module provides goals, developed teaching and a final summary. Lesson counts follow the subject rather than a fixed number.
 
-YAML knowledge checks are registered separately for future presentation. They follow the relevant summaries and include original questions and answer feedback. Technical pages remain draft for review.
+YAML knowledge checks are registered separately for future presentation. They follow the relevant summaries and include original questions and answer feedback.
 
 Read the explanations and worked examples to identify the responsible component, intended operation and limits of each claim. No live environment or executed results are required.
 

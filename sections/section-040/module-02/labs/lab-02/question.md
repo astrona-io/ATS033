@@ -2,7 +2,9 @@
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
-# Question
+# Block File Deletion With A Localhost seccomp Profile
+
+Allow about 10 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-040-02-02" ||
 
 Keep this connection selected throughout the task. Every script supplied by the lab refuses a different context.
 
-Allow about 10 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 

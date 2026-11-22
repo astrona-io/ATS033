@@ -147,6 +147,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-010/module-02/course-04-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Harden Node Access With SSH And Host Login Paths'
+    path: sections/section-010/module-02/quiz.yaml
+    question_count: 12
+    pass_score: 70
   - type: reading
     title: Restrict Workload Access To The Host
     path: sections/section-010/module-03/course.md
@@ -219,6 +224,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-010/module-03/course-04-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Restrict Workload Access To The Host'
+    path: sections/section-010/module-03/quiz.yaml
+    question_count: 12
+    pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Minimize The Host OS Footprint'
     path: sections/section-010/module-01/quiz.yaml
@@ -412,6 +422,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-020/module-02/course-04-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Least-Privilege RBAC Roles And Bindings'
+    path: sections/section-020/module-02/quiz.yaml
+    question_count: 10
+    pass_score: 70
   - type: reading
     title: Restrict ServiceAccounts And API Tokens
     path: sections/section-020/module-03/course.md
@@ -487,6 +502,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-020/module-03/course-04-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Restrict ServiceAccounts And API Tokens'
+    path: sections/section-020/module-03/quiz.yaml
+    question_count: 11
+    pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Using least-privilege identity and access management'
     path: sections/section-020/module-01/quiz.yaml
@@ -646,6 +666,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-030/module-02/course-04-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Limit Service Exposure Outside The Cluster'
+    path: sections/section-030/module-02/quiz.yaml
+    question_count: 11
+    pass_score: 70
   - type: reading
     title: Restrict Access To The API Server And Control-Plane Ports
     path: sections/section-030/module-03/course.md
@@ -736,6 +761,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-030/module-03/course-05-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Restrict Access To The API Server And Control-Plane Ports'
+    path: sections/section-030/module-03/quiz.yaml
+    question_count: 11
+    pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Minimize External Access To The Network'
     path: sections/section-030/module-01/quiz.yaml
@@ -910,6 +940,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-040/module-02/course-04-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Apply seccomp Profiles To Pods'
+    path: sections/section-040/module-02/quiz.yaml
+    question_count: 12
+    pass_score: 70
   - type: reading
     title: Confine Workloads With AppArmor And Capabilities
     path: sections/section-040/module-03/course.md
@@ -980,6 +1015,11 @@ modules:
   - type: reading
     title: Summary
     path: sections/section-040/module-03/course-04-summary.md
+  - type: quiz
+    title: 'Knowledge Check: Confine Workloads With AppArmor And Capabilities'
+    path: sections/section-040/module-03/quiz.yaml
+    question_count: 12
+    pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Appropriately use kernel hardening tools such as AppArmor,
       seccomp'

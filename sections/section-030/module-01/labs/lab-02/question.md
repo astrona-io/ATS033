@@ -2,7 +2,9 @@
 exam_objectives:
 - Minimize external access to the network
 ---
-# Question
+# Block A Host Port With ufw
+
+Allow about 10 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ kubectl config current-context
 
 The second command prints `kubernetes-admin@astro-ats-033-lab-030-01-02`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. `ufw` (Uncomplicated Firewall) is installed on the node but not active. Firewall commands need `sudo`. They change only the lab VM, not your own computer.
 
-Allow about 10 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 

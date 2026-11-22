@@ -14,7 +14,7 @@ helm version --short
 openssl version
 ```
 
-From the local course checkout, start an ungraded environment through its configuration directory. These authored changes must be available in the checkout you use; the draft content is not a claim of course publication.
+From the local course checkout, start an ungraded environment through its configuration directory. The configuration directory must be in the checkout you use.
 
 ```sh
 astrona run -c sections/section-010/module-01/playground

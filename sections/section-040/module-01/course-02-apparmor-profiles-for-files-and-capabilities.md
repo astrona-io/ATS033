@@ -1,5 +1,4 @@
 ---
-draft: true
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
@@ -140,7 +139,13 @@ kubectl -n starfleet exec apparmor-localhost -- cat /proc/1/attr/current
 kubectl -n starfleet exec apparmor-localhost -- sh -c 'echo test > /tmp/file'
 ```
 
-The first command prints the profile name `k8s-deny-tmp-write` followed by the mode in parentheses. The write is expected to fail with a `Permission denied` error, although `/tmp` is writable for the user and seccomp would have allowed the `openat` syscall. This is the difference between the two boundaries. Remove the pod with `kubectl -n starfleet delete pod apparmor-localhost` when you are done.
+The first command prints the profile name `k8s-deny-tmp-write` followed by the mode in parentheses.
+
+In a kind cluster, the line can also carry a suffix after the name. A kind node is itself a container, and the kernel stacks the pod's profile on top of the confinement of that node container. Stacking means that the kernel applies both labels at once and allows an action only when both allow it.
+
+For example, one run on a kind cluster printed `k8s-deny-tmp-write//&unconfined (enforce)`. The part before `//&` is the pod's profile, and `enforce` is the mode: AppArmor blocks and logs what the profile denies.
+
+The write is expected to fail with a `Permission denied` error, although `/tmp` is writable for the user and seccomp would have allowed the `openat` syscall. This is the difference between the two boundaries. Remove the pod with `kubectl -n starfleet delete pod apparmor-localhost` when you are done.
 
 If AppArmor is not active in your playground, the pod does not start, and the next part shows how to read that symptom.
 
