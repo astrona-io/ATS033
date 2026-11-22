@@ -2,7 +2,9 @@
 exam_objectives:
 - Using least-privilege identity and access management
 ---
-# Question
+# Record Every Change To The Sudo Rules
+
+Allow about 10 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ kubectl config current-context
 
 The second command prints `kubernetes-admin@astro-ats-033-lab-020-01-04`. You are logged in as the `student` user. Audit rules, audit logs and sudoers files belong to `root`, so run the commands that read or change them with `sudo`. They change only the lab VM, not your own computer.
 
-Allow about 10 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 

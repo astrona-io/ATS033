@@ -2,7 +2,9 @@
 exam_objectives:
 - Minimize host OS footprint (reduce attack surface)
 ---
-# Question
+# Enforce The Baseline Pod Security Standard
+
+Allow about 8 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-010-03-02" ||
 
 Keep this connection selected. Every script supplied with this task refuses a different context.
 
-Allow about 8 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 

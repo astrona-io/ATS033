@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # Smoke test of the start state that docs/overview.md describes.
 # scripts/ci/test-playground.sh runs this file inside the playground VM as
-# the student user, after validate.sh. It exits non-zero when one fact is
-# not as the page says.
+# the student user. It exits non-zero when one fact is not as the page says.
 set -euo pipefail
 cluster="astro-ats-033-playground-040-03"
 if [[ "$(kubectl config current-context)" != "kubernetes-admin@$cluster" ]]; then
   printf 'Refusing to operate on another Kubernetes context\n' >&2
   exit 1
 fi
+
+# The cluster is ready and the workloads of the pages run.
+kubectl -n starfleet rollout status deployment/probe --timeout=60s
+kubectl -n starfleet wait --for=condition=Ready pod/shuttle --timeout=60s
+kubectl get --raw=/readyz >/dev/null
 
 fail() {
   printf 'smoke: %s\n' "$1" >&2

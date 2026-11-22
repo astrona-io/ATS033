@@ -2,7 +2,9 @@
 exam_objectives:
 - Minimize external access to the network
 ---
-# Question
+# Close The Kubelet API To Anonymous Callers
+
+Allow about 8 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ kubectl config current-context
 
 The second command prints `kubernetes-admin@astro-ats-033-lab-030-03-03`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. Node files and processes belong to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.
 
-Allow about 8 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 

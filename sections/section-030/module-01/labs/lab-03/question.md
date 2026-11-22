@@ -2,7 +2,9 @@
 exam_objectives:
 - Minimize external access to the network
 ---
-# Question
+# Default-Deny Ingress With One Allowed Client
+
+Allow about 12 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ test "$(kubectl config current-context)" = "kind-astro-ats-033-lab-030-01-03" ||
 
 Keep this connection selected.
 
-Allow about 12 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 

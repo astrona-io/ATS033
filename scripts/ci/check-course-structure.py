@@ -103,9 +103,14 @@ def check_lab(root, lab, entry):
         if 'ASTRONA_KUBE_CONTEXT' not in (directory / script).read_text():
             raise ValueError(f'{lab}: {script} needs the context guard')
     question = (directory / 'question.md').read_text()
-    minutes = re.search(r'^Allow about (\d+) minutes for the tasks\.( Cluster startup adds time\.)?$', question, re.M)
+    # The title names the technical task, as the lab entry in astrona.yaml does,
+    # and the exam time line sits right under it, as in ATS020 and ATS034.
+    title = re.search(r'^# (.+)$', question, re.M)
+    if not title or title.group(1) != entry.get('title'):
+        raise ValueError(f'{lab}: the question.md title must be the lab title in astrona.yaml ({entry.get("title")})')
+    minutes = re.search(r'^# [^\n]+\n\nAllow about (\d+) minutes for the tasks\.$', question, re.M)
     if not minutes or int(minutes.group(1)) > MAX_MINUTES:
-        raise ValueError(f'{lab}: question.md needs "Allow about N minutes for the tasks." with N <= {MAX_MINUTES}')
+        raise ValueError(f'{lab}: question.md needs "Allow about N minutes for the tasks." under its title with N <= {MAX_MINUTES}')
     if entry.get('estimated_duration') != f'{minutes.group(1)}m':
         raise ValueError(f'{lab}: estimated_duration in astrona.yaml must be {minutes.group(1)}m to match question.md')
     positions = [question.find(part) for part in QUESTION_PARTS]

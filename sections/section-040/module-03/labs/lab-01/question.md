@@ -2,7 +2,9 @@
 exam_objectives:
 - Appropriately use kernel hardening tools such as AppArmor, seccomp
 ---
-# Question
+# Switch An AppArmor Profile From Complain To Enforce Mode
+
+Allow about 8 minutes for the tasks.
 
 Solve this question on: `terminal`
 
@@ -17,7 +19,7 @@ kubectl config current-context
 
 The second command prints `kubernetes-admin@astro-ats-033-lab-040-03-01`. You are logged in as the `student` user, which has a kubeconfig file for the cluster. A kubeconfig file tells `kubectl` which cluster to use and which credentials to send. AppArmor files and the kernel profile list belong to root, so run node commands with `sudo`. They change only the lab VM, not your own computer.
 
-Allow about 8 minutes for the tasks. Cluster startup adds time.
+The time above does not count the cluster startup.
 
 ## Tasks
 
