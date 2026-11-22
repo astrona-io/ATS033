@@ -138,33 +138,36 @@ printf '%s\n' "$aa_status_output"
 profile_loaded=no
 if [[ "$apparmor_enabled" == Y ]]; then
   save_file_from_page "$page" k8s-deny-tmp-write
-  if run_on_node sh -c 'command -v apparmor_parser' >/dev/null 2>&1; then
-    "$engine" cp k8s-deny-tmp-write "$node_name:/etc/apparmor.d/k8s-deny-tmp-write"
-    run_on_node apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
-    profile_loaded=node
-  elif [[ "${GITHUB_ACTIONS:-}" == true ]] && sudo -n apparmor_parser --version >/dev/null 2>&1; then
-    # CI only. The kind node image has no apparmor_parser, so the page's two
-    # load commands cannot run in the node. A kind node is a container and
-    # shares the kernel of the GitHub runner, which has AppArmor and
-    # apparmor_parser. A profile that the runner loads is in that same kernel,
-    # so the node uses it exactly as if the page's commands had loaded it.
-    # The profile is unloaded again after the check.
-    sudo -n apparmor_parser -r "$work_directory/k8s-deny-tmp-write"
-    # The kind node also has no securityfs at /sys/kernel/security, so the
-    # kubelet rejects the pod with "Cannot enforce AppArmor: AppArmor is not
-    # enabled on the host" (CI job 137359971123). Mount securityfs in the node
-    # and restart containerd and the kubelet, which check this once at start.
+  if [[ "${GITHUB_ACTIONS:-}" == true ]] && ! run_on_node sh -c 'command -v apparmor_parser' >/dev/null 2>&1; then
+    # CI only. The GitHub runner kernel has AppArmor, but the kind node image
+    # is not ready to use it:
+    # - it has no apparmor_parser, so the page's load commands cannot run;
+    # - it has no securityfs at /sys/kernel/security, so the kubelet rejects
+    #   the pod with "Cannot enforce AppArmor: AppArmor is not enabled on the
+    #   host" (CI job 137359971123);
+    # - containerd also needs apparmor_parser, or it fails the container with
+    #   "failed to generate apparmor spec opts: apparmor is not supported"
+    #   (CI job 137363165018).
+    # The script installs the apparmor package in the node, mounts securityfs
+    # and restarts containerd and the kubelet, which check AppArmor once at
+    # start. After that the page's own commands run unchanged.
+    run_on_node sh -c 'apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends apparmor >/dev/null'
     if ! run_on_node test -e /sys/kernel/security/apparmor; then
       run_on_node mount -t securityfs securityfs /sys/kernel/security
-      run_on_node systemctl restart containerd
-      run_on_node systemctl restart kubelet
-      kubectl wait --for=condition=Ready "node/$node_name" --timeout=120s
     fi
-    profile_loaded=host
+    run_on_node systemctl restart containerd
+    run_on_node systemctl restart kubelet
+    kubectl wait --for=condition=Ready "node/$node_name" --timeout=120s
+    printf 'note: CI installed apparmor_parser in the node and mounted securityfs\n'
+  fi
+  if run_on_node sh -c 'command -v apparmor_parser' >/dev/null 2>&1; then
+    # The page's commands: copy the profile into the node and load it.
+    "$engine" cp k8s-deny-tmp-write "$node_name:/etc/apparmor.d/k8s-deny-tmp-write"
+    run_on_node apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
+    profile_loaded=yes
   fi
 fi
-if [[ "$profile_loaded" != no ]]; then
-  printf 'note: the profile k8s-deny-tmp-write was loaded by the %s\n' "$([[ "$profile_loaded" == host ]] && echo 'runner host (CI)' || echo node)"
+if [[ "$profile_loaded" == yes ]]; then
   save_from_page "$page" pod-apparmor-localhost.yaml
   kubectl -n starfleet wait --for=condition=Ready pod/apparmor-localhost --timeout=120s
   attr_current="$(kubectl -n starfleet exec apparmor-localhost -- cat /proc/1/attr/current)"
@@ -173,11 +176,8 @@ if [[ "$profile_loaded" != no ]]; then
   expect_failure 'the /tmp write fails under the profile' kubectl -n starfleet exec apparmor-localhost -- sh -c 'echo test > /tmp/file'
   expect 'the /tmp write fails with Permission denied' "$failure_output" 'Permission denied'
   kubectl -n starfleet delete pod apparmor-localhost --timeout=120s
-  if [[ "$profile_loaded" == host ]]; then
-    sudo -n apparmor_parser -R "$work_directory/k8s-deny-tmp-write"
-  fi
 else
-  printf 'note: AppArmor is not usable on this node (enabled=%s, no apparmor_parser on the node or the CI host), so the page is reading material here\n' "${apparmor_enabled:-missing}"
+  printf 'note: AppArmor is not usable on this node (enabled=%s, no apparmor_parser in the node), so the page is reading material here\n' "${apparmor_enabled:-missing}"
 fi
 
 # The Restricted Security Context
