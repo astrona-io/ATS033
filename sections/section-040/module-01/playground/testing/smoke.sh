@@ -135,18 +135,39 @@ apparmor_enabled="$(run_on_node cat /sys/module/apparmor/parameters/enabled 2>/d
 printf 'apparmor enabled: %s\n' "$apparmor_enabled"
 aa_status_output="$(run_on_node aa-status 2>&1 || true)"
 printf '%s\n' "$aa_status_output"
-if [[ "$apparmor_enabled" == Y ]] && run_on_node sh -c 'command -v apparmor_parser' >/dev/null 2>&1; then
+profile_loaded=no
+if [[ "$apparmor_enabled" == Y ]]; then
   save_file_from_page "$page" k8s-deny-tmp-write
-  "$engine" cp k8s-deny-tmp-write "$node_name:/etc/apparmor.d/k8s-deny-tmp-write"
-  run_on_node apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
+  if run_on_node sh -c 'command -v apparmor_parser' >/dev/null 2>&1; then
+    "$engine" cp k8s-deny-tmp-write "$node_name:/etc/apparmor.d/k8s-deny-tmp-write"
+    run_on_node apparmor_parser -r /etc/apparmor.d/k8s-deny-tmp-write
+    profile_loaded=node
+  elif [[ "${GITHUB_ACTIONS:-}" == true ]] && sudo -n apparmor_parser --version >/dev/null 2>&1; then
+    # CI only. The kind node image has no apparmor_parser, so the page's two
+    # load commands cannot run in the node. A kind node is a container and
+    # shares the kernel of the GitHub runner, which has AppArmor and
+    # apparmor_parser. A profile that the runner loads is in that same kernel,
+    # so the node uses it exactly as if the page's commands had loaded it.
+    # The profile is unloaded again after the check.
+    sudo -n apparmor_parser -r "$work_directory/k8s-deny-tmp-write"
+    profile_loaded=host
+  fi
+fi
+if [[ "$profile_loaded" != no ]]; then
+  printf 'note: the profile k8s-deny-tmp-write was loaded by the %s\n' "$([[ "$profile_loaded" == host ]] && echo 'runner host (CI)' || echo node)"
   save_from_page "$page" pod-apparmor-localhost.yaml
   kubectl -n starfleet wait --for=condition=Ready pod/apparmor-localhost --timeout=120s
-  expect 'the pod runs under k8s-deny-tmp-write and its mode' "$(kubectl -n starfleet exec apparmor-localhost -- cat /proc/1/attr/current)" 'k8s-deny-tmp-write ('
+  attr_current="$(kubectl -n starfleet exec apparmor-localhost -- cat /proc/1/attr/current)"
+  printf '%s\n' "$attr_current"
+  expect_match 'the pod runs under k8s-deny-tmp-write followed by its mode in parentheses' "$attr_current" '^k8s-deny-tmp-write \([a-z]+\)$'
   expect_failure 'the /tmp write fails under the profile' kubectl -n starfleet exec apparmor-localhost -- sh -c 'echo test > /tmp/file'
   expect 'the /tmp write fails with Permission denied' "$failure_output" 'Permission denied'
   kubectl -n starfleet delete pod apparmor-localhost --timeout=120s
+  if [[ "$profile_loaded" == host ]]; then
+    sudo -n apparmor_parser -R "$work_directory/k8s-deny-tmp-write"
+  fi
 else
-  printf 'note: AppArmor is not usable on this node (enabled=%s or no apparmor_parser), so the page is reading material here\n' "${apparmor_enabled:-missing}"
+  printf 'note: AppArmor is not usable on this node (enabled=%s, no apparmor_parser on the node or the CI host), so the page is reading material here\n' "${apparmor_enabled:-missing}"
 fi
 
 # The Restricted Security Context
