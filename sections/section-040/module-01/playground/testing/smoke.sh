@@ -150,6 +150,16 @@ if [[ "$apparmor_enabled" == Y ]]; then
     # so the node uses it exactly as if the page's commands had loaded it.
     # The profile is unloaded again after the check.
     sudo -n apparmor_parser -r "$work_directory/k8s-deny-tmp-write"
+    # The kind node also has no securityfs at /sys/kernel/security, so the
+    # kubelet rejects the pod with "Cannot enforce AppArmor: AppArmor is not
+    # enabled on the host" (CI job 137359971123). Mount securityfs in the node
+    # and restart containerd and the kubelet, which check this once at start.
+    if ! run_on_node test -e /sys/kernel/security/apparmor; then
+      run_on_node mount -t securityfs securityfs /sys/kernel/security
+      run_on_node systemctl restart containerd
+      run_on_node systemctl restart kubelet
+      kubectl wait --for=condition=Ready "node/$node_name" --timeout=120s
+    fi
     profile_loaded=host
   fi
 fi
