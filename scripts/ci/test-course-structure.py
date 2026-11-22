@@ -137,6 +137,11 @@ class StructureTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'under its title'):
             module.validate(self.root)
 
+    def test_playground_grader_leftover(self):
+        (self.root / 'sections/section-030/module-02/playground/validate.sh').write_text('#!/usr/bin/env bash\n')
+        with self.assertRaisesRegex(ValueError, 'ungraded playground'):
+            module.validate(self.root)
+
     def test_duration_drift(self):
         course = self.course()
         next(e for e in self.content_of(course, LAB) if e['path'] == LAB)['estimated_duration'] = '25m'
