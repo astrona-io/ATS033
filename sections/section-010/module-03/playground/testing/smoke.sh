@@ -163,8 +163,9 @@ wide="$(kubectl -n starfleet get pod ledger visitor -o wide)"
 printf '%s\n' "$wide"
 expect_match 'dedicated: ledger runs on the worker' "$wide" "^ledger +1/1 +Running +0 .* $worker_name "
 expect_match 'dedicated: visitor stays Pending' "$wide" '^visitor +0/1 +Pending +0 '
-expect 'dedicated: the scheduler names the untolerated taints' "$description" 'untolerated taint'
-expect 'dedicated: the dedicated taint is one of them' "$description" '{dedicated: ledger}'
+expect 'dedicated: the scheduler reports untolerated taints' "$description" 'untolerated taint'
+# The Kubernetes 1.35 scheduler event counts the untolerated taints but does
+# not name them (job 137304436318), and the page does not claim more.
 deleted="$(kubectl -n starfleet delete pod ledger visitor)"
 expect 'dedicated: delete removes ledger' "$deleted" 'pod "ledger" deleted'
 expect 'dedicated: delete removes visitor' "$deleted" 'pod "visitor" deleted'

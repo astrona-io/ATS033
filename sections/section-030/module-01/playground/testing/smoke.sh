@@ -111,12 +111,18 @@ echo "$NODE_IP"
 expect_match 'the node InternalIP is an IPv4 address' "$NODE_IP" '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'
 save_from_page "$page" pod-exposed-server.yaml
 kubectl -n starfleet wait --for=condition=Ready pod/exposed-server --timeout=180s
-listeners="$(run_on_node ss -tln)"
+# The pod is Ready as soon as its container starts, a moment before the
+# server opens its port, so read the listeners again for up to 60 seconds.
+for attempt in $(seq 1 30); do
+  listeners="$(run_on_node ss -tln)"
+  grep -Eq '(0\.0\.0\.0|\*|\[::\]):19091 ' <<<"$listeners" && break
+  sleep 2
+done
 printf '%s\n' "$listeners"
 expect_match 'port 19091 listens on a wildcard address' "$listeners" '(0\.0\.0\.0|\*|\[::\]):19091 '
 expect 'a request from shuttle to the node address prints a directory listing' "$(kubectl -n starfleet exec shuttle -- wget -qO- -T 3 "http://$NODE_IP:19091/")" 'Directory listing'
-# The guide already created node-local-server with the same fields, so this
-# apply leaves it unchanged.
+# The guide already created node-local-server with the same fields. The apply
+# prints configured or unchanged; only the result that follows is checked.
 save_from_page "$page" pod-node-local-server.yaml
 kubectl -n starfleet wait --for=condition=Ready pod/node-local-server --timeout=180s
 listeners="$(run_on_node ss -tln)"

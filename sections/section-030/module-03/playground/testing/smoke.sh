@@ -147,7 +147,7 @@ fi
 expect 'kubectl auth can-i fails on the SelfSubjectAccessReview' "$can_i" 'Error from server (Forbidden): selfsubjectaccessreviews.authorization.k8s.io is forbidden: User "system:anonymous" cannot create resource "selfsubjectaccessreviews" in API group "authorization.k8s.io" at the cluster scope'
 binding="$(kubectl get clusterrolebinding system:public-info-viewer -o wide)"
 printf '%s\n' "$binding"
-expect_match 'the public-info-viewer binding names both groups' "$binding" '^system:public-info-viewer +ClusterRole/system:public-info-viewer +[0-9a-z]+ +system:authenticated, system:unauthenticated$'
+expect_match 'the public-info-viewer binding names both groups' "$binding" '^system:public-info-viewer +ClusterRole/system:public-info-viewer +[0-9a-z]+ +system:authenticated, system:unauthenticated *$'
 
 # etcd Client Access
 # This part only reads, so it runs before the kubelet change.

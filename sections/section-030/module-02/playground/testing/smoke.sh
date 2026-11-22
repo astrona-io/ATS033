@@ -118,7 +118,13 @@ expect 'apply changes probe-admin' "$(save_from_page "$page" service-probe-admin
 admin="$(kubectl -n starfleet get service probe-admin)"
 printf '%s\n' "$admin"
 expect_match 'probe-admin is now ClusterIP with port 80 only' "$admin" '^probe-admin +ClusterIP +[0-9.]+ +<none> +80/TCP '
-closed="$(run_expecting_failure kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$WORKER_IP:30090/")"
+# kube-proxy removes the node port rules a few seconds after the apply, so ask
+# again for up to 60 seconds before the request is expected to fail.
+for attempt in $(seq 1 20); do
+  closed="$(run_expecting_failure kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$WORKER_IP:30090/")"
+  [[ "$closed" == *failed ]] && break
+  sleep 3
+done
 printf '%s\n' "$closed"
 expect 'the request to the released node port fails' "$closed" failed
 expect 'wget prints an error' "$closed" 'wget: '
