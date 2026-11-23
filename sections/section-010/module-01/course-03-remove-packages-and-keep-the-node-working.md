@@ -68,7 +68,7 @@ dpkg-query --list | wc -l
 ```
 
 ```text
-740
+741
 ```
 
 To learn which package owns a file, use `dpkg -S`. The next command asks about the real path of `systemctl`. `command -v` finds the program in the search path, and `readlink -f` follows symbolic links to the real file:
