@@ -166,7 +166,15 @@ expect_equal 'every Service is of type ClusterIP' "$(printf '%s\n' "$services" |
 expect_equal 'every PORTS value is <none>' "$(printf '%s\n' "$services" | sed 1d | grep -cv '<none>$' || true)" 0
 expect 'apply creates probe-nodeport' "$(save_from_page "$page" service-probe-nodeport.yaml)" 'service/probe-nodeport created'
 NODE_IP="$(kubectl get node "$cluster-control-plane" -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}')"
-expect_match 'drifter reaches the probe through the node port' "$(kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$NODE_IP:30080/")" '^version=v1'
+# kube-proxy programs the new node port a moment after the Service exists, so
+# the first request can get "Connection refused". Retry 15 times, about a minute at most.
+nodeport_answer=''
+for _ in $(seq 1 15); do
+  nodeport_answer="$(kubectl -n outpost exec drifter -- wget -qO- -T 3 "http://$NODE_IP:30080/" 2>/dev/null || true)"
+  printf '%s\n' "$nodeport_answer" | grep -q '^version=v1' && break
+  sleep 2
+done
+expect_match 'drifter reaches the probe through the node port' "$nodeport_answer" '^version=v1'
 expect 'deleting probe-nodeport succeeds' "$(kubectl -n starfleet delete service probe-nodeport)" 'service "probe-nodeport" deleted'
 API_SERVER="$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')"
 anonymous="$(curl --insecure --silent --max-time 5 "$API_SERVER/api/v1/namespaces" || true)"
