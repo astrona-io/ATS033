@@ -1,20 +1,18 @@
----
-exam_objectives:
-- Appropriately use kernel hardening tools such as AppArmor, seccomp
----
 # Summary
 
-Containers share the kernel of their node, so a flaw in a kernel feature that a process may call is a flaw for every container on that node. Kernel hardening narrows what each process can reach. Seccomp filters system calls. It is inherited by child processes and cannot be removed once installed, and it decides on the syscall and its numbers only. AppArmor is mandatory access control by name: a profile lists the files, capabilities and network operations that a program may use, and everything else is denied, even for root.
+Containers share the kernel of their node. So a flaw in a kernel feature that a process may call is a flaw for every container on that node. Kernel hardening narrows what each process can reach.
 
-Kubernetes selects both in a securityContext. The field `seccompProfile` takes `RuntimeDefault`, `Localhost` (with `localhostProfile` relative to `/var/lib/kubelet/seccomp`) or `Unconfined`. The field `appArmorProfile`, available since v1.30, takes the same three types, and `localhostProfile` is the name inside the profile file. A container value overrides a pod value. Without a seccomp profile and without the kubelet setting `seccompDefault: true`, a pod runs without a filter.
+Seccomp (secure computing mode) filters system calls (syscalls). Child processes inherit the filter, and a process cannot remove it once it is installed. The filter decides only on the syscall and its numeric arguments. AppArmor is mandatory access control by name: a profile lists the files, capabilities and network operations that a program may use, and everything else is denied, even for root.
 
-A profile works only if the node provides it. A `Localhost` profile must exist on every node where the pod can run, and AppArmor needs a kernel with the module enabled and a runtime that supports it. A `kind` playground node uses the kernel of the machine that runs Podman, so AppArmor may be unavailable there.
+Kubernetes selects both in a securityContext. The field `seccompProfile` takes `RuntimeDefault`, `Localhost` or `Unconfined`. For `Localhost`, `localhostProfile` is a path relative to `/var/lib/kubelet/seccomp`. The field `appArmorProfile`, available since v1.30, takes the same three types, and its `localhostProfile` is the name inside the profile file. A container value overrides a pod value. Without a seccomp profile and without the kubelet setting `seccompDefault: true`, a pod runs without a filter.
 
-The restricted security context combines the identity and filesystem settings with the kernel profiles: non-root user, `allowPrivilegeEscalation: false`, all capabilities dropped, a read-only root filesystem with a writable volume, `fsGroup` for the volume and `RuntimeDefault` seccomp. The files `/proc/1/status` and `/proc/1/attr/current` show inside the container what is applied.
+A profile works only if the node provides it. A `Localhost` profile must exist on every node where the pod can run. AppArmor needs a kernel with the module enabled and a runtime that supports it. A `kind` playground node uses the kernel of the machine that runs Podman, so AppArmor may be unavailable there.
 
-When a profile fails, a pod that does not start has a delivery problem that the pod events explain, and an application that starts and is denied has a content problem that the application log and the kernel log explain. The fix is to allow the one call or path that is needed. Setting `Unconfined` removes the protection and is not a fix.
+The restricted security context combines the identity and filesystem settings with the kernel profiles: a non-root user, `allowPrivilegeEscalation: false`, all capabilities dropped, a read-only root filesystem with a writable volume, `fsGroup` for the volume and `RuntimeDefault` seccomp. Inside the container, the files `/proc/1/status` and `/proc/1/attr/current` show what is applied.
 
-Key facts:
+When a profile fails, look at where the failure happens. A pod that does not start has a delivery problem, and the pod events explain it. An application that starts and is then denied has a content problem, and the application log and the kernel log explain it. The fix is to allow the one call or path that is needed. Setting `Unconfined` removes the protection and is not a fix.
+
+Key facts to remember:
 
 - `Seccomp: 2` in `/proc/1/status` means a filter is installed. `0` means none.
 - `NoNewPrivs: 1` follows from `allowPrivilegeEscalation: false`.
