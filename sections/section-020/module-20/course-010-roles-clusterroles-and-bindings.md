@@ -1,29 +1,36 @@
----
-exam_objectives:
-- Using least-privilege identity and access management
----
 # Roles, ClusterRoles And Bindings
 
-The API server checks every request against RBAC rules before it runs the request. If the rules are wrong, a workload either fails because it lacks a permission or, worse, succeeds because it holds far more than it needs. To write correct rules you must know exactly what each of the four RBAC kinds contains and where each one applies. This part builds a Role, shows what a ClusterRole adds, and shows how the kind of binding decides the scope.
+The API server checks every request against the RBAC rules before it runs the request. RBAC stands for role-based access control: a set of Kubernetes objects that say who may do what through the API. If the rules are wrong, two things can happen. A workload fails because it lacks a permission, or, worse, it succeeds because it holds far more than it needs.
+
+To write correct rules, you must know exactly what each of the four RBAC kinds contains and where each one applies. On this page, you build a Role, see what a ClusterRole adds, and see how the kind of binding decides the scope.
 
 ## The four kinds and what they hold
 
-RBAC separates what is allowed from who is allowed. A **Role** holds rules and lives in one namespace. A **ClusterRole** holds rules and is not namespaced. It can describe resources that exist outside any namespace (nodes, namespaces, PersistentVolumes), URLs that are not resources (`/healthz`), or the same namespaced resources as a Role. A **RoleBinding** lives in one namespace and gives a Role or a ClusterRole to subjects. A **ClusterRoleBinding** gives a ClusterRole to subjects in every namespace and for cluster-scoped resources. A subject is a user, a group or a ServiceAccount.
+RBAC keeps two questions apart: what is allowed, and who is allowed. Two kinds hold the rules, and two kinds hand those rules to someone:
 
-Each rule has four parts. `apiGroups` names the API group, and the empty string means the core group, where `pods`, `secrets` and `configmaps` live. `resources` names the resource, and a slash adds a subresource, such as `pods/log` or `pods/exec`. `verbs` names the actions: `get`, `list`, `watch`, `create`, `update`, `patch`, `delete` and a few others. The optional `resourceNames` restricts the rule to named objects. RBAC has no deny rule. The API server allows a request when at least one rule from any binding of the subject matches it.
+- A **Role** holds rules and lives in one namespace.
+- A **ClusterRole** holds rules and is not namespaced. It can describe resources that exist outside any namespace (nodes, namespaces, PersistentVolumes), URLs that are not resources (`/healthz`), or the same namespaced resources as a Role.
+- A **RoleBinding** lives in one namespace and gives a Role or a ClusterRole to subjects.
+- A **ClusterRoleBinding** gives a ClusterRole to subjects in every namespace and for cluster-scoped resources.
 
-```mermaid
-flowchart TB
-    A["RoleBinding in starfleet"] -->|"roleRef: Role"| B["Role: starfleet only"]
-    A -->|"roleRef: ClusterRole"| C["ClusterRole: limited to starfleet"]
-    D["ClusterRoleBinding"] -->|"roleRef: ClusterRole"| E["ClusterRole: all namespaces"]
-```
+A subject is the identity that receives the rules: a user, a group or a ServiceAccount. A ServiceAccount is the identity that a pod uses when it talks to the API server.
 
-The diagram shows that the binding, not the role, decides the scope: a RoleBinding limits even a ClusterRole to its own namespace.
+Each rule has four parts. Together they describe one kind of request:
+
+- `apiGroups` names the API group. The empty string means the core group, where `pods`, `secrets` and `configmaps` live.
+- `resources` names the resource. A slash adds a subresource, such as `pods/log` or `pods/exec`.
+- `verbs` names the actions: `get`, `list`, `watch`, `create`, `update`, `patch`, `delete` and a few others.
+- The optional `resourceNames` restricts the rule to named objects.
+
+RBAC has no deny rule. The API server allows a request when at least one rule from any binding of the subject matches it. If no rule matches, the API server rejects the request.
+
+![Diagram: a RoleBinding in starfleet that points to a Role or a ClusterRole grants the rules only in starfleet, while a ClusterRoleBinding grants a ClusterRole in all namespaces](images/binding-sets-scope.svg)
+
+The drawing shows that the binding, not the role, decides the scope: a RoleBinding limits even a ClusterRole to its own namespace.
 
 ## Build a narrow Role
 
-The playground has a `shuttle` pod and a `probe` Deployment in `starfleet`. A reporting tool needs to read the configuration of one ConfigMap, not all of them. Select the playground first:
+The playground has a `shuttle` pod and a `probe` Deployment in `starfleet`. A reporting tool needs to read the configuration in one ConfigMap, not in all of them. First, point `kubectl` at the playground cluster:
 
 <!-- astrona:playground:renew -->
 
@@ -32,7 +39,7 @@ export KUBECONFIG="$(astrona kubeconfig ats-033-playground-020-02)"
 test "$(kubectl config current-context)" = "kind-astro-ats-033-playground-020-02" || exit 1
 ```
 
-Save this as `serviceaccount-report-reader.yaml`:
+The reporting tool needs its own identity, so start with a ServiceAccount. Save this as `serviceaccount-report-reader.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -42,7 +49,7 @@ metadata:
   namespace: starfleet
 ```
 
-Save this as `role-probe-code-reader.yaml`:
+Next comes the Role. It allows one verb, `get`, on one ConfigMap, `probe-code`, in the core API group. Save this as `role-probe-code-reader.yaml`:
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -57,7 +64,7 @@ rules:
   verbs: ["get"]
 ```
 
-Save this as `rolebinding-report-reader.yaml`:
+The Role does nothing until a binding gives it to a subject. The RoleBinding below connects the Role to the ServiceAccount. Save this as `rolebinding-report-reader.yaml`:
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -81,7 +88,7 @@ Apply all three:
 kubectl apply -f serviceaccount-report-reader.yaml -f role-probe-code-reader.yaml -f rolebinding-report-reader.yaml
 ```
 
-Then check the result. Ask the API server as the ServiceAccount whether it may read the named ConfigMap, list ConfigMaps, and read the same ConfigMap in another namespace:
+Then check the result. Ask the API server, acting as the ServiceAccount, three questions: may it read the named ConfigMap, may it list ConfigMaps, and may it read the same ConfigMap in another namespace?
 
 ```sh
 account=system:serviceaccount:starfleet:report-reader
@@ -92,9 +99,13 @@ kubectl auth can-i get configmap/probe-code --as="$account" -n outpost
 
 The answers are `yes`, `no` and `no`. The `resourceNames` list allows only the `get` of that one object. A `list` request has no object name, so a rule with `resourceNames` never matches it. A `no` answer ends the command with a nonzero exit status, which is normal.
 
+![Diagram: the report-reader ServiceAccount may get configmap/probe-code in starfleet, but may not list configmaps and may not get probe-code in outpost](images/resource-names-checks.svg)
+
+The drawing shows the three questions. Only the first one matches the rule: the right verb, the right object name and the namespace of the RoleBinding.
+
 ## Limit a ClusterRole with a RoleBinding
 
-Kubernetes ships ClusterRoles such as `view`, which grants read access to most namespaced resources. A ClusterRoleBinding would give that read access in every namespace. A RoleBinding that points to the same ClusterRole gives it in one namespace only. You reuse the rules and still limit the scope.
+Writing every rule by hand is slow, so Kubernetes ships ready-made ClusterRoles. One of them is `view`, which grants read access to most namespaced resources. A ClusterRoleBinding to `view` would give that read access in every namespace. A RoleBinding that points to the same ClusterRole gives it in one namespace only. You reuse the rules and still limit the scope.
 
 Save this as `rolebinding-report-reader-view.yaml`:
 
@@ -127,13 +138,21 @@ kubectl auth can-i list pods --as="$account" -n starfleet
 kubectl auth can-i list pods --as="$account" -n outpost
 ```
 
-The first answer is `yes` and the second is `no`. The `view` ClusterRole does not include Secrets, so the ServiceAccount still cannot read them. The reference of a binding to a role cannot change after creation, so a wrong `roleRef` means deleting the binding and creating it again.
+The first answer is `yes` and the second is `no`. The `view` ClusterRole does not include Secrets, so the ServiceAccount still cannot read them.
+
+One more detail matters when you fix a binding. The `roleRef` field, which names the role of a binding, cannot change after creation. So a wrong `roleRef` means deleting the binding and creating it again.
 
 ## Choosing the right kind
 
-Use a Role and a RoleBinding when the permission is about one namespace, which is most workloads. Use a ClusterRole with a RoleBinding when several namespaces need the same rules but each one grants them separately. Use a ClusterRole with a ClusterRoleBinding only for cluster-scoped resources such as nodes, or for a tool that truly works across all namespaces. When you are not sure, start with the smaller scope.
+With these examples in mind, the choice of kind follows from the scope that the permission needs:
 
-You now know what each kind holds, how `resourceNames` narrows a rule and how the binding sets the scope. The next question is how permissions grow beyond this care in real clusters, and what Kubernetes does to stop users from granting what they do not hold.
+- Use a Role and a RoleBinding when the permission is about one namespace. This fits most workloads.
+- Use a ClusterRole with a RoleBinding when several namespaces need the same rules, but each one grants them separately.
+- Use a ClusterRole with a ClusterRoleBinding only for cluster-scoped resources such as nodes, or for a tool that truly works across all namespaces.
+
+When you are not sure, start with the smaller scope.
+
+You now know what each kind holds, how `resourceNames` narrows a rule and how the binding sets the scope. The open question is how permissions grow far beyond this in real clusters, and what Kubernetes does to stop users from granting what they do not hold.
 
 ## Common pitfalls
 
