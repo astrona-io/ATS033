@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 390" width="840" height="390" role="img" aria-labelledby="title desc">
+  <title id="title">Replace a wide binding with a narrow Role</title>
+  <desc id="desc">Before: the restarter ServiceAccount in outpost is bound by the RoleBinding restarter-admin to the ClusterRole admin, so it may get Secrets and create RoleBindings. After: the RoleBinding restarter binds it to the Role restarter, so it may not get Secrets and may patch Deployments.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <text class="strong" x="20" y="26">Before: RoleBinding to admin</text>
+  <rect class="frame" x="20" y="40" width="380" height="340" rx="10"/>
+  <text class="label" x="34" y="62">namespace <tspan class="code">outpost</tspan></text>
+  <path class="line" d="M210 120 V145" marker-end="url(#arrow)"/>
+  <path class="line" d="M210 195 V220" marker-end="url(#arrow)"/>
+  <path class="line" d="M210 270 V286 H120 V305" marker-end="url(#arrow)"/>
+  <path class="line" d="M210 270 V286 H300 V305" marker-end="url(#arrow)"/>
+  <rect class="box" x="130" y="72" width="160" height="48" rx="8"/>
+  <text x="210" y="92" text-anchor="middle">ServiceAccount</text>
+  <text class="code" x="210" y="110" text-anchor="middle">restarter</text>
+  <rect class="box" x="130" y="147" width="160" height="48" rx="8"/>
+  <text x="210" y="167" text-anchor="middle">RoleBinding</text>
+  <text class="code" x="210" y="185" text-anchor="middle">restarter-admin</text>
+  <rect class="drop" x="130" y="222" width="160" height="48" rx="8"/>
+  <text x="210" y="242" text-anchor="middle">ClusterRole</text>
+  <text class="code" x="210" y="260" text-anchor="middle">admin</text>
+  <rect class="drop" x="35" y="307" width="170" height="56" rx="8"/>
+  <text class="code" x="120" y="330" text-anchor="middle">get secrets</text>
+  <text class="strong bad" x="120" y="350" text-anchor="middle">yes</text>
+  <rect class="drop" x="215" y="307" width="170" height="56" rx="8"/>
+  <text class="code" x="300" y="330" text-anchor="middle">create rolebindings</text>
+  <text class="strong bad" x="300" y="350" text-anchor="middle">yes</text>
+  <text class="strong" x="440" y="26">After: narrow Role restarter</text>
+  <rect class="frame" x="440" y="40" width="380" height="340" rx="10"/>
+  <text class="label" x="454" y="62">namespace <tspan class="code">outpost</tspan></text>
+  <path class="line" d="M630 120 V145" marker-end="url(#arrow)"/>
+  <path class="line" d="M630 195 V220" marker-end="url(#arrow)"/>
+  <path class="okline" d="M630 270 V286 H540 V305" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M630 270 V286 H720 V305" marker-end="url(#arrowok)"/>
+  <rect class="box" x="550" y="72" width="160" height="48" rx="8"/>
+  <text x="630" y="92" text-anchor="middle">ServiceAccount</text>
+  <text class="code" x="630" y="110" text-anchor="middle">restarter</text>
+  <rect class="box" x="550" y="147" width="160" height="48" rx="8"/>
+  <text x="630" y="167" text-anchor="middle">RoleBinding</text>
+  <text class="code" x="630" y="185" text-anchor="middle">restarter</text>
+  <rect class="ok" x="550" y="222" width="160" height="48" rx="8"/>
+  <text x="630" y="242" text-anchor="middle">Role</text>
+  <text class="code" x="630" y="260" text-anchor="middle">restarter</text>
+  <rect class="ok" x="455" y="307" width="170" height="56" rx="8"/>
+  <text class="code" x="540" y="330" text-anchor="middle">get secrets</text>
+  <text class="strong good" x="540" y="350" text-anchor="middle">no</text>
+  <rect class="ok" x="635" y="307" width="170" height="56" rx="8"/>
+  <text class="code" x="720" y="330" text-anchor="middle">patch deployments</text>
+  <text class="strong good" x="720" y="350" text-anchor="middle">yes</text>
+</svg>

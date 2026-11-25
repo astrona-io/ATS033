@@ -1,0 +1,38 @@
+Copyright (C) 2026 Astrona.io and the authors and maintainers listed in
+AUTHORS.md.
+
+This repository uses two licenses. Each file is covered by exactly one of them.
+
+1. Course content: Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+   International (CC BY-NC-SA 4.0). Full text: LICENSE-CONTENT.
+
+   Covers all written and visual teaching material: Markdown pages (course
+   pages, lab tasks and lab solutions, playground guides, summaries), images,
+   diagrams, and the question banks (the quiz YAML files under sections/).
+
+   Commands, YAML and other code snippets shown inside these pages are part
+   of the page and are covered by CC BY-NC-SA 4.0, not by the AGPL.
+
+2. Code: GNU Affero General Public License v3 (AGPL v3). Full text: LICENSE.
+
+   Covers everything that runs or configures an environment: shell and Python
+   scripts, lab and playground configuration (config.yaml, astrona.yaml),
+   bootstrap, validation and testing files, Kubernetes manifests shipped as
+   files, and JSON schemas.
+
+Commercial use of the course content needs a written agreement with
+Astrona.io. Contact Astrona.io for a commercial license, for the content or
+for the code without the AGPL terms.
+
+Additional terms under section 7 of the AGPL v3 (they apply to the code;
+CC BY-NC-SA 4.0 section 3(a) already requires the same attribution for the
+content):
+
+(b) All copies and modified versions must keep the author and maintainer
+    attributions: the AUTHORS.md file, the copyright notice above, and the
+    "Created by Astrona.io" credit shown in the material. Modified versions
+    may add their own attributions next to these, but must not remove them.
+
+(e) This license grants no right to use the names "Astrona" and "Astrona.io"
+    or the Astrona logo, except to state truthfully where the material comes
+    from.

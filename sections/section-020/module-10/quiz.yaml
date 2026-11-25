@@ -1,0 +1,269 @@
+# Knowledge check for section 020. Contract:
+# scripts/ci/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-020-01
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-020
+  title: Using least-privilege identity and access management
+placement:
+  position: after
+  reading: sections/section-020/module-30/course-100-summary.md
+questions:
+  - id: ats033-020-01-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Grant one file through a group instead of broad access."
+    source_readings:
+      - sections/section-020/module-10/course-010-users-groups-and-file-permissions.md
+    prompt: "A backup account must read `/var/lib/app/report` (owner `root`, mode `0600`). Which change gives the least access that completes the task?"
+    options:
+      - id: a
+        text: "Add the account to the `root` group."
+        explanation: "The account would gain the group rights on every file that group owns."
+      - id: b
+        text: "Run `chmod 0644 /var/lib/app/report`."
+        explanation: "Every account on the node could then read the file."
+      - id: c
+        text: "Create a group for the report, set it on the file with mode `0640`, and add the account to that group."
+        explanation: "Correct. Only the named account and the owner can read the file."
+      - id: d
+        text: "Give the account a `sudo` rule for all commands."
+        explanation: "This gives full root access for a read task."
+    correct_option: c
+    explanation: "A dedicated group makes the grant visible and limited to one file."
+
+  - id: ats033-020-01-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Turn off an account completely."
+    source_readings:
+      - sections/section-020/module-10/course-020-privilege-elevation-and-account-locking.md
+    prompt: "An employee leaves. You run `usermod --lock` on the account. The employee can still log in over SSH with a private key. Why?"
+    options:
+      - id: a
+        text: "The lock marker blocks password authentication only. Key-based login needs an expiry date or a `nologin` shell to stop."
+        explanation: "Correct. Combine the lock with an expiry date and a non-login shell."
+      - id: b
+        text: "`usermod --lock` only works on accounts with a home directory."
+        explanation: "The lock does not depend on the home directory."
+      - id: c
+        text: "SSH ignores all account settings."
+        explanation: "SSH uses the account checks, which is why an expiry date works."
+      - id: d
+        text: "The account must be removed from `/etc/group` first."
+        explanation: "Group membership does not control SSH login."
+    correct_option: a
+    explanation: "A password lock leaves key-based logins open unless the account is also expired or has a `nologin` shell."
+
+  - id: ats033-020-01-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Verify the permissions of a ServiceAccount with `kubectl auth can-i`."
+    source_readings:
+      - sections/section-020/module-10/course-030-kubernetes-identities-and-rbac.md
+    prompt: "A Role allows `get` and `list` on pods in `starfleet`. A RoleBinding in `starfleet` binds it to the ServiceAccount `probe-reader`. What does `kubectl auth can-i list pods --as=system:serviceaccount:starfleet:probe-reader -n outpost` print?"
+    options:
+      - id: a
+        text: "`yes`, because the ServiceAccount exists in the cluster."
+        explanation: "Existence alone grants nothing."
+      - id: b
+        text: "`yes`, because Roles apply to all namespaces."
+        explanation: "A Role applies only in its own namespace."
+      - id: c
+        text: "`no`, because the RoleBinding grants the Role in `starfleet` only."
+        explanation: "Correct. A RoleBinding is namespaced."
+      - id: d
+        text: "An error, because `--as` cannot be used with ServiceAccounts."
+        explanation: "`--as` works with ServiceAccount user names."
+    correct_option: c
+    explanation: "RBAC is additive and a RoleBinding grants its Role only in its own namespace."
+
+  - id: ats033-020-01-q11
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the binding kind that sets the scope of a ClusterRole."
+    source_readings:
+      - sections/section-020/module-20/course-010-roles-clusterroles-and-bindings.md
+    prompt: "The ClusterRole `view` must let the ServiceAccount `report-reader` read pods in the `starfleet` namespace only. Which object does that?"
+    options:
+      - id: a
+        text: "A ClusterRoleBinding that names `view` and the ServiceAccount."
+        explanation: "A ClusterRoleBinding grants the rules in every namespace."
+      - id: b
+        text: "A RoleBinding in `starfleet` whose `roleRef` names the ClusterRole `view`."
+        explanation: "Correct. A RoleBinding limits the rules of a ClusterRole to its own namespace."
+      - id: c
+        text: "A Role in `starfleet` that has the name `view`."
+        explanation: "A new Role would hold its own rules. It would not reuse the ClusterRole."
+      - id: d
+        text: "A RoleBinding in `outpost` that names the ServiceAccount."
+        explanation: "A RoleBinding grants access only in its own namespace, which is `outpost` here."
+    correct_option: b
+    explanation: "The scope comes from the binding. A RoleBinding that references a ClusterRole gives its rules in one namespace."
+
+  - id: ats033-020-01-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Remove a wide grant completely after adding a narrow one."
+    source_readings:
+      - sections/section-020/module-20/course-020-wildcards-cluster-admin-and-escalation.md
+    prompt: "You create a narrow Role and RoleBinding for a ServiceAccount. It can still delete Secrets in every namespace. A ClusterRoleBinding to `cluster-admin` still names it. What fixes this?"
+    options:
+      - id: a
+        text: "Delete the narrow Role, because Kubernetes uses the strictest role."
+        explanation: "RBAC has no strictest-role rule. Permissions only add up."
+      - id: b
+        text: "Delete the ClusterRoleBinding that names `cluster-admin`."
+        explanation: "Correct. RBAC only adds permissions, so the wide binding must be removed."
+      - id: c
+        text: "Add a deny rule for Secrets to the narrow Role."
+        explanation: "RBAC has no deny rule."
+      - id: d
+        text: "Restart the API server so it reloads the roles."
+        explanation: "The API server already evaluates all bindings on every request."
+    correct_option: b
+    explanation: "Access ends only when every binding that grants it is deleted."
+
+  - id: ats033-020-01-q13
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read the effective permissions of an identity with kubectl auth can-i."
+    source_readings:
+      - sections/section-020/module-20/course-030-audit-permissions-with-kubectl-auth-can-i.md
+    prompt: "Which command lists every rule that applies to the ServiceAccount `ops-agent` in `starfleet` without using its token?"
+    options:
+      - id: a
+        text: "`kubectl auth can-i --list --as=system:serviceaccount:starfleet:ops-agent -n starfleet`"
+        explanation: "Correct. The option --as sends the question as that identity, and --list prints its rules."
+      - id: b
+        text: "`kubectl get serviceaccount ops-agent -o yaml`"
+        explanation: "This shows the ServiceAccount object. It lists no permissions."
+      - id: c
+        text: "`kubectl auth can-i --list -n starfleet`"
+        explanation: "Without --as the command lists the permissions of your own administrator session."
+      - id: d
+        text: "`kubectl describe role ops-agent -n starfleet`"
+        explanation: "This shows one Role only and misses other bindings, ClusterRoles and aggregated rules."
+    correct_option: a
+    explanation: "The authorizer answers `can-i`, so it includes every binding that applies."
+
+  - id: ats033-020-01-q09
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Reduce the credentials that reach pods."
+    source_readings:
+      - sections/section-020/module-10/course-030-kubernetes-identities-and-rbac.md
+    prompt: "A pod serves static pages and never calls the Kubernetes API. Its ServiceAccount has `automountServiceAccountToken` unset. Which change removes the API credential from the pod without changing the application?"
+    options:
+      - id: a
+        text: "Set `automountServiceAccountToken: false` in the pod spec."
+        explanation: "Correct. The kubelet then does not mount the token, and a value on the pod overrides the ServiceAccount."
+      - id: b
+        text: "Delete the Role the ServiceAccount uses."
+        explanation: "The token is still mounted. It only has fewer permissions."
+      - id: c
+        text: "Add a ClusterRoleBinding with no subjects."
+        explanation: "This changes no credentials."
+      - id: d
+        text: "Set `readOnlyRootFilesystem: true`."
+        explanation: "The token mount is a separate volume. This setting does not remove it."
+    correct_option: a
+    explanation: "Turning off the automatic mount removes the token from pods that do not need it."
+
+  - id: ats033-020-01-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make an auditd watch rule persistent and load it without a reboot."
+    source_readings:
+      - sections/section-020/module-10/course-060-persistent-audit-rules-with-augenrules.md
+    prompt: "An administrator writes `-w /etc/sudoers.d -p wa -k sudoers-change` to `/etc/audit/rules.d/40-sudoers.rules`. `auditctl -l` still prints `No rules`. What loads the rule into the kernel without a reboot and keeps it after the next restart of `auditd`?"
+    options:
+      - id: a
+        text: "Run `auditctl -w /etc/sudoers.d -p wa -k sudoers-change`."
+        explanation: "This loads the rule into the kernel only. The rule file is still not built into `/etc/audit/audit.rules`, and `augenrules --check` still reports a change."
+      - id: b
+        text: "Run `augenrules --load`."
+        explanation: "Correct. It builds `/etc/audit/audit.rules` from the files in `rules.d` and loads it, and `auditd` loads the same file at every start."
+      - id: c
+        text: "Rename the file to `40-sudoers.conf`."
+        explanation: "`augenrules` reads only files whose names end in `.rules`, so the rule would be ignored."
+      - id: d
+        text: "Run `ausearch --input-logs -k sudoers-change`."
+        explanation: "`ausearch` only reads the audit log. It does not load rules."
+    correct_option: b
+    explanation: "A file in `rules.d` does nothing until `augenrules --load` builds and loads `/etc/audit/audit.rules`."
+
+  - id: ats033-020-01-q14
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Describe where a pod token comes from and what it allows."
+    source_readings:
+      - sections/section-020/module-30/course-010-dedicated-serviceaccounts-and-automount.md
+    prompt: "A pod names no `serviceAccountName`. Which ServiceAccount does it use, and where does the kubelet write its token?"
+    options:
+      - id: a
+        text: "The `default` ServiceAccount of the namespace; the token goes to `/var/run/secrets/kubernetes.io/serviceaccount`."
+        explanation: "Correct. The admission controller sets `default`, and the kubelet writes the token files there."
+      - id: b
+        text: "A new ServiceAccount named after the pod; the token goes to `/etc/kubernetes`."
+        explanation: "Kubernetes does not create a ServiceAccount for each pod."
+      - id: c
+        text: "No ServiceAccount; the pod has no token."
+        explanation: "Every pod has a ServiceAccount. The token is mounted unless it is turned off."
+      - id: d
+        text: "The ServiceAccount of the node; the token goes to `/root`."
+        explanation: "Nodes do not provide pod identities this way."
+    correct_option: a
+    explanation: "Pods without `serviceAccountName` use `default` and receive its token in the standard directory."
+
+  - id: ats033-020-01-q15
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain a bound projected token."
+    source_readings:
+      - sections/section-020/module-30/course-020-bound-projected-tokens.md
+    prompt: "Which statement about the token that the kubelet projects into a current pod is correct?"
+    options:
+      - id: a
+        text: "It never expires, and it is stored in a Secret for the ServiceAccount."
+        explanation: "This describes the old long-lived token Secret."
+      - id: b
+        text: "It expires, it is tied to the pod, and the API server rejects it after the pod is deleted."
+        explanation: "Correct. It is a bound token that the API server issues through the TokenRequest API."
+      - id: c
+        text: "It is valid for any audience and any cluster."
+        explanation: "A token carries an audience, and a service accepts only tokens meant for it."
+      - id: d
+        text: "It is created once per ServiceAccount and shared by all pods."
+        explanation: "The kubelet requests a token for each pod."
+    correct_option: b
+    explanation: "Bound tokens have an expiry and are tied to the pod."
+
+  - id: ats033-020-01-q16
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Close the default ServiceAccount and remove long-lived tokens."
+    source_readings:
+      - sections/section-020/module-30/course-030-the-default-serviceaccount-and-unused-tokens.md
+    prompt: "A namespace has a RoleBinding that gives `default` the right to list pods, and a Secret of type `kubernetes.io/service-account-token`. Which pair of actions reduces the risk?"
+    options:
+      - id: a
+        text: "Delete the `default` ServiceAccount and keep the Secret."
+        explanation: "The controller recreates `default`, and the Secret token stays valid."
+      - id: b
+        text: "Delete the RoleBinding, set `automountServiceAccountToken: false` on `default`, and delete the unused Secret."
+        explanation: "Correct. This removes the permission, the mount and the token that never expires."
+      - id: c
+        text: "Only set `automountServiceAccountToken: false` on `default`."
+        explanation: "The RoleBinding still grants permissions to any token of `default`, and the Secret token stays valid."
+      - id: d
+        text: "Rename the Secret so that it is harder to find."
+        explanation: "The token stays valid under any name."
+    correct_option: b
+    explanation: "Remove the binding, turn off the mount and delete tokens that nothing uses."

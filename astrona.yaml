@@ -23,16 +23,16 @@ modules:
   content:
   - type: reading
     title: Introduction
-    path: sections/intro/README.md
+    path: sections/intro/00-introduction.md
   - type: reading
     title: Welcome To The Course
-    path: sections/intro/course-01-welcome.md
+    path: sections/intro/10-welcome.md
   - type: reading
     title: Get Your Machine Ready
-    path: sections/intro/course-02-get-your-machine-ready.md
+    path: sections/intro/20-get-your-machine-ready.md
   - type: reading
     title: How This Course Is Made
-    path: sections/intro/course-03-how-this-course-is-made.md
+    path: sections/intro/30-how-this-course-is-made.md
 - id: module-010
   title: Minimize host OS footprint (reduce attack surface)
   description: Developed reading and reasoning for Minimize host OS footprint (reduce
@@ -41,22 +41,22 @@ modules:
   content:
   - type: reading
     title: Minimize host OS footprint (reduce attack surface)
-    path: sections/section-010/README.md
+    path: sections/section-010/00-introduction.md
   - type: reading
     title: Reduce The Host Operating-System Attack Surface
-    path: sections/section-010/module-01/course.md
+    path: sections/section-010/module-10/course-000.md
   - type: reading
     title: Inventory Services And Listeners
-    path: sections/section-010/module-01/course-01-inventory-services-and-listeners.md
+    path: sections/section-010/module-10/course-010-inventory-services-and-listeners.md
   - type: reading
     title: Stop, Disable And Mask Services
-    path: sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
+    path: sections/section-010/module-10/course-020-stop-disable-and-mask-services.md
   - type: reading
     title: Close An Unneeded Listener On A Node — Task
-    path: sections/section-010/module-01/labs/lab-01/question.md
+    path: sections/section-010/module-10/labs/lab-01/question.md
   - type: lab
     title: Close An Unneeded Listener On A Node
-    path: sections/section-010/module-01/labs/lab-01
+    path: sections/section-010/module-10/labs/lab-01
     difficulty: intermediate
     estimated_duration: 8m
     topic: host-service-footprint
@@ -68,16 +68,16 @@ modules:
     - host-service-footprint
   - type: reading
     title: Close An Unneeded Listener On A Node — Solution
-    path: sections/section-010/module-01/labs/lab-01/solution.md
+    path: sections/section-010/module-10/labs/lab-01/solution.md
   - type: reading
     title: Remove Packages And Keep The Node Working
-    path: sections/section-010/module-01/course-03-remove-packages-and-keep-the-node-working.md
+    path: sections/section-010/module-10/course-030-remove-packages-and-keep-the-node-working.md
   - type: reading
     title: Purge An Unneeded Package From A Node — Task
-    path: sections/section-010/module-01/labs/lab-02/question.md
+    path: sections/section-010/module-10/labs/lab-02/question.md
   - type: lab
     title: Purge An Unneeded Package From A Node
-    path: sections/section-010/module-01/labs/lab-02
+    path: sections/section-010/module-10/labs/lab-02
     difficulty: intermediate
     estimated_duration: 8m
     topic: host-package-footprint
@@ -89,28 +89,28 @@ modules:
     - host-package-footprint
   - type: reading
     title: Purge An Unneeded Package From A Node — Solution
-    path: sections/section-010/module-01/labs/lab-02/solution.md
+    path: sections/section-010/module-10/labs/lab-02/solution.md
   - type: reading
     title: Privileged Host Interfaces
-    path: sections/section-010/module-01/course-04-privileged-host-interfaces.md
+    path: sections/section-010/module-10/course-040-privileged-host-interfaces.md
   - type: reading
     title: Summary
-    path: sections/section-010/module-01/course-05-summary.md
+    path: sections/section-010/module-10/course-100-summary.md
   - type: reading
     title: Harden Node Access With SSH And Host Login Paths
-    path: sections/section-010/module-02/course.md
+    path: sections/section-010/module-20/course-000.md
   - type: reading
     title: Read The sshd Settings That Decide Who Gets In
-    path: sections/section-010/module-02/course-01-read-the-sshd-settings.md
+    path: sections/section-010/module-20/course-010-read-the-sshd-settings.md
   - type: reading
     title: Limit Who Can Log In
-    path: sections/section-010/module-02/course-02-limit-who-can-log-in.md
+    path: sections/section-010/module-20/course-020-limit-who-can-log-in.md
   - type: reading
     title: Restrict SSH Logins In sshd_config — Task
-    path: sections/section-010/module-02/labs/lab-01/question.md
+    path: sections/section-010/module-20/labs/lab-01/question.md
   - type: lab
     title: Restrict SSH Logins In sshd_config
-    path: sections/section-010/module-02/labs/lab-01
+    path: sections/section-010/module-20/labs/lab-01
     difficulty: intermediate
     estimated_duration: 10m
     topic: ssh-host-login
@@ -122,16 +122,16 @@ modules:
     - ssh-host-login
   - type: reading
     title: Restrict SSH Logins In sshd_config — Solution
-    path: sections/section-010/module-02/labs/lab-01/solution.md
+    path: sections/section-010/module-20/labs/lab-01/solution.md
   - type: reading
     title: Login Shells And Unused Accounts
-    path: sections/section-010/module-02/course-03-login-shells-and-unused-accounts.md
+    path: sections/section-010/module-20/course-030-login-shells-and-unused-accounts.md
   - type: reading
     title: Close Unused And Duplicate Root Accounts — Task
-    path: sections/section-010/module-02/labs/lab-02/question.md
+    path: sections/section-010/module-20/labs/lab-02/question.md
   - type: lab
     title: Close Unused And Duplicate Root Accounts
-    path: sections/section-010/module-02/labs/lab-02
+    path: sections/section-010/module-20/labs/lab-02
     difficulty: intermediate
     estimated_duration: 8m
     topic: unused-host-accounts
@@ -143,27 +143,27 @@ modules:
     - unused-host-accounts
   - type: reading
     title: Close Unused And Duplicate Root Accounts — Solution
-    path: sections/section-010/module-02/labs/lab-02/solution.md
+    path: sections/section-010/module-20/labs/lab-02/solution.md
   - type: reading
     title: Summary
-    path: sections/section-010/module-02/course-04-summary.md
+    path: sections/section-010/module-20/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Harden Node Access With SSH And Host Login Paths'
-    path: sections/section-010/module-02/quiz.yaml
+    path: sections/section-010/module-20/quiz.yaml
     question_count: 12
     pass_score: 70
   - type: reading
     title: Restrict Workload Access To The Host
-    path: sections/section-010/module-03/course.md
+    path: sections/section-010/module-30/course-000.md
   - type: reading
     title: Host Namespaces, hostPath And Privileged Containers
-    path: sections/section-010/module-03/course-01-host-namespaces-hostpath-and-privileged-containers.md
+    path: sections/section-010/module-30/course-010-host-namespaces-hostpath-and-privileged-containers.md
   - type: reading
     title: Remove Host Access From A Workload — Task
-    path: sections/section-010/module-03/labs/lab-01/question.md
+    path: sections/section-010/module-30/labs/lab-01/question.md
   - type: lab
     title: Remove Host Access From A Workload
-    path: sections/section-010/module-03/labs/lab-01
+    path: sections/section-010/module-30/labs/lab-01
     examScope: namespace
     difficulty: intermediate
     estimated_duration: 10m
@@ -176,16 +176,16 @@ modules:
     - workload-host-access
   - type: reading
     title: Remove Host Access From A Workload — Solution
-    path: sections/section-010/module-03/labs/lab-01/solution.md
+    path: sections/section-010/module-30/labs/lab-01/solution.md
   - type: reading
     title: Enforce Limits With Pod Security Admission
-    path: sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+    path: sections/section-010/module-30/course-020-enforce-limits-with-pod-security-admission.md
   - type: reading
     title: Enforce The Baseline Pod Security Standard — Task
-    path: sections/section-010/module-03/labs/lab-02/question.md
+    path: sections/section-010/module-30/labs/lab-02/question.md
   - type: lab
     title: Enforce The Baseline Pod Security Standard
-    path: sections/section-010/module-03/labs/lab-02
+    path: sections/section-010/module-30/labs/lab-02
     examScope: namespace
     difficulty: intermediate
     estimated_duration: 8m
@@ -198,16 +198,16 @@ modules:
     - namespace-pod-security
   - type: reading
     title: Enforce The Baseline Pod Security Standard — Solution
-    path: sections/section-010/module-03/labs/lab-02/solution.md
+    path: sections/section-010/module-30/labs/lab-02/solution.md
   - type: reading
     title: Kubelet Settings And Dedicated Nodes
-    path: sections/section-010/module-03/course-03-kubelet-settings-and-dedicated-nodes.md
+    path: sections/section-010/module-30/course-030-kubelet-settings-and-dedicated-nodes.md
   - type: reading
     title: Dedicate A Worker Node To One Workload — Task
-    path: sections/section-010/module-03/labs/lab-03/question.md
+    path: sections/section-010/module-30/labs/lab-03/question.md
   - type: lab
     title: Dedicate A Worker Node To One Workload
-    path: sections/section-010/module-03/labs/lab-03
+    path: sections/section-010/module-30/labs/lab-03
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 10m
@@ -220,18 +220,18 @@ modules:
     - dedicated-workload-nodes
   - type: reading
     title: Dedicate A Worker Node To One Workload — Solution
-    path: sections/section-010/module-03/labs/lab-03/solution.md
+    path: sections/section-010/module-30/labs/lab-03/solution.md
   - type: reading
     title: Summary
-    path: sections/section-010/module-03/course-04-summary.md
+    path: sections/section-010/module-30/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Restrict Workload Access To The Host'
-    path: sections/section-010/module-03/quiz.yaml
+    path: sections/section-010/module-30/quiz.yaml
     question_count: 12
     pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Minimize The Host OS Footprint'
-    path: sections/section-010/module-01/quiz.yaml
+    path: sections/section-010/module-10/quiz.yaml
     question_count: 10
     pass_score: 70
 - id: module-020
@@ -242,19 +242,19 @@ modules:
   content:
   - type: reading
     title: Using least-privilege identity and access management
-    path: sections/section-020/README.md
+    path: sections/section-020/00-introduction.md
   - type: reading
     title: Apply Least Privilege To Identities
-    path: sections/section-020/module-01/course.md
+    path: sections/section-020/module-10/course-000.md
   - type: reading
     title: Users, Groups And File Permissions
-    path: sections/section-020/module-01/course-01-users-groups-and-file-permissions.md
+    path: sections/section-020/module-10/course-010-users-groups-and-file-permissions.md
   - type: reading
     title: Grant Read Access Through A Group — Task
-    path: sections/section-020/module-01/labs/lab-01/question.md
+    path: sections/section-020/module-10/labs/lab-01/question.md
   - type: lab
     title: Grant Read Access Through A Group
-    path: sections/section-020/module-01/labs/lab-01
+    path: sections/section-020/module-10/labs/lab-01
     difficulty: intermediate
     estimated_duration: 6m
     topic: host-identity
@@ -267,16 +267,16 @@ modules:
     - host-identity
   - type: reading
     title: Grant Read Access Through A Group — Solution
-    path: sections/section-020/module-01/labs/lab-01/solution.md
+    path: sections/section-020/module-10/labs/lab-01/solution.md
   - type: reading
     title: Privilege Elevation And Account Locking
-    path: sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+    path: sections/section-020/module-10/course-020-privilege-elevation-and-account-locking.md
   - type: reading
     title: Lock And Expire A Departed Account — Task
-    path: sections/section-020/module-01/labs/lab-02/question.md
+    path: sections/section-020/module-10/labs/lab-02/question.md
   - type: lab
     title: Lock And Expire A Departed Account
-    path: sections/section-020/module-01/labs/lab-02
+    path: sections/section-020/module-10/labs/lab-02
     difficulty: intermediate
     estimated_duration: 10m
     topic: account-locking
@@ -291,19 +291,19 @@ modules:
     - account-locking
   - type: reading
     title: Lock And Expire A Departed Account — Solution
-    path: sections/section-020/module-01/labs/lab-02/solution.md
+    path: sections/section-020/module-10/labs/lab-02/solution.md
   - type: reading
     title: Kubernetes Identities And RBAC
-    path: sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md
+    path: sections/section-020/module-10/course-030-kubernetes-identities-and-rbac.md
   - type: reading
     title: Revoking Host And Kubernetes Access
-    path: sections/section-020/module-01/course-04-revoking-host-and-kubernetes-access.md
+    path: sections/section-020/module-10/course-040-revoking-host-and-kubernetes-access.md
   - type: reading
     title: Revoke A Leaver's Access Everywhere — Task
-    path: sections/section-020/module-01/labs/lab-03/question.md
+    path: sections/section-020/module-10/labs/lab-03/question.md
   - type: lab
     title: Revoke A Leaver's Access Everywhere
-    path: sections/section-020/module-01/labs/lab-03
+    path: sections/section-020/module-10/labs/lab-03
     difficulty: intermediate
     estimated_duration: 12m
     topic: access-revocation
@@ -317,19 +317,19 @@ modules:
     - access-revocation
   - type: reading
     title: Revoke A Leaver's Access Everywhere — Solution
-    path: sections/section-020/module-01/labs/lab-03/solution.md
+    path: sections/section-020/module-10/labs/lab-03/solution.md
   - type: reading
     title: Audit Trails On The Node And In The Cluster
-    path: sections/section-020/module-01/course-05-audit-trails-on-the-node-and-in-the-cluster.md
+    path: sections/section-020/module-10/course-050-audit-trails-on-the-node-and-in-the-cluster.md
   - type: reading
     title: Persistent Audit Rules With augenrules
-    path: sections/section-020/module-01/course-06-persistent-audit-rules-with-augenrules.md
+    path: sections/section-020/module-10/course-060-persistent-audit-rules-with-augenrules.md
   - type: reading
     title: Record Every Change To The Sudo Rules — Task
-    path: sections/section-020/module-01/labs/lab-04/question.md
+    path: sections/section-020/module-10/labs/lab-04/question.md
   - type: lab
     title: Record Every Change To The Sudo Rules
-    path: sections/section-020/module-01/labs/lab-04
+    path: sections/section-020/module-10/labs/lab-04
     difficulty: intermediate
     estimated_duration: 10m
     topic: audit-rules
@@ -343,22 +343,22 @@ modules:
     - audit-rules
   - type: reading
     title: Record Every Change To The Sudo Rules — Solution
-    path: sections/section-020/module-01/labs/lab-04/solution.md
+    path: sections/section-020/module-10/labs/lab-04/solution.md
   - type: reading
     title: Summary
-    path: sections/section-020/module-01/course-07-summary.md
+    path: sections/section-020/module-10/course-100-summary.md
   - type: reading
     title: Least-Privilege RBAC Roles And Bindings
-    path: sections/section-020/module-02/course.md
+    path: sections/section-020/module-20/course-000.md
   - type: reading
     title: Roles, ClusterRoles And Bindings
-    path: sections/section-020/module-02/course-01-roles-clusterroles-and-bindings.md
+    path: sections/section-020/module-20/course-010-roles-clusterroles-and-bindings.md
   - type: reading
     title: Scope Access With resourceNames And A RoleBinding — Task
-    path: sections/section-020/module-02/labs/lab-01/question.md
+    path: sections/section-020/module-20/labs/lab-01/question.md
   - type: lab
     title: Scope Access With resourceNames And A RoleBinding
-    path: sections/section-020/module-02/labs/lab-01
+    path: sections/section-020/module-20/labs/lab-01
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
@@ -372,16 +372,16 @@ modules:
     - rbac-resource-scoping
   - type: reading
     title: Scope Access With resourceNames And A RoleBinding — Solution
-    path: sections/section-020/module-02/labs/lab-01/solution.md
+    path: sections/section-020/module-20/labs/lab-01/solution.md
   - type: reading
     title: Wildcards, cluster-admin And Escalation
-    path: sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+    path: sections/section-020/module-20/course-020-wildcards-cluster-admin-and-escalation.md
   - type: reading
     title: Replace Wildcard And Cluster-Admin Access — Task
-    path: sections/section-020/module-02/labs/lab-02/question.md
+    path: sections/section-020/module-20/labs/lab-02/question.md
   - type: lab
     title: Replace Wildcard And Cluster-Admin Access
-    path: sections/section-020/module-02/labs/lab-02
+    path: sections/section-020/module-20/labs/lab-02
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
@@ -395,16 +395,16 @@ modules:
     - rbac-least-privilege
   - type: reading
     title: Replace Wildcard And Cluster-Admin Access — Solution
-    path: sections/section-020/module-02/labs/lab-02/solution.md
+    path: sections/section-020/module-20/labs/lab-02/solution.md
   - type: reading
     title: Audit Permissions With kubectl auth can-i
-    path: sections/section-020/module-02/course-03-audit-permissions-with-kubectl-auth-can-i.md
+    path: sections/section-020/module-20/course-030-audit-permissions-with-kubectl-auth-can-i.md
   - type: reading
     title: Find Hidden RBAC Grants — Task
-    path: sections/section-020/module-02/labs/lab-03/question.md
+    path: sections/section-020/module-20/labs/lab-03/question.md
   - type: lab
     title: Find Hidden RBAC Grants
-    path: sections/section-020/module-02/labs/lab-03
+    path: sections/section-020/module-20/labs/lab-03
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 10m
@@ -418,27 +418,27 @@ modules:
     - rbac-aggregation
   - type: reading
     title: Find Hidden RBAC Grants — Solution
-    path: sections/section-020/module-02/labs/lab-03/solution.md
+    path: sections/section-020/module-20/labs/lab-03/solution.md
   - type: reading
     title: Summary
-    path: sections/section-020/module-02/course-04-summary.md
+    path: sections/section-020/module-20/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Least-Privilege RBAC Roles And Bindings'
-    path: sections/section-020/module-02/quiz.yaml
+    path: sections/section-020/module-20/quiz.yaml
     question_count: 10
     pass_score: 70
   - type: reading
     title: Restrict ServiceAccounts And API Tokens
-    path: sections/section-020/module-03/course.md
+    path: sections/section-020/module-30/course-000.md
   - type: reading
     title: Dedicated ServiceAccounts And automountServiceAccountToken
-    path: sections/section-020/module-03/course-01-dedicated-serviceaccounts-and-automount.md
+    path: sections/section-020/module-30/course-010-dedicated-serviceaccounts-and-automount.md
   - type: reading
     title: Give A Workload Its Own ServiceAccount — Task
-    path: sections/section-020/module-03/labs/lab-01/question.md
+    path: sections/section-020/module-30/labs/lab-01/question.md
   - type: lab
     title: Give A Workload Its Own ServiceAccount
-    path: sections/section-020/module-03/labs/lab-01
+    path: sections/section-020/module-30/labs/lab-01
     examScope: namespace
     difficulty: intermediate
     estimated_duration: 8m
@@ -452,16 +452,16 @@ modules:
     - serviceaccount-tokens
   - type: reading
     title: Give A Workload Its Own ServiceAccount — Solution
-    path: sections/section-020/module-03/labs/lab-01/solution.md
+    path: sections/section-020/module-30/labs/lab-01/solution.md
   - type: reading
     title: Bound Projected Tokens
-    path: sections/section-020/module-03/course-02-bound-projected-tokens.md
+    path: sections/section-020/module-30/course-020-bound-projected-tokens.md
   - type: reading
     title: Mount A Short-Lived Projected Token — Task
-    path: sections/section-020/module-03/labs/lab-02/question.md
+    path: sections/section-020/module-30/labs/lab-02/question.md
   - type: lab
     title: Mount A Short-Lived Projected Token
-    path: sections/section-020/module-03/labs/lab-02
+    path: sections/section-020/module-30/labs/lab-02
     examScope: namespace
     difficulty: intermediate
     estimated_duration: 8m
@@ -475,16 +475,16 @@ modules:
     - projected-tokens
   - type: reading
     title: Mount A Short-Lived Projected Token — Solution
-    path: sections/section-020/module-03/labs/lab-02/solution.md
+    path: sections/section-020/module-30/labs/lab-02/solution.md
   - type: reading
     title: The Default ServiceAccount And Unused Tokens
-    path: sections/section-020/module-03/course-03-the-default-serviceaccount-and-unused-tokens.md
+    path: sections/section-020/module-30/course-030-the-default-serviceaccount-and-unused-tokens.md
   - type: reading
     title: Close The Default ServiceAccount — Task
-    path: sections/section-020/module-03/labs/lab-03/question.md
+    path: sections/section-020/module-30/labs/lab-03/question.md
   - type: lab
     title: Close The Default ServiceAccount
-    path: sections/section-020/module-03/labs/lab-03
+    path: sections/section-020/module-30/labs/lab-03
     examScope: namespace
     difficulty: intermediate
     estimated_duration: 6m
@@ -498,18 +498,18 @@ modules:
     - default-serviceaccount
   - type: reading
     title: Close The Default ServiceAccount — Solution
-    path: sections/section-020/module-03/labs/lab-03/solution.md
+    path: sections/section-020/module-30/labs/lab-03/solution.md
   - type: reading
     title: Summary
-    path: sections/section-020/module-03/course-04-summary.md
+    path: sections/section-020/module-30/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Restrict ServiceAccounts And API Tokens'
-    path: sections/section-020/module-03/quiz.yaml
+    path: sections/section-020/module-30/quiz.yaml
     question_count: 11
     pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Using least-privilege identity and access management'
-    path: sections/section-020/module-01/quiz.yaml
+    path: sections/section-020/module-10/quiz.yaml
     question_count: 11
     pass_score: 70
 - id: module-030
@@ -520,19 +520,19 @@ modules:
   content:
   - type: reading
     title: Minimize external access to the network
-    path: sections/section-030/README.md
+    path: sections/section-030/00-introduction.md
   - type: reading
     title: Minimize External Access To The Network
-    path: sections/section-030/module-01/course.md
+    path: sections/section-030/module-10/course-000.md
   - type: reading
     title: Listeners And Bind Addresses
-    path: sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
+    path: sections/section-030/module-10/course-010-listeners-and-bind-addresses.md
   - type: reading
     title: Bind A Host-Network Service To Loopback — Task
-    path: sections/section-030/module-01/labs/lab-01/question.md
+    path: sections/section-030/module-10/labs/lab-01/question.md
   - type: lab
     title: Bind A Host-Network Service To Loopback
-    path: sections/section-030/module-01/labs/lab-01
+    path: sections/section-030/module-10/labs/lab-01
     difficulty: intermediate
     estimated_duration: 10m
     topic: host-network-exposure
@@ -544,16 +544,16 @@ modules:
     - host-network-exposure
   - type: reading
     title: Bind A Host-Network Service To Loopback — Solution
-    path: sections/section-030/module-01/labs/lab-01/solution.md
+    path: sections/section-030/module-10/labs/lab-01/solution.md
   - type: reading
     title: Host Firewalls With iptables And ufw
-    path: sections/section-030/module-01/course-02-host-firewalls-with-iptables-and-ufw.md
+    path: sections/section-030/module-10/course-020-host-firewalls-with-iptables-and-ufw.md
   - type: reading
     title: Block A Host Port With ufw — Task
-    path: sections/section-030/module-01/labs/lab-02/question.md
+    path: sections/section-030/module-10/labs/lab-02/question.md
   - type: lab
     title: Block A Host Port With ufw
-    path: sections/section-030/module-01/labs/lab-02
+    path: sections/section-030/module-10/labs/lab-02
     difficulty: intermediate
     estimated_duration: 10m
     topic: host-firewall
@@ -565,16 +565,16 @@ modules:
     - host-firewall
   - type: reading
     title: Block A Host Port With ufw — Solution
-    path: sections/section-030/module-01/labs/lab-02/solution.md
+    path: sections/section-030/module-10/labs/lab-02/solution.md
   - type: reading
     title: NetworkPolicy For Pod Traffic
-    path: sections/section-030/module-01/course-03-networkpolicy-for-pod-traffic.md
+    path: sections/section-030/module-10/course-030-networkpolicy-for-pod-traffic.md
   - type: reading
     title: Default-Deny Ingress With One Allowed Client — Task
-    path: sections/section-030/module-01/labs/lab-03/question.md
+    path: sections/section-030/module-10/labs/lab-03/question.md
   - type: lab
     title: Default-Deny Ingress With One Allowed Client
-    path: sections/section-030/module-01/labs/lab-03
+    path: sections/section-030/module-10/labs/lab-03
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 12m
@@ -587,25 +587,25 @@ modules:
     - networkpolicy-ingress
   - type: reading
     title: Default-Deny Ingress With One Allowed Client — Solution
-    path: sections/section-030/module-01/labs/lab-03/solution.md
+    path: sections/section-030/module-10/labs/lab-03/solution.md
   - type: reading
     title: NodePorts, Control-Plane Ports And API Access
-    path: sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md
+    path: sections/section-030/module-10/course-040-nodeports-control-plane-ports-and-api-access.md
   - type: reading
     title: Summary
-    path: sections/section-030/module-01/course-05-summary.md
+    path: sections/section-030/module-10/course-100-summary.md
   - type: reading
     title: Limit Service Exposure Outside The Cluster
-    path: sections/section-030/module-02/course.md
+    path: sections/section-030/module-20/course-000.md
   - type: reading
     title: Service Types And What They Open
-    path: sections/section-030/module-02/course-01-service-types-and-what-they-open.md
+    path: sections/section-030/module-20/course-010-service-types-and-what-they-open.md
   - type: reading
     title: Close An Accidental NodePort — Task
-    path: sections/section-030/module-02/labs/lab-01/question.md
+    path: sections/section-030/module-20/labs/lab-01/question.md
   - type: lab
     title: Close An Accidental NodePort
-    path: sections/section-030/module-02/labs/lab-01
+    path: sections/section-030/module-20/labs/lab-01
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 6m
@@ -618,16 +618,16 @@ modules:
     - service-exposure
   - type: reading
     title: Close An Accidental NodePort — Solution
-    path: sections/section-030/module-02/labs/lab-01/solution.md
+    path: sections/section-030/module-20/labs/lab-01/solution.md
   - type: reading
     title: Narrowing NodePorts And Load Balancers
-    path: sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
+    path: sections/section-030/module-20/course-020-narrowing-nodeports-and-load-balancers.md
   - type: reading
     title: Answer A NodePort Only On Nodes With Endpoints — Task
-    path: sections/section-030/module-02/labs/lab-02/question.md
+    path: sections/section-030/module-20/labs/lab-02/question.md
   - type: lab
     title: Answer A NodePort Only On Nodes With Endpoints
-    path: sections/section-030/module-02/labs/lab-02
+    path: sections/section-030/module-20/labs/lab-02
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 8m
@@ -640,16 +640,16 @@ modules:
     - external-traffic-policy
   - type: reading
     title: Answer A NodePort Only On Nodes With Endpoints — Solution
-    path: sections/section-030/module-02/labs/lab-02/solution.md
+    path: sections/section-030/module-20/labs/lab-02/solution.md
   - type: reading
     title: Ingress As The Single Entry Point
-    path: sections/section-030/module-02/course-03-ingress-and-finding-exposed-services.md
+    path: sections/section-030/module-20/course-030-ingress-and-finding-exposed-services.md
   - type: reading
     title: Audit And Close Unapproved Service Exposure — Task
-    path: sections/section-030/module-02/labs/lab-03/question.md
+    path: sections/section-030/module-20/labs/lab-03/question.md
   - type: lab
     title: Audit And Close Unapproved Service Exposure
-    path: sections/section-030/module-02/labs/lab-03
+    path: sections/section-030/module-20/labs/lab-03
     examScope: cluster
     difficulty: intermediate
     estimated_duration: 15m
@@ -662,27 +662,27 @@ modules:
     - exposure-audit
   - type: reading
     title: Audit And Close Unapproved Service Exposure — Solution
-    path: sections/section-030/module-02/labs/lab-03/solution.md
+    path: sections/section-030/module-20/labs/lab-03/solution.md
   - type: reading
     title: Summary
-    path: sections/section-030/module-02/course-04-summary.md
+    path: sections/section-030/module-20/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Limit Service Exposure Outside The Cluster'
-    path: sections/section-030/module-02/quiz.yaml
+    path: sections/section-030/module-20/quiz.yaml
     question_count: 11
     pass_score: 70
   - type: reading
     title: Restrict Access To The API Server And Control-Plane Ports
-    path: sections/section-030/module-03/course.md
+    path: sections/section-030/module-30/course-000.md
   - type: reading
     title: Control-Plane Ports And Listeners
-    path: sections/section-030/module-03/course-01-control-plane-ports-and-listeners.md
+    path: sections/section-030/module-30/course-010-control-plane-ports-and-listeners.md
   - type: reading
     title: Bind The Scheduler To Loopback — Task
-    path: sections/section-030/module-03/labs/lab-01/question.md
+    path: sections/section-030/module-30/labs/lab-01/question.md
   - type: lab
     title: Bind The Scheduler To Loopback
-    path: sections/section-030/module-03/labs/lab-01
+    path: sections/section-030/module-30/labs/lab-01
     difficulty: intermediate
     estimated_duration: 10m
     topic: control-plane-listeners
@@ -694,16 +694,16 @@ modules:
     - control-plane-listeners
   - type: reading
     title: Bind The Scheduler To Loopback — Solution
-    path: sections/section-030/module-03/labs/lab-01/solution.md
+    path: sections/section-030/module-30/labs/lab-01/solution.md
   - type: reading
     title: API Server Authentication And Authorization
-    path: sections/section-030/module-03/course-02-api-server-authentication-and-authorization.md
+    path: sections/section-030/module-30/course-020-api-server-authentication-and-authorization.md
   - type: reading
     title: Remove Anonymous Access From RBAC Bindings — Task
-    path: sections/section-030/module-03/labs/lab-02/question.md
+    path: sections/section-030/module-30/labs/lab-02/question.md
   - type: lab
     title: Remove Anonymous Access From RBAC Bindings
-    path: sections/section-030/module-03/labs/lab-02
+    path: sections/section-030/module-30/labs/lab-02
     difficulty: intermediate
     estimated_duration: 10m
     topic: anonymous-api-access
@@ -715,16 +715,16 @@ modules:
     - anonymous-api-access
   - type: reading
     title: Remove Anonymous Access From RBAC Bindings — Solution
-    path: sections/section-030/module-03/labs/lab-02/solution.md
+    path: sections/section-030/module-30/labs/lab-02/solution.md
   - type: reading
     title: Kubelet API Authentication And Authorization
-    path: sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
+    path: sections/section-030/module-30/course-030-kubelet-api-authentication-and-authorization.md
   - type: reading
     title: Close The Kubelet API To Anonymous Callers — Task
-    path: sections/section-030/module-03/labs/lab-03/question.md
+    path: sections/section-030/module-30/labs/lab-03/question.md
   - type: lab
     title: Close The Kubelet API To Anonymous Callers
-    path: sections/section-030/module-03/labs/lab-03
+    path: sections/section-030/module-30/labs/lab-03
     difficulty: intermediate
     estimated_duration: 8m
     topic: kubelet-api
@@ -736,16 +736,16 @@ modules:
     - kubelet-api
   - type: reading
     title: Close The Kubelet API To Anonymous Callers — Solution
-    path: sections/section-030/module-03/labs/lab-03/solution.md
+    path: sections/section-030/module-30/labs/lab-03/solution.md
   - type: reading
     title: etcd Client Access
-    path: sections/section-030/module-03/course-04-etcd-client-access.md
+    path: sections/section-030/module-30/course-040-etcd-client-access.md
   - type: reading
     title: Restrict The etcd Data Directory — Task
-    path: sections/section-030/module-03/labs/lab-04/question.md
+    path: sections/section-030/module-30/labs/lab-04/question.md
   - type: lab
     title: Restrict The etcd Data Directory
-    path: sections/section-030/module-03/labs/lab-04
+    path: sections/section-030/module-30/labs/lab-04
     difficulty: intermediate
     estimated_duration: 6m
     topic: etcd-data-directory
@@ -757,18 +757,18 @@ modules:
     - etcd-data-directory
   - type: reading
     title: Restrict The etcd Data Directory — Solution
-    path: sections/section-030/module-03/labs/lab-04/solution.md
+    path: sections/section-030/module-30/labs/lab-04/solution.md
   - type: reading
     title: Summary
-    path: sections/section-030/module-03/course-05-summary.md
+    path: sections/section-030/module-30/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Restrict Access To The API Server And Control-Plane Ports'
-    path: sections/section-030/module-03/quiz.yaml
+    path: sections/section-030/module-30/quiz.yaml
     question_count: 11
     pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Minimize External Access To The Network'
-    path: sections/section-030/module-01/quiz.yaml
+    path: sections/section-030/module-10/quiz.yaml
     question_count: 10
     pass_score: 70
 - id: module-040
@@ -779,19 +779,19 @@ modules:
   content:
   - type: reading
     title: Appropriately use kernel hardening tools such as AppArmor, seccomp
-    path: sections/section-040/README.md
+    path: sections/section-040/00-introduction.md
   - type: reading
     title: Kernel Hardening With seccomp And AppArmor
-    path: sections/section-040/module-01/course.md
+    path: sections/section-040/module-10/course-000.md
   - type: reading
     title: 'Seccomp: Filtering System Calls'
-    path: sections/section-040/module-01/course-01-seccomp-filtering-system-calls.md
+    path: sections/section-040/module-10/course-010-seccomp-filtering-system-calls.md
   - type: reading
     title: Install And Use A Localhost seccomp Profile — Task
-    path: sections/section-040/module-01/labs/lab-01/question.md
+    path: sections/section-040/module-10/labs/lab-01/question.md
   - type: lab
     title: Install And Use A Localhost seccomp Profile
-    path: sections/section-040/module-01/labs/lab-01
+    path: sections/section-040/module-10/labs/lab-01
     difficulty: intermediate
     estimated_duration: 8m
     topic: seccomp-profile-install
@@ -803,16 +803,16 @@ modules:
     - seccomp-profile-install
   - type: reading
     title: Install And Use A Localhost seccomp Profile — Solution
-    path: sections/section-040/module-01/labs/lab-01/solution.md
+    path: sections/section-040/module-10/labs/lab-01/solution.md
   - type: reading
     title: 'AppArmor: Profiles For Files And Capabilities'
-    path: sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+    path: sections/section-040/module-10/course-020-apparmor-profiles-for-files-and-capabilities.md
   - type: reading
     title: Load An AppArmor Profile And Attach It To A Pod — Task
-    path: sections/section-040/module-01/labs/lab-02/question.md
+    path: sections/section-040/module-10/labs/lab-02/question.md
   - type: lab
     title: Load An AppArmor Profile And Attach It To A Pod
-    path: sections/section-040/module-01/labs/lab-02
+    path: sections/section-040/module-10/labs/lab-02
     difficulty: intermediate
     estimated_duration: 12m
     topic: apparmor-load
@@ -824,16 +824,16 @@ modules:
     - apparmor-load
   - type: reading
     title: Load An AppArmor Profile And Attach It To A Pod — Solution
-    path: sections/section-040/module-01/labs/lab-02/solution.md
+    path: sections/section-040/module-10/labs/lab-02/solution.md
   - type: reading
     title: The Restricted Security Context
-    path: sections/section-040/module-01/course-03-the-restricted-security-context.md
+    path: sections/section-040/module-10/course-030-the-restricted-security-context.md
   - type: reading
     title: Harden A Deployment To The Restricted Pod Security Level — Task
-    path: sections/section-040/module-01/labs/lab-03/question.md
+    path: sections/section-040/module-10/labs/lab-03/question.md
   - type: lab
     title: Harden A Deployment To The Restricted Pod Security Level
-    path: sections/section-040/module-01/labs/lab-03
+    path: sections/section-040/module-10/labs/lab-03
     examScope: namespace
     difficulty: intermediate
     estimated_duration: 12m
@@ -846,16 +846,16 @@ modules:
     - security-context
   - type: reading
     title: Harden A Deployment To The Restricted Pod Security Level — Solution
-    path: sections/section-040/module-01/labs/lab-03/solution.md
+    path: sections/section-040/module-10/labs/lab-03/solution.md
   - type: reading
     title: Diagnosing Profile Failures
-    path: sections/section-040/module-01/course-04-diagnosing-profile-failures.md
+    path: sections/section-040/module-10/course-040-diagnosing-profile-failures.md
   - type: reading
     title: Fix A Pod That References A Missing seccomp Profile — Task
-    path: sections/section-040/module-01/labs/lab-04/question.md
+    path: sections/section-040/module-10/labs/lab-04/question.md
   - type: lab
     title: Fix A Pod That References A Missing seccomp Profile
-    path: sections/section-040/module-01/labs/lab-04
+    path: sections/section-040/module-10/labs/lab-04
     difficulty: intermediate
     estimated_duration: 8m
     topic: seccomp-missing-profile
@@ -867,22 +867,22 @@ modules:
     - seccomp-missing-profile
   - type: reading
     title: Fix A Pod That References A Missing seccomp Profile — Solution
-    path: sections/section-040/module-01/labs/lab-04/solution.md
+    path: sections/section-040/module-10/labs/lab-04/solution.md
   - type: reading
     title: Summary
-    path: sections/section-040/module-01/course-05-summary.md
+    path: sections/section-040/module-10/course-100-summary.md
   - type: reading
     title: Apply seccomp Profiles To Pods
-    path: sections/section-040/module-02/course.md
+    path: sections/section-040/module-20/course-000.md
   - type: reading
     title: Profile Types, Locations And The Unconfined Risk
-    path: sections/section-040/module-02/course-01-profile-types-locations-and-the-unconfined-risk.md
+    path: sections/section-040/module-20/course-010-profile-types-locations-and-the-unconfined-risk.md
   - type: reading
     title: Apply The RuntimeDefault seccomp Profile To Deployments — Task
-    path: sections/section-040/module-02/labs/lab-01/question.md
+    path: sections/section-040/module-20/labs/lab-01/question.md
   - type: lab
     title: Apply The RuntimeDefault seccomp Profile To Deployments
-    path: sections/section-040/module-02/labs/lab-01
+    path: sections/section-040/module-20/labs/lab-01
     difficulty: intermediate
     estimated_duration: 8m
     topic: seccomp-runtime-default
@@ -894,16 +894,16 @@ modules:
     - seccomp-runtime-default
   - type: reading
     title: Apply The RuntimeDefault seccomp Profile To Deployments — Solution
-    path: sections/section-040/module-02/labs/lab-01/solution.md
+    path: sections/section-040/module-20/labs/lab-01/solution.md
   - type: reading
     title: Write And Load A Localhost Profile
-    path: sections/section-040/module-02/course-02-write-and-load-a-localhost-profile.md
+    path: sections/section-040/module-20/course-020-write-and-load-a-localhost-profile.md
   - type: reading
     title: Block File Deletion With A Localhost seccomp Profile — Task
-    path: sections/section-040/module-02/labs/lab-02/question.md
+    path: sections/section-040/module-20/labs/lab-02/question.md
   - type: lab
     title: Block File Deletion With A Localhost seccomp Profile
-    path: sections/section-040/module-02/labs/lab-02
+    path: sections/section-040/module-20/labs/lab-02
     difficulty: intermediate
     estimated_duration: 10m
     topic: seccomp-localhost
@@ -915,16 +915,16 @@ modules:
     - seccomp
   - type: reading
     title: Block File Deletion With A Localhost seccomp Profile — Solution
-    path: sections/section-040/module-02/labs/lab-02/solution.md
+    path: sections/section-040/module-20/labs/lab-02/solution.md
   - type: reading
     title: Find Blocked Syscalls And Fix Failures
-    path: sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+    path: sections/section-040/module-20/course-030-find-blocked-syscalls-and-fix-failures.md
   - type: reading
     title: Find And Fix A Blocked System Call In A seccomp Profile — Task
-    path: sections/section-040/module-02/labs/lab-03/question.md
+    path: sections/section-040/module-20/labs/lab-03/question.md
   - type: lab
     title: Find And Fix A Blocked System Call In A seccomp Profile
-    path: sections/section-040/module-02/labs/lab-03
+    path: sections/section-040/module-20/labs/lab-03
     difficulty: intermediate
     estimated_duration: 10m
     topic: seccomp-syscall-debug
@@ -936,27 +936,27 @@ modules:
     - seccomp-syscall-debug
   - type: reading
     title: Find And Fix A Blocked System Call In A seccomp Profile — Solution
-    path: sections/section-040/module-02/labs/lab-03/solution.md
+    path: sections/section-040/module-20/labs/lab-03/solution.md
   - type: reading
     title: Summary
-    path: sections/section-040/module-02/course-04-summary.md
+    path: sections/section-040/module-20/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Apply seccomp Profiles To Pods'
-    path: sections/section-040/module-02/quiz.yaml
+    path: sections/section-040/module-20/quiz.yaml
     question_count: 12
     pass_score: 70
   - type: reading
     title: Confine Workloads With AppArmor And Capabilities
-    path: sections/section-040/module-03/course.md
+    path: sections/section-040/module-30/course-000.md
   - type: reading
     title: AppArmor Modes And Loading Profiles
-    path: sections/section-040/module-03/course-01-apparmor-modes-and-loading-profiles.md
+    path: sections/section-040/module-30/course-010-apparmor-modes-and-loading-profiles.md
   - type: reading
     title: Switch An AppArmor Profile From Complain To Enforce Mode — Task
-    path: sections/section-040/module-03/labs/lab-01/question.md
+    path: sections/section-040/module-30/labs/lab-01/question.md
   - type: lab
     title: Switch An AppArmor Profile From Complain To Enforce Mode
-    path: sections/section-040/module-03/labs/lab-01
+    path: sections/section-040/module-30/labs/lab-01
     difficulty: intermediate
     estimated_duration: 8m
     topic: apparmor-enforce-mode
@@ -968,16 +968,16 @@ modules:
     - apparmor-enforce-mode
   - type: reading
     title: Switch An AppArmor Profile From Complain To Enforce Mode — Solution
-    path: sections/section-040/module-03/labs/lab-01/solution.md
+    path: sections/section-040/module-30/labs/lab-01/solution.md
   - type: reading
     title: Select A Profile With appArmorProfile
-    path: sections/section-040/module-03/course-02-select-a-profile-with-apparmorprofile.md
+    path: sections/section-040/module-30/course-020-select-a-profile-with-apparmorprofile.md
   - type: reading
     title: Set An AppArmor Profile For One Container — Task
-    path: sections/section-040/module-03/labs/lab-02/question.md
+    path: sections/section-040/module-30/labs/lab-02/question.md
   - type: lab
     title: Set An AppArmor Profile For One Container
-    path: sections/section-040/module-03/labs/lab-02
+    path: sections/section-040/module-30/labs/lab-02
     difficulty: intermediate
     estimated_duration: 10m
     topic: apparmor-container-profile
@@ -989,16 +989,16 @@ modules:
     - apparmor-container-profile
   - type: reading
     title: Set An AppArmor Profile For One Container — Solution
-    path: sections/section-040/module-03/labs/lab-02/solution.md
+    path: sections/section-040/module-30/labs/lab-02/solution.md
   - type: reading
     title: Drop Capabilities And Block Privilege Escalation
-    path: sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+    path: sections/section-040/module-30/course-030-drop-capabilities-and-block-privilege-escalation.md
   - type: reading
     title: Drop All Capabilities Except NET_BIND_SERVICE — Task
-    path: sections/section-040/module-03/labs/lab-03/question.md
+    path: sections/section-040/module-30/labs/lab-03/question.md
   - type: lab
     title: Drop All Capabilities Except NET_BIND_SERVICE
-    path: sections/section-040/module-03/labs/lab-03
+    path: sections/section-040/module-30/labs/lab-03
     examScope: namespace
     difficulty: intermediate
     estimated_duration: 10m
@@ -1011,19 +1011,19 @@ modules:
     - capabilities
   - type: reading
     title: Drop All Capabilities Except NET_BIND_SERVICE — Solution
-    path: sections/section-040/module-03/labs/lab-03/solution.md
+    path: sections/section-040/module-30/labs/lab-03/solution.md
   - type: reading
     title: Summary
-    path: sections/section-040/module-03/course-04-summary.md
+    path: sections/section-040/module-30/course-100-summary.md
   - type: quiz
     title: 'Knowledge Check: Confine Workloads With AppArmor And Capabilities'
-    path: sections/section-040/module-03/quiz.yaml
+    path: sections/section-040/module-30/quiz.yaml
     question_count: 12
     pass_score: 70
   - type: quiz
     title: 'Knowledge Check: Appropriately use kernel hardening tools such as AppArmor,
       seccomp'
-    path: sections/section-040/module-01/quiz.yaml
+    path: sections/section-040/module-10/quiz.yaml
     question_count: 10
     pass_score: 70
   - type: quiz

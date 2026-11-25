@@ -37,12 +37,19 @@ Strict guidelines:
   has a task, a step-by-step solution and a short intro. Keep each file to its
   job. Do not add "Prerequisite: ... Next: ..." navigation lines to pages;
   the landing page and the course outline already give the order.
+- **Name files in steps of ten.** The folder view shows the reading order.
+  A section starts with `00-introduction.md`. Modules are `module-10`,
+  `module-20`, `module-30`. In a module, the landing page is `course-000.md`,
+  the parts are `course-010-<slug>.md`, `course-020-<slug>.md`, and the
+  summary is always `course-100-summary.md`. Lab folders and lab names keep
+  their own numbers, and question `id`s never change.
 - **Keep each part short.** One idea per part, about 5 to 8 minutes of
   reading and at most about 8 command blocks, so a learner can finish it with
   the playground in one sitting of about 15 minutes. Split at a natural seam
   where each half ends with something the learner has seen work. Never split
-  only to hit a number. When you split, renumber the files, fix every "Part N"
-  reference in the module and `astrona.yaml`.
+  only to hit a number. When you split, give the new part a free step-ten
+  number (or renumber the parts), fix every "Part N" reference in the module
+  and `astrona.yaml`.
 - **Read like a book, not like a web page.** Each part reads as a chapter of
   a technical book. Open with a short paragraph on the problem it solves and
   why it matters. Link each paragraph to the next with a transition sentence.
@@ -54,7 +61,7 @@ Strict guidelines:
   one or two sentences on what to run and why, the command, the real output,
   then a sentence or two on what it shows.
 - **The module ends with a summary.** The last page of every module is
-  `course-0N-summary.md` with the title `# Summary`: a few short prose
+  `course-100-summary.md` with the title `# Summary`: a few short prose
   paragraphs on what the reader learned, organised by idea, optionally with
   one short list of key facts. It names no parts, modules, sections or
   chapters, and has no links, lab table, quiz or commands. Its last line is
@@ -112,9 +119,14 @@ Strict guidelines:
   old, run it again"), background facts, optional extra steps, and plain
   information. Never a command snippet, never two in a row, and most pages
   need zero or one tip. Each part ends with a
-  `## Common pitfalls` `> [!WARNING]` block for that part only. Use a Mermaid
-  diagram for a flow, an order or a state change, keep it under about 12
-  boxes, and follow it with one sentence that says what it shows.
+  `## Common pitfalls` `> [!WARNING]` block for that part only. Draw a
+  picture wherever it explains a flow, an order, a state change or who does
+  what better than text. Prefer a hand-drawn SVG in the module's `images/`
+  folder (shown with `![Diagram: what it shows](images/<name>.svg)`): light
+  box fills with dark text so it reads on light and dark pages, green for
+  allowed, red dashed for dropped, real names in monospace, a `<title>` and
+  `<desc>`. Mermaid is still fine for a quick flow. Keep either under about
+  12 boxes, and follow it with one sentence that says what it shows.
 - **Labs come right after the part they practise.** Do not collect all
   graded labs at the end of a module. In `astrona.yaml`, put each lab (its
   `question.md` reading and the `lab` entry) right after the reading part it
@@ -143,22 +155,26 @@ Strict guidelines:
 - **Every course starts with an Introduction.** It lives in `sections/intro/`
   and is the first entry in `astrona.yaml` (`id: module-intro`, title
   "Introduction"). It has exactly these four pages, in this order:
-  - `README.md`, `# Introduction`: what the introduction covers and its three
+  - `00-introduction.md`, `# Introduction`: what the introduction covers and its three
     pages, named in prose (no links), ending with the topic the course starts
     with.
-  - `course-01-welcome.md`, `# Welcome To The Course`: who the course is for,
+  - `10-welcome.md`, `# Welcome To The Course`: who the course is for,
     the exam domain and what the reader can do at the end, the words the
     course uses, the example app, how the course is laid out and how to read
     a page.
-  - `course-02-get-your-machine-ready.md`, `# Get Your Machine Ready`: the
+  - `20-get-your-machine-ready.md`, `# Get Your Machine Ready`: the
     tools to install, the `astrona` commands used every day, and what to do
     when a start goes wrong.
-  - `course-03-how-this-course-is-made.md`, `# How This Course Is Made`: how
-    content is written and checked, the maintainers, how to report a mistake,
-    and the license.
+  - `30-how-this-course-is-made.md`, `# How This Course Is Made`: how
+    content is written and checked, "About the authors" (one HTML
+    `<table>` per author or maintainer, no header row: 320 × 320 PNG photo, shown at 120 × 120, from
+    `images/author/<handle>.png` beside one cell with three lines split by `<br>`:
+    the bold name, a short bio, then the GitHub link and optional LinkedIn link; roles live only in `AUTHORS.md`; the format is in CONTRIBUTING.md;
+    it must match `AUTHORS.md`, and `scripts/ci/check-authors.py` checks it),
+    how to report a mistake, and the license.
   The Introduction teaches no product content and has no playground, labs or
   summary. Its only links are the repository's contributors page, issues
-  page and license.
+  page and license, and the GitHub and LinkedIn profiles of the authors.
 - **No links to other course files.** A course page (every reading listed in
   `astrona.yaml`, the playground guide `docs/overview.md`, and a lab's
   `question.md` and `solution.md`) never links to or points the reader at
@@ -260,7 +276,7 @@ the CKS labs keep theirs. ATS031 applies it to the CKS labs; copy from it. In sh
 
 The course covers **System Hardening**, worth **10%** of
 **Certified Kubernetes Security Specialist (CKS)**. It is part of **ATP007**.
-The official objectives are listed in `astrona.yaml` and mapped in `CURRICULUM.md`.
+The official objectives are listed in `astrona.yaml`, and `README.md` lists the modules under each one.
 
 ### Playground and graded lab scope
 
@@ -281,17 +297,19 @@ self-contained-page and Mermaid rules apply throughout.
 
 ### Reusable question data
 
-Write original single-choice questions as YAML banks under section folders and
-`assessments/`. Use the versioned contract in `schemas/question-bank.schema.json`
-and teaching order in `assessments/index.yaml`. Each bank has 5–15 questions with
-stable IDs, one correct option, per-option feedback, a measurable learning
-objective and source reading paths for author traceability.
+Write original single-choice questions as YAML question banks. Each module has
+one `sections/section-0N0/module-N0/quiz.yaml` with 5–15 questions, and the course
+ends with `sections/final-domain-quiz.yaml`. Use the versioned contract in
+`scripts/ci/question-bank.schema.json`: stable IDs, one correct option, per-option
+feedback, a measurable learning objective and source reading paths for author
+traceability.
 
-Do not register YAML as a Markdown reading. A future renderer consumes the bank
-index and presents the checkpoint after its declared reading, preserving bank
-order when several share an anchor. Do not expose answer keys before submission
-in a production quiz interface. These public banks are practice material, not
-secure or official exam questions.
+Register every bank in astrona.yaml as a `type: quiz` entry with `path`,
+`question_count` (equal to the number of questions) and `pass_score`, after the
+module summary it checks. Content sync turns the bank into a knowledge-check page
+that grades in the browser. `scripts/ci/check-assessments.py` checks that every
+bank is registered, matches the schema and comes after the readings it uses.
+These public banks are practice material, not secure or official exam questions.
 
 ### Review and authoring checks
 
@@ -299,7 +317,8 @@ Preserve the shared CLAUDE.md prefix copied from ATS015. Keep course IDs, offici
 domain weights and ATP links unchanged. Technical pages carry no `draft: true`
 front matter. The course registration in `astrona-content` is published (ATP007 version 1.0.0, approved 2026-11-21); maturity stays `alpha`.
 
-Primary author sources are recorded in `SOURCES.md`. The objective list was
-verified on 2026-10-11. Detailed reading expansions were written on 2026-10-11.
-Validate manifest paths, summary ordering, curriculum coverage and question
+Check facts against primary sources: the official CKS objectives
+(https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/,
+last checked 2026-10-11) and the upstream project documentation (kubernetes.io, CIS,
+and each tool's own docs). Validate manifest paths, summary ordering, curriculum coverage and question
 contracts. Do not claim live verification until the actual runtime result has been recorded.

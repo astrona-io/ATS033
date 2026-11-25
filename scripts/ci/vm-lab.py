@@ -11,7 +11,7 @@ check.py, live.py, ...), and this script generates its vm/ folder:
 - vm/verify-start.sh, vm/apply-solution.sh, vm/wait-solved.sh and one
   vm/validate-<outcome>.sh per outcome run the copy in /opt/astrona-lab.
 
-    python3 scripts/ci/vm-lab.py sections/section-020/module-03/labs/lab-02
+    python3 scripts/ci/vm-lab.py sections/section-020/module-30/labs/lab-02
     python3 scripts/ci/vm-lab.py --check <lab directory>...
 
 --check writes nothing and fails when a vm/ file is missing or stale.

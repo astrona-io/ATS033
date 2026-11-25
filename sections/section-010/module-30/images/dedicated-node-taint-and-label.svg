@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 390" width="840" height="390" role="img" aria-labelledby="title desc">
+  <title id="title">A dedicated node with a label and a taint</title>
+  <desc id="desc">The ledger pod has a nodeSelector for the label node-restriction.kubernetes.io/dedicated=ledger and a toleration for the taint dedicated=ledger:NoSchedule, so it runs on the worker node. The visitor pod tolerates neither the control-plane taint nor the dedicated taint, so it stays Pending.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M250 72 H182" marker-end="url(#arrow)"/>
+  <path class="dashed" d="M300 94 L250 168" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M380 94 L430 168" marker-end="url(#arrowbad)"/>
+  <path class="okline" d="M705 94 V198" marker-end="url(#arrowok)"/>
+  <text class="label" x="216" y="62" text-anchor="middle">stays</text>
+  <text class="label bad" x="190" y="140" text-anchor="middle">no toleration</text>
+  <text class="label bad" x="450" y="140">no toleration</text>
+  <text class="label good" x="695" y="140" text-anchor="end">nodeSelector + toleration</text>
+  <rect class="drop" x="30" y="50" width="150" height="44" rx="8"/>
+  <text class="code" x="105" y="77" text-anchor="middle">Pending</text>
+  <rect class="box" x="250" y="50" width="160" height="44" rx="8"/>
+  <text x="330" y="77" text-anchor="middle"><tspan class="code">visitor</tspan> pod</text>
+  <rect class="ok" x="620" y="50" width="170" height="44" rx="8"/>
+  <text x="705" y="77" text-anchor="middle"><tspan class="code">ledger</tspan> pod</text>
+  <rect class="frame" x="30" y="170" width="300" height="200" rx="10"/>
+  <text class="label" x="46" y="194">Control-plane node</text>
+  <text x="46" y="240">Carries its own taint</text>
+  <rect class="frame" x="370" y="170" width="440" height="200" rx="10"/>
+  <text class="label" x="386" y="194">Worker node</text>
+  <rect class="ok" x="620" y="200" width="170" height="44" rx="8"/>
+  <text x="705" y="227" text-anchor="middle"><tspan class="code">ledger</tspan> running</text>
+  <text class="label" x="386" y="290">Label:</text>
+  <text class="code" x="386" y="312">node-restriction.kubernetes.io/dedicated=ledger</text>
+  <text class="label" x="386" y="336">Taint:</text>
+  <text class="code" x="386" y="356">dedicated=ledger:NoSchedule</text>
+</svg>

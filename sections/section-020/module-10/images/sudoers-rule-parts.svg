@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 260" width="840" height="260" role="img" aria-labelledby="title desc">
+  <title id="title">The four parts of a sudoers rule</title>
+  <desc id="desc">A sudoers rule names who, on which host, as which user and which commands. The first rule lets the group deployers run any command as any user without a password. The second rule allows only systemctl restart kubelet.service as root.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <!-- Lines first, so the boxes sit on top. -->
+  <text class="label" x="100" y="40" text-anchor="middle">who</text>
+  <text class="label" x="235" y="40" text-anchor="middle">host</text>
+  <text class="label" x="360" y="40" text-anchor="middle">run as</text>
+  <text class="label" x="630" y="40" text-anchor="middle">commands</text>
+
+  <text class="strong bad" x="30" y="72">Full root: any command as any user</text>
+  <rect class="box" x="30" y="82" width="140" height="48" rx="8"/>
+  <text class="code" x="100" y="111" text-anchor="middle">%deployers</text>
+  <rect class="box" x="190" y="82" width="90" height="48" rx="8"/>
+  <text class="code" x="235" y="111" text-anchor="middle">ALL</text>
+  <rect class="drop" x="300" y="82" width="120" height="48" rx="8"/>
+  <text class="code" x="360" y="111" text-anchor="middle">(ALL:ALL)</text>
+  <rect class="drop" x="440" y="82" width="380" height="48" rx="8"/>
+  <text class="code" x="630" y="111" text-anchor="middle">NOPASSWD: ALL</text>
+
+  <text class="strong good" x="30" y="166">Least privilege: one command as root</text>
+  <rect class="box" x="30" y="176" width="140" height="56" rx="8"/>
+  <text class="code" x="100" y="209" text-anchor="middle">%deployers</text>
+  <rect class="box" x="190" y="176" width="90" height="56" rx="8"/>
+  <text class="code" x="235" y="209" text-anchor="middle">ALL</text>
+  <rect class="ok" x="300" y="176" width="120" height="56" rx="8"/>
+  <text class="code" x="360" y="209" text-anchor="middle">(root)</text>
+  <rect class="ok" x="440" y="176" width="380" height="56" rx="8"/>
+  <text class="code" x="630" y="199" text-anchor="middle">NOPASSWD:</text>
+  <text class="code" x="630" y="219" text-anchor="middle">/usr/bin/systemctl restart kubelet.service</text>
+</svg>

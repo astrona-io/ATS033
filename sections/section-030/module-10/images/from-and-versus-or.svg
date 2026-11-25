@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 340" width="840" height="340" role="img" aria-labelledby="title desc">
+  <title id="title">One from item compared with two items</title>
+  <desc id="desc">Left: one from item that holds both namespaceSelector and podSelector. A pod must be in a selected namespace and carry the label (AND). Right: two separate from items. A pod in a selected namespace, or a pod with the label in the policy namespace, is allowed (OR).</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <line class="sep" x1="420" y1="30" x2="420" y2="320"/>
+  <text class="strong" x="30" y="40">One item: AND</text>
+  <rect class="ask" x="30" y="60" width="360" height="110" rx="8"/>
+  <text x="46" y="88" class="code">from:</text>
+  <text x="46" y="110" class="code">- namespaceSelector: ...</text>
+  <text x="62" y="132" class="code">podSelector: ...</text>
+  <text x="46" y="156" class="label">both selectors in one entry</text>
+  <rect class="ok" x="30" y="200" width="360" height="50" rx="8"/>
+  <text x="210" y="230" text-anchor="middle">pods with the label in those namespaces</text>
+  <text class="label" x="30" y="290">Narrow: a pod must pass both selectors.</text>
+  <text class="strong" x="450" y="40">Two items: OR</text>
+  <rect class="ask" x="450" y="60" width="360" height="110" rx="8"/>
+  <text x="466" y="88" class="code">from:</text>
+  <text x="466" y="110" class="code">- namespaceSelector: ...</text>
+  <text x="466" y="132" class="code">- podSelector: ...</text>
+  <text x="466" y="156" class="label">two entries, one dash each</text>
+  <rect class="drop" x="450" y="200" width="360" height="50" rx="8"/>
+  <text x="630" y="222" text-anchor="middle">every pod in those namespaces,</text>
+  <text x="630" y="242" text-anchor="middle">plus labelled pods in this namespace</text>
+  <text class="label" x="450" y="290">Wide: a pod may pass either selector.</text>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 300" width="840" height="300" role="img" aria-labelledby="title desc">
+  <title id="title">loadBalancerSourceRanges filters clients at the load balancer</title>
+  <desc id="desc">A client with an address in 203.0.113.0/24 passes the external load balancer and reaches the node port. A client from any other address is dropped at the load balancer. The cloud provider integration configures this filter; in kind nothing enforces it.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="okline" d="M210 82 L348 128" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M210 212 L338 172" marker-end="url(#arrowbad)"/>
+  <path class="okline" d="M586 145 H638" marker-end="url(#arrowok)"/>
+
+  <text class="label bad" x="232" y="222">dropped</text>
+
+  <rect class="ok" x="30" y="56" width="180" height="52" rx="8"/>
+  <text x="120" y="78" text-anchor="middle">client in</text>
+  <text class="code" x="120" y="97" text-anchor="middle">203.0.113.0/24</text>
+  <rect class="drop" x="30" y="186" width="180" height="52" rx="8"/>
+  <text x="120" y="208" text-anchor="middle">client from any</text>
+  <text x="120" y="227" text-anchor="middle">other address</text>
+
+  <rect x="340" y="118" width="10" height="56" rx="2" fill="#c53030"/>
+  <rect class="policy" x="350" y="110" width="236" height="72" rx="8"/>
+  <text x="468" y="138" text-anchor="middle">external load balancer</text>
+  <text class="code" x="468" y="160" text-anchor="middle">loadBalancerSourceRanges</text>
+
+  <rect class="box" x="640" y="122" width="180" height="46" rx="8"/>
+  <text x="730" y="150" text-anchor="middle">node port on the nodes</text>
+
+  <text class="label" x="420" y="276" text-anchor="middle">The cloud provider integration configures the filter. In kind, nothing enforces it.</text>
+</svg>

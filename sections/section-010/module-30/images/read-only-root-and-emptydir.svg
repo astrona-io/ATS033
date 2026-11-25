@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 320" width="840" height="320" role="img" aria-labelledby="title desc">
+  <title id="title">Read-only root with an emptyDir volume</title>
+  <desc id="desc">In a container with readOnlyRootFilesystem true, a non-root user ID and dropped capabilities, a write to the root file system fails. A write to the emptyDir volume mounted at /scratch works. The kubelet creates the emptyDir and deletes it with the pod.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="dashed" d="M270 140 H520 V104" marker-end="url(#arrowbad)"/>
+  <path class="okline" d="M270 170 H520 V208" marker-end="url(#arrowok)"/>
+  <text class="label bad" x="370" y="130" text-anchor="middle">write fails</text>
+  <text class="label good" x="370" y="194" text-anchor="middle">write works</text>
+  <rect class="frame" x="30" y="30" width="780" height="270" rx="10"/>
+  <text class="label" x="46" y="54">Container: readOnlyRootFilesystem: true, runAsUser: 10001, capabilities dropped</text>
+  <rect class="box" x="70" y="132" width="200" height="50" rx="8"/>
+  <text x="170" y="162" text-anchor="middle">container process</text>
+  <rect class="drop" x="470" y="58" width="300" height="44" rx="8"/>
+  <text x="620" y="85" text-anchor="middle"><tspan class="code">/</tspan> root file system, read-only</text>
+  <rect class="ok" x="470" y="210" width="300" height="44" rx="8"/>
+  <text x="620" y="237" text-anchor="middle"><tspan class="code">/scratch</tspan>, <tspan class="code">emptyDir</tspan> volume</text>
+  <text class="label" x="620" y="278" text-anchor="middle">The kubelet creates it and deletes it with the pod</text>
+</svg>

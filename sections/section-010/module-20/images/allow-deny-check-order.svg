@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 330" width="840" height="330" role="img" aria-labelledby="title desc">
+  <title id="title">The order of the sshd allow and deny checks</title>
+  <desc id="desc">A login attempt passes DenyUsers, AllowUsers, DenyGroups and AllowGroups in that order. A match in a deny list or a missing entry in an existing allow list refuses the login before any key is tried. A login that passes all four reaches the key check.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="okline" d="M140 85 H160" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M274 85 H294" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M408 85 H428" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M542 85 H562" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M676 85 H696" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M219 110 V226" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="227" y="172">match</text>
+  <path class="dashed" d="M353 110 V226" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="361" y="172">not listed</text>
+  <path class="dashed" d="M487 110 V226" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="495" y="172">match</text>
+  <path class="dashed" d="M621 110 V226" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="629" y="172">not listed</text>
+  <rect class="box" x="30" y="60" width="110" height="50" rx="8"/>
+  <text x="85" y="90" text-anchor="middle">login attempt</text>
+  <rect class="ask" x="164" y="60" width="110" height="50" rx="8"/>
+  <text class="code" x="219" y="90" text-anchor="middle">DenyUsers</text>
+  <rect class="ask" x="298" y="60" width="110" height="50" rx="8"/>
+  <text class="code" x="353" y="90" text-anchor="middle">AllowUsers</text>
+  <rect class="ask" x="432" y="60" width="110" height="50" rx="8"/>
+  <text class="code" x="487" y="90" text-anchor="middle">DenyGroups</text>
+  <rect class="ask" x="566" y="60" width="110" height="50" rx="8"/>
+  <text class="code" x="621" y="90" text-anchor="middle">AllowGroups</text>
+  <rect class="ok" x="700" y="60" width="110" height="50" rx="8"/>
+  <text x="755" y="90" text-anchor="middle">key check</text>
+  <rect class="drop" x="150" y="230" width="540" height="44" rx="8"/>
+  <text x="420" y="257" text-anchor="middle">login refused before any key is tried</text>
+  <text x="30" y="310">An allow list counts only when it exists. Without <tspan class="code">AllowUsers</tspan>, every account passes that check.</text>
+</svg>

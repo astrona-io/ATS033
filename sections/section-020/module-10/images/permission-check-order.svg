@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 450" width="840" height="450" role="img" aria-labelledby="title desc">
+  <title id="title">How Linux picks the permission bits for a file</title>
+  <desc id="desc">A process opens a file. If its UID is 0, root skips the check. Otherwise, if the UID owns the file, only the owner bits count. Otherwise, if the file group is one of the user groups, only the group bits count. Otherwise only the other bits count.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <!-- Lines first, so the boxes sit on top. -->
+  <path class="line" d="M250 68 V106" marker-end="url(#arrow)"/>
+  <path class="line" d="M250 156 V202" marker-end="url(#arrow)"/>
+  <path class="line" d="M250 252 V298" marker-end="url(#arrow)"/>
+  <path class="line" d="M250 348 V394" marker-end="url(#arrow)"/>
+  <path class="okline" d="M400 132 H498" marker-end="url(#arrowok)"/>
+  <path class="line" d="M400 228 H498" marker-end="url(#arrow)"/>
+  <path class="line" d="M400 324 H498" marker-end="url(#arrow)"/>
+
+  <text class="label" x="450" y="124" text-anchor="middle">yes</text>
+  <text class="label" x="450" y="220" text-anchor="middle">yes</text>
+  <text class="label" x="450" y="316" text-anchor="middle">yes</text>
+  <text class="label" x="262" y="184">no</text>
+  <text class="label" x="262" y="280">no</text>
+  <text class="label" x="262" y="376">no</text>
+
+  <rect class="box" x="100" y="24" width="300" height="44" rx="8"/>
+  <text class="strong" x="250" y="51" text-anchor="middle">A process opens a file</text>
+
+  <rect class="ask" x="100" y="108" width="300" height="48" rx="8"/>
+  <text x="250" y="137" text-anchor="middle">Is the UID 0 (<tspan class="code">root</tspan>)?</text>
+
+  <rect class="ask" x="100" y="204" width="300" height="48" rx="8"/>
+  <text x="250" y="233" text-anchor="middle">Does the UID own the file?</text>
+
+  <rect class="ask" x="100" y="300" width="300" height="48" rx="8"/>
+  <text x="250" y="329" text-anchor="middle">Is the file group one of its groups?</text>
+
+  <rect class="ok" x="500" y="108" width="300" height="48" rx="8"/>
+  <text x="650" y="137" text-anchor="middle"><tspan class="code">root</tspan> skips the ordinary check</text>
+
+  <rect class="box" x="500" y="204" width="300" height="48" rx="8"/>
+  <text x="650" y="233" text-anchor="middle">Use only the owner bits</text>
+
+  <rect class="box" x="500" y="300" width="300" height="48" rx="8"/>
+  <text x="650" y="329" text-anchor="middle">Use only the group bits</text>
+
+  <rect class="box" x="100" y="396" width="300" height="44" rx="8"/>
+  <text x="250" y="423" text-anchor="middle">Use only the other bits</text>
+</svg>

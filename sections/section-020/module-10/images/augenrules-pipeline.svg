@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 260" width="840" height="260" role="img" aria-labelledby="title desc">
+  <title id="title">How a rule file reaches the kernel</title>
+  <desc id="desc">augenrules joins the files in /etc/audit/rules.d into /etc/audit/audit.rules. auditctl -R loads that file into the kernel rule list. For each matching event the kernel creates a record, and auditd writes it to /var/log/audit/audit.log.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <!-- Lines first, so the boxes sit on top. -->
+  <path class="line" d="M260 95 H348" marker-end="url(#arrow)"/>
+  <path class="line" d="M560 95 H648" marker-end="url(#arrow)"/>
+  <path class="okline" d="M735 120 V178" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M650 205 H582" marker-end="url(#arrowok)"/>
+
+  <text class="label code" x="304" y="60" text-anchor="middle">augenrules</text>
+  <text class="label code" x="604" y="60" text-anchor="middle">auditctl -R</text>
+  <text class="label good" x="747" y="154">matching event</text>
+  <text class="label good" x="616" y="196" text-anchor="middle">writes</text>
+
+  <rect class="box" x="30" y="70" width="230" height="50" rx="8"/>
+  <text class="code" x="145" y="100" text-anchor="middle">/etc/audit/rules.d/*.rules</text>
+
+  <rect class="box" x="350" y="70" width="210" height="50" rx="8"/>
+  <text class="code" x="455" y="100" text-anchor="middle">/etc/audit/audit.rules</text>
+
+  <rect class="ask" x="650" y="70" width="170" height="50" rx="8"/>
+  <text x="735" y="100" text-anchor="middle">Kernel rule list</text>
+
+  <rect class="box" x="650" y="180" width="170" height="50" rx="8"/>
+  <text class="code" x="735" y="210" text-anchor="middle">auditd</text>
+
+  <rect class="ok" x="330" y="180" width="250" height="50" rx="8"/>
+  <text class="code" x="455" y="210" text-anchor="middle">/var/log/audit/audit.log</text>
+
+  <text class="label" x="30" y="146"><tspan class="code">augenrules --load</tspan> runs both steps:</text>
+  <text class="label" x="30" y="166">it builds the file, then loads it.</text>
+</svg>

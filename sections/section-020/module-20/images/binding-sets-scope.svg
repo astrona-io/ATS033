@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 360" width="840" height="360" role="img" aria-labelledby="title desc">
+  <title id="title">The binding sets the scope</title>
+  <desc id="desc">A RoleBinding in the starfleet namespace can point to a Role or to a ClusterRole. In both cases the rules apply only in starfleet. A ClusterRoleBinding points to a ClusterRole, and its rules apply in all namespaces.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="okline" d="M180 163 H200 V98 H378" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M180 183 H200 V258 H378" marker-end="url(#arrowok)"/>
+  <path class="line" d="M700 136 V228" marker-end="url(#arrow)"/>
+
+  <rect class="frame" x="20" y="30" width="540" height="300" rx="10"/>
+  <text class="label" x="36" y="54">Rules apply only in namespace starfleet</text>
+  <rect class="box" x="40" y="145" width="140" height="56" rx="8"/>
+  <text class="strong" x="110" y="169" text-anchor="middle">RoleBinding</text>
+  <text class="label" x="110" y="189" text-anchor="middle">in <tspan class="code">starfleet</tspan></text>
+  <text class="code" x="210" y="90">roleRef: Role</text>
+  <text class="code" x="210" y="250">roleRef: ClusterRole</text>
+  <rect class="ok" x="380" y="70" width="160" height="56" rx="8"/>
+  <text class="strong" x="460" y="94" text-anchor="middle">Role</text>
+  <text class="label" x="460" y="114" text-anchor="middle">starfleet only</text>
+  <rect class="ok" x="380" y="230" width="160" height="56" rx="8"/>
+  <text class="strong" x="460" y="254" text-anchor="middle">ClusterRole</text>
+  <text class="label" x="460" y="274" text-anchor="middle">limited to starfleet</text>
+
+  <rect class="frame" x="590" y="30" width="230" height="300" rx="10"/>
+  <text class="label" x="604" y="54">Rules apply in all namespaces</text>
+  <rect class="box" x="610" y="80" width="180" height="56" rx="8"/>
+  <text class="strong" x="700" y="113" text-anchor="middle">ClusterRoleBinding</text>
+  <text class="code" x="710" y="178">roleRef:</text>
+  <text class="code" x="710" y="196">ClusterRole</text>
+  <rect class="ask" x="610" y="230" width="180" height="56" rx="8"/>
+  <text class="strong" x="700" y="254" text-anchor="middle">ClusterRole</text>
+  <text class="label" x="700" y="274" text-anchor="middle">all namespaces</text>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 310" width="850" height="310" role="img" aria-labelledby="title desc">
+  <title id="title">Three questions for report-reader</title>
+  <desc id="desc">The report-reader ServiceAccount asks three questions. Get configmap/probe-code in starfleet is allowed, because the verb and the name match the rule. List configmaps in starfleet is denied, because a list request has no object name. Get configmap/probe-code in outpost is denied, because no binding exists in outpost.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="okline" d="M200 150 H216 V60 H598" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M200 160 H598" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M200 170 H216 V260 H598" marker-end="url(#arrowbad)"/>
+
+  <rect class="box" x="30" y="130" width="170" height="60" rx="8"/>
+  <text x="115" y="155" text-anchor="middle">ServiceAccount</text>
+  <text class="code" x="115" y="175" text-anchor="middle">report-reader</text>
+
+  <text class="code" x="232" y="50">get configmap/probe-code -n starfleet</text>
+  <text class="code" x="232" y="150">list configmaps -n starfleet</text>
+  <text class="code" x="232" y="250">get configmap/probe-code -n outpost</text>
+
+  <rect class="ok" x="600" y="36" width="230" height="48" rx="8"/>
+  <text x="715" y="65" text-anchor="middle"><tspan class="strong good">yes</tspan>: name and verb match</text>
+  <rect class="drop" x="600" y="136" width="230" height="48" rx="8"/>
+  <text x="715" y="165" text-anchor="middle"><tspan class="strong bad">no</tspan>: list has no object name</text>
+  <rect class="drop" x="600" y="236" width="230" height="48" rx="8"/>
+  <text x="715" y="265" text-anchor="middle"><tspan class="strong bad">no</tspan>: no binding in outpost</text>
+</svg>

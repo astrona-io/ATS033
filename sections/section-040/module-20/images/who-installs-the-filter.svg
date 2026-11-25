@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 290" width="840" height="290" role="img" aria-labelledby="title desc">
+  <title id="title">Who installs the seccomp filter</title>
+  <desc id="desc">The kubelet finds the profile and passes it to containerd. containerd passes it to runc, and runc loads the filter into the kernel just before the application starts. The kernel then checks every syscall of the container process.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <rect class="frame" x="20" y="20" width="800" height="250" rx="10"/>
+  <text class="label" x="36" y="44">node</text>
+  <path class="line" d="M190 100 H238" marker-end="url(#arrow)"/>
+  <path class="line" d="M380 100 H428" marker-end="url(#arrow)"/>
+  <path class="line" d="M570 100 H618" marker-end="url(#arrow)"/>
+  <path class="line" d="M500 130 V198" marker-end="url(#arrow)"/>
+  <path class="okline" d="M690 130 V198" marker-end="url(#arrowok)"/>
+  <text class="label" x="508" y="170">loads the filter</text>
+  <text class="label good" x="698" y="170">every syscall</text>
+  <rect class="box" x="50" y="70" width="140" height="60" rx="8"/>
+  <text class="code" x="120" y="95" text-anchor="middle">kubelet</text>
+  <text class="label" x="120" y="115" text-anchor="middle">finds the profile</text>
+  <rect class="box" x="240" y="70" width="140" height="60" rx="8"/>
+  <text class="code" x="310" y="95" text-anchor="middle">containerd</text>
+  <text class="label" x="310" y="115" text-anchor="middle">passes it on</text>
+  <rect class="box" x="430" y="70" width="140" height="60" rx="8"/>
+  <text class="code" x="500" y="95" text-anchor="middle">runc</text>
+  <text class="label" x="500" y="115" text-anchor="middle">loads it</text>
+  <rect class="box" x="620" y="70" width="160" height="60" rx="8"/>
+  <text x="700" y="95" text-anchor="middle">container process</text>
+  <text class="label" x="700" y="115" text-anchor="middle">the application</text>
+  <rect class="ask" x="50" y="200" width="730" height="50" rx="8"/>
+  <text x="415" y="230" text-anchor="middle">Linux kernel: checks every syscall of the process against the filter</text>
+</svg>

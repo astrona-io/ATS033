@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 380" width="840" height="380" role="img" aria-labelledby="title desc">
+  <title id="title">A NodePort opens on every node</title>
+  <desc id="desc">A client sends a request to port 30080 on the control-plane node or on the worker node. kube-proxy rules on each node forward it to the probe pods. The node port is open on both nodes, even on a node that runs no probe pod.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <rect class="frame" x="300" y="30" width="250" height="150" rx="10"/>
+  <text class="label" x="316" y="54">control-plane node</text>
+  <rect class="frame" x="300" y="200" width="510" height="160" rx="10"/>
+  <text class="label" x="316" y="224">worker node</text>
+  <path class="okline" d="M150 130 H328" marker-end="url(#arrowok)"/>
+  <text class="label good" x="224" y="120" text-anchor="middle">NODE_IP:30080</text>
+  <path class="okline" d="M150 290 H328" marker-end="url(#arrowok)"/>
+  <text class="label good" x="224" y="280" text-anchor="middle">worker IP:30080</text>
+  <path class="okline" d="M510 130 H640 V256" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M510 290 H588" marker-end="url(#arrowok)"/>
+  <rect class="box" x="30" y="110" width="120" height="200" rx="8"/>
+  <text x="90" y="200" text-anchor="middle">client</text>
+  <text x="90" y="220" text-anchor="middle" class="label">for example</text>
+  <text x="90" y="238" text-anchor="middle" class="code">drifter</text>
+  <rect class="ask" x="330" y="105" width="180" height="50" rx="8"/>
+  <text x="420" y="128" text-anchor="middle">kube-proxy rules</text>
+  <text x="420" y="146" text-anchor="middle" class="label">port 30080 open</text>
+  <rect class="ask" x="330" y="265" width="180" height="50" rx="8"/>
+  <text x="420" y="288" text-anchor="middle">kube-proxy rules</text>
+  <text x="420" y="306" text-anchor="middle" class="label">port 30080 open</text>
+  <rect class="ok" x="590" y="258" width="200" height="64" rx="8"/>
+  <text x="690" y="286" text-anchor="middle"><tspan class="code">probe</tspan> pods</text>
+  <text x="690" y="306" text-anchor="middle" class="label">container port 8080</text>
+</svg>

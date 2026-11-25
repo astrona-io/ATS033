@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 360" width="860" height="360" role="img" aria-labelledby="title desc">
+  <title id="title">Bind address and network filter</title>
+  <desc id="desc">The firewall or security group drops callers from unknown networks. A caller from an allowed network reaches kube-apiserver on port 6443, which listens on all addresses. The same caller cannot reach the scheduler on port 10259, which listens on the loopback address only.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <rect class="frame" x="525" y="50" width="305" height="290" rx="10"/>
+  <text class="label" x="541" y="74">control-plane node</text>
+
+  <path class="dashed" d="M240 114 H352" marker-end="url(#arrowbad)"/>
+  <path class="okline" d="M240 204 H558" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M240 294 H440"/>
+  <path class="dashed" d="M440 294 H558" marker-end="url(#arrowbad)"/>
+
+  <text class="label bad" x="300" y="102" text-anchor="middle">dropped</text>
+  <text class="label good" x="300" y="192" text-anchor="middle">6443</text>
+  <text class="label good" x="300" y="282" text-anchor="middle">10259</text>
+  <text class="label bad" x="450" y="320" text-anchor="middle">no listener on</text>
+  <text class="label bad" x="450" y="336" text-anchor="middle">this address</text>
+
+  <rect x="356" y="84" width="16" height="230" rx="3" fill="#fff7e0" stroke="#b7791f" stroke-width="1.5"/>
+  <text class="label" x="364" y="42" text-anchor="middle">firewall or</text>
+  <text class="label" x="364" y="58" text-anchor="middle">security group</text>
+
+  <rect class="drop" x="30" y="90" width="210" height="48" rx="8"/>
+  <text x="135" y="119" text-anchor="middle">caller, unknown network</text>
+  <rect class="box" x="30" y="180" width="210" height="48" rx="8"/>
+  <text x="135" y="209" text-anchor="middle">caller, allowed network</text>
+  <rect class="box" x="30" y="270" width="210" height="48" rx="8"/>
+  <text x="135" y="299" text-anchor="middle">caller, allowed network</text>
+
+  <rect class="ok" x="560" y="170" width="240" height="68" rx="8"/>
+  <text class="code" x="680" y="198" text-anchor="middle">kube-apiserver *:6443</text>
+  <text x="680" y="222" text-anchor="middle">listens on all addresses</text>
+  <rect class="box" x="560" y="260" width="240" height="68" rx="8"/>
+  <text class="code" x="680" y="288" text-anchor="middle">scheduler 127.0.0.1:10259</text>
+  <text x="680" y="312" text-anchor="middle">listens on loopback only</text>
+</svg>

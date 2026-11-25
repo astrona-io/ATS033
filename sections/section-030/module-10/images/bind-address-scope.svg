@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 380" width="840" height="380" role="img" aria-labelledby="title desc">
+  <title id="title">Bind address decides who can connect</title>
+  <desc id="desc">The shuttle pod sends requests to the node InternalIP. Port 19091 has a listener on 0.0.0.0, so the request succeeds. Port 19090 has a listener on 127.0.0.1 only, so the request is refused. A process on the same node reaches 127.0.0.1:19090 through loopback.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <rect class="frame" x="300" y="30" width="520" height="320" rx="10"/>
+  <text class="label" x="316" y="54">control-plane node (host network)</text>
+  <path class="okline" d="M170 110 H448" marker-end="url(#arrowok)"/>
+  <text class="label good" x="235" y="100" text-anchor="middle">NODE_IP:19091</text>
+  <path class="dashed" d="M170 240 H448" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="235" y="230" text-anchor="middle">NODE_IP:19090</text>
+  <text class="label bad" x="235" y="262" text-anchor="middle">refused</text>
+  <path class="okline" d="M640 310 H700 V268" marker-end="url(#arrowok)"/>
+  <text class="label good" x="710" y="300">loopback</text>
+  <rect class="box" x="30" y="85" width="140" height="180" rx="8"/>
+  <text x="100" y="170" text-anchor="middle"><tspan class="code">shuttle</tspan> pod</text>
+  <text class="label" x="100" y="192" text-anchor="middle">pod network</text>
+  <rect class="ok" x="452" y="80" width="340" height="60" rx="8"/>
+  <text x="622" y="105" text-anchor="middle"><tspan class="code">exposed-server</tspan></text>
+  <text x="622" y="126" text-anchor="middle">listens on <tspan class="code">0.0.0.0:19091</tspan></text>
+  <rect class="ask" x="452" y="210" width="340" height="56" rx="8"/>
+  <text x="622" y="234" text-anchor="middle"><tspan class="code">node-local-server</tspan></text>
+  <text x="622" y="254" text-anchor="middle">listens on <tspan class="code">127.0.0.1:19090</tspan></text>
+  <rect class="box" x="452" y="290" width="186" height="40" rx="8"/>
+  <text x="545" y="315" text-anchor="middle">local process</text>
+</svg>

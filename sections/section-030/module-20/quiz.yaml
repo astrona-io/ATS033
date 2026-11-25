@@ -1,0 +1,259 @@
+# Module quiz for section 030, module 02. Contract:
+# scripts/ci/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-030-02
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-030/module-20
+  title: Limit Service Exposure Outside The Cluster
+questions:
+- id: ats033-030-02-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Name the component that forwards traffic from a node port to a pod.
+  source_readings:
+  - sections/section-030/module-20/course-010-service-types-and-what-they-open.md
+  prompt: 'The `probe-admin` Service of type `NodePort` uses port 30090. All `probe` pods run on the worker node. The `drifter` pod sends a request to the control-plane node address on port 30090 and gets a line that starts with `version=v1`. Which component forwarded the request to a `probe` pod?'
+  options:
+  - id: a
+    text: The API server, because it allocated the node port.
+    explanation: The API server stores the Service and allocates the port, but it does not forward the traffic.
+  - id: b
+    text: The kubelet on the worker node, because it runs the pods.
+    explanation: The kubelet starts the containers. It does not program the Service rules.
+  - id: c
+    text: "`kube-proxy` on the control-plane node, through the packet rules it programmed."
+    explanation: Correct. `kube-proxy` runs on every node and its rules rewrite the destination to a pod address, even on a node without a pod.
+  - id: d
+    text: The cloud provider integration, because it creates external access.
+    explanation: The cloud provider integration creates load balancers. A `NodePort` Service does not need it.
+  correct_option: c
+  explanation: The API server allocates the node port, and `kube-proxy` on each node programs the iptables or IPVS rules that forward it to a pod.
+- id: ats033-030-02-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Identify every way a LoadBalancer Service can be reached.
+  source_readings:
+  - sections/section-030/module-20/course-010-service-types-and-what-they-open.md
+  prompt: A reviewer sees that the `probe-edge` Service of type `LoadBalancer` has a `ClusterIP` address and concludes that it is reachable inside the cluster only. Why is this conclusion wrong?
+  options:
+  - id: a
+    text: A `LoadBalancer` Service also has a node port on every node and an external load balancer address.
+    explanation: Correct. The types build on each other, so a `LoadBalancer` Service can be reached in three ways.
+  - id: b
+    text: A `ClusterIP` address is a public address that any client can route to.
+    explanation: A `ClusterIP` address works inside the cluster only.
+  - id: c
+    text: A `LoadBalancer` Service has no cluster address, so the field shows a wrong value.
+    explanation: A `LoadBalancer` Service does have a cluster address. The value is real.
+  - id: d
+    text: A `LoadBalancer` Service only returns a DNS name and opens nothing.
+    explanation: That describes the type `ExternalName`.
+  correct_option: a
+  explanation: Check the whole `spec`. A `LoadBalancer` Service has a cluster address, a node port and an external address.
+- id: ats033-030-02-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Predict the effect of changing a NodePort Service back to ClusterIP.
+  source_readings:
+  - sections/section-030/module-20/course-010-service-types-and-what-they-open.md
+  prompt: You apply a manifest that changes `probe-admin` in `starfleet` from type `NodePort` to type `ClusterIP`, with no `nodePort` field. What happens next?
+  options:
+  - id: a
+    text: The node port stays open until you delete the Service.
+    explanation: The change of type releases the node port at once.
+  - id: b
+    text: All clients lose access, including pods inside the cluster.
+    explanation: The `ClusterIP` address remains, so pods inside the cluster still reach the application.
+  - id: c
+    text: The API server rejects the change, because the type of a Service cannot change.
+    explanation: The API server accepts the change of type.
+  - id: d
+    text: The node port is released, and pods in the cluster still reach the application through the name `probe-admin.starfleet`.
+    explanation: Correct. A request to port 30090 now fails, and the cluster address still works.
+  correct_option: d
+  explanation: Changing the type to `ClusterIP` removes the external path and keeps the internal one.
+- id: ats033-030-02-q04
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain why a LoadBalancer Service in a kind cluster has no external address.
+  source_readings:
+  - sections/section-030/module-20/course-020-narrowing-nodeports-and-load-balancers.md
+  prompt: In the `kind` playground, the `EXTERNAL-IP` of the `probe-edge` Service of type `LoadBalancer` stays `<pending>`, and `.status.loadBalancer` is empty. What is the reason?
+  options:
+  - id: a
+    text: "`kube-proxy` is not running on the nodes."
+    explanation: "`kube-proxy` forwards node port traffic. It does not create external load balancers."
+  - id: b
+    text: "`kind` runs no cloud provider integration, so no component creates the load balancer."
+    explanation: Correct. The cloud provider integration is the controller that calls the cloud API and fills in the external address.
+  - id: c
+    text: The Service has no `loadBalancerSourceRanges`, so the platform refuses to create it.
+    explanation: An empty list means any client range is accepted. It does not block the creation.
+  - id: d
+    text: The API server has not allocated a node port for the Service yet.
+    explanation: The node port is allocated, and it is shown in `.spec.ports[0].nodePort`.
+  correct_option: b
+  explanation: A `LoadBalancer` Service needs the cloud provider integration. Without it, the external address stays pending.
+- id: ats033-030-02-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain how externalTrafficPolicy Cluster changes the client address that an application sees.
+  source_readings:
+  - sections/section-030/module-20/course-020-narrowing-nodeports-and-load-balancers.md
+  prompt: 'A published Service uses the default `externalTrafficPolicy: Cluster`. The application logs show a node address as the client of every request. What causes this?'
+  options:
+  - id: a
+    text: The node replaced the source address with its own address (SNAT), so the reply returns the same way.
+    explanation: Correct. With `Cluster`, the node may forward to a pod on any node and replaces the source address.
+  - id: b
+    text: The load balancer always hides the client address, whatever the policy.
+    explanation: With `Local`, the pod sees the original client address.
+  - id: c
+    text: The application runs with `hostNetwork`, so it sees only node addresses.
+    explanation: The client address seen by the pod comes from the Service policy, not from the host network setting.
+  - id: d
+    text: A NetworkPolicy rewrote the source address.
+    explanation: A NetworkPolicy allows or blocks traffic. It does not rewrite addresses.
+  correct_option: a
+  explanation: Under `Cluster`, source network address translation (SNAT) loses the real client address. `Local` keeps it.
+- id: ats033-030-02-q06
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Choose the right control to restrict clients of a NodePort Service.
+  source_readings:
+  - sections/section-030/module-20/course-020-narrowing-nodeports-and-load-balancers.md
+  prompt: An administrator adds `loadBalancerSourceRanges` with `203.0.113.0/24` to a Service of type `NodePort`, to allow only that client network. What is the effect?
+  options:
+  - id: a
+    text: Every node drops requests from addresses outside the range.
+    explanation: No load balancer exists to read the field, so nothing applies it.
+  - id: b
+    text: The API server rejects the Service.
+    explanation: The field applies to `LoadBalancer` Services only. On a `NodePort` Service no load balancer reads it, so it has no effect.
+  - id: c
+    text: Nothing changes; the node ports need a firewall or a cloud security group on the nodes.
+    explanation: Correct. Only a load balancer reads the field.
+  - id: d
+    text: The Service changes to type `LoadBalancer`.
+    explanation: A field does not change the type of the Service.
+  correct_option: c
+  explanation: "`loadBalancerSourceRanges` applies to `LoadBalancer` Services only. Filter node ports with a firewall."
+- id: ats033-030-02-q07
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Identify which component enforces loadBalancerSourceRanges and the risk of an empty list.
+  source_readings:
+  - sections/section-030/module-20/course-020-narrowing-nodeports-and-load-balancers.md
+  prompt: A team says its application of type `LoadBalancer` is private because it runs in a private namespace. The Service has no `loadBalancerSourceRanges`. Which statement is accurate?
+  options:
+  - id: a
+    text: The namespace limits the load balancer to clients in the same namespace.
+    explanation: A namespace does not filter traffic that arrives at a load balancer.
+  - id: b
+    text: "`kube-proxy` blocks external clients until a range is added."
+    explanation: An empty list does not block anything.
+  - id: c
+    text: The API server fills in the range of the cluster network by default.
+    explanation: The field stays empty when it is not set.
+  - id: d
+    text: The load balancer accepts clients from any address. When a list is set, the cloud provider integration configures the load balancer or its firewall to enforce it.
+    explanation: Correct. An empty list is the most common reason a private application is reachable from the internet.
+  correct_option: d
+  explanation: The field is only a request until the platform acts on it, and an empty field means no client restriction.
+- id: ats033-030-02-q08
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Explain the role of healthCheckNodePort under externalTrafficPolicy Local.
+  source_readings:
+  - sections/section-030/module-20/course-020-narrowing-nodeports-and-load-balancers.md
+  prompt: 'A `LoadBalancer` Service uses `externalTrafficPolicy: Local`. A rolling update leaves one node without a ready pod. What keeps the load balancer from sending traffic to that node?'
+  options:
+  - id: a
+    text: The kubelet removes the node from the cluster during the update.
+    explanation: The node stays in the cluster. Only its pod is not ready.
+  - id: b
+    text: The load balancer calls the `healthCheckNodePort` to learn which nodes have pods, and sends traffic only to those nodes.
+    explanation: Correct. Without this health check, the load balancer sends traffic to the node, and the node drops it.
+  - id: c
+    text: The node forwards the traffic to a pod on another node.
+    explanation: Under `Local`, a node forwards only to its own pods.
+  - id: d
+    text: "`loadBalancerSourceRanges` excludes nodes without pods."
+    explanation: That field lists client address ranges, not nodes.
+  correct_option: b
+  explanation: Under `Local`, a node without a ready pod drops traffic. The `healthCheckNodePort` lets the load balancer avoid such nodes.
+- id: ats033-030-02-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain why old NodePort Services must be removed after an Ingress is added.
+  source_readings:
+  - sections/section-030/module-20/course-030-ingress-and-finding-exposed-services.md
+  prompt: A team installs an Ingress controller and routes `probe.example.test` to the `probe` Service. The old `probe-admin` Service of type `NodePort` stays in place. What is the security problem?
+  options:
+  - id: a
+    text: The Ingress controller cannot route to a Service that also has a node port.
+    explanation: The routing is not the problem. The problem is the node port that the old Service still opens.
+  - id: b
+    text: The Ingress rules now also apply to the node port, so clients get errors.
+    explanation: Ingress rules do not apply to a node port.
+  - id: c
+    text: The `NodePort` Service still opens its port on every node and bypasses every rule of the Ingress.
+    explanation: Correct. An Ingress does not remove an old `NodePort` Service.
+  - id: d
+    text: The Ingress controller closes the node port, so internal clients lose access.
+    explanation: The controller does not change other Services.
+  correct_option: c
+  explanation: An Ingress is a gain only when the other Services stay at `ClusterIP`.
+- id: ats033-030-02-q10
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Interpret the externalIPs field during an exposure audit.
+  source_readings:
+  - sections/section-030/module-20/course-030-ingress-and-finding-exposed-services.md
+  prompt: During an audit, the `EXTERNAL-IPS` column of a `ClusterIP` Service shows an address. Why does this value need an explanation?
+  options:
+  - id: a
+    text: It is the address of the pod that serves the Service.
+    explanation: The pod address is not stored in `externalIPs`.
+  - id: b
+    text: Any node accepts traffic for the Service on that address, and a user who can create Services can use it to attract traffic for addresses the user does not own.
+    explanation: Correct. `externalIPs` is an old feature that opens access even on a `ClusterIP` Service.
+  - id: c
+    text: It is the address that the cloud provider assigned to the load balancer.
+    explanation: That address appears in `status.loadBalancer.ingress`.
+  - id: d
+    text: It shows that an Ingress controller handles the Service.
+    explanation: An Ingress does not write into the Service `externalIPs` field.
+  correct_option: b
+  explanation: A complete audit checks Service types, `externalIPs`, Ingress objects and host-network pods.
+- id: ats033-030-02-q11
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain why host-network pods belong in an external access audit.
+  source_readings:
+  - sections/section-030/module-20/course-030-ingress-and-finding-exposed-services.md
+  prompt: The Service audit finds only `ClusterIP` Services and no Ingress objects. One pod shows `true` in the `HOSTNETWORK` column. Why is the audit not finished?
+  options:
+  - id: a
+    text: The pod shares the network of its node, so its listeners are on the node and not behind a Service.
+    explanation: Correct. A review of ports on the node covers such a pod.
+  - id: b
+    text: A host-network pod always creates a hidden `NodePort` Service.
+    explanation: No Service is created. The pod listens on the node directly.
+  - id: c
+    text: A host-network pod disables `kube-proxy` on its node.
+    explanation: "`kube-proxy` keeps working on the node. The risk is that the listeners of the pod are on the node itself."
+  - id: d
+    text: The pod is reachable only from other pods on the same node, so it must be moved.
+    explanation: Its listeners are on the node, so the node address can expose them.
+  correct_option: a
+  explanation: Services, `externalIPs`, Ingress objects and host-network pods can all open access.
+placement:
+  position: after
+  reading: sections/section-030/module-20/course-100-summary.md

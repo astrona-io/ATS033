@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 360" width="840" height="360" role="img" aria-labelledby="title desc">
+  <title id="title">Rules in the INPUT chain are checked in order</title>
+  <desc id="desc">A packet for the node is checked against INPUT rule 1. A match with DROP discards it. With no match it goes to rule 2, where a match with ACCEPT delivers it. With no match on any rule, the chain policy decides.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M140 100 V136" marker-end="url(#arrow)"/>
+  <path class="line" d="M140 186 V226" marker-end="url(#arrow)"/>
+  <text class="label" x="150" y="212">no match</text>
+  <path class="line" d="M140 276 V306" marker-end="url(#arrow)"/>
+  <text class="label" x="150" y="296">no match</text>
+  <path class="dashed" d="M250 161 H528" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="390" y="151" text-anchor="middle">match: DROP</text>
+  <path class="okline" d="M250 251 H528" marker-end="url(#arrowok)"/>
+  <text class="label good" x="390" y="241" text-anchor="middle">match: ACCEPT</text>
+  <rect class="box" x="30" y="50" width="220" height="50" rx="8"/>
+  <text x="140" y="80" text-anchor="middle">packet for the node</text>
+  <rect class="ask" x="30" y="136" width="220" height="50" rx="8"/>
+  <text x="140" y="166" text-anchor="middle"><tspan class="code">INPUT</tspan> rule 1</text>
+  <rect class="ask" x="30" y="226" width="220" height="50" rx="8"/>
+  <text x="140" y="256" text-anchor="middle"><tspan class="code">INPUT</tspan> rule 2</text>
+  <rect class="box" x="30" y="306" width="220" height="40" rx="8"/>
+  <text x="140" y="331" text-anchor="middle">chain policy decides</text>
+  <rect class="drop" x="530" y="136" width="260" height="50" rx="8"/>
+  <text x="660" y="166" text-anchor="middle">packet discarded</text>
+  <rect class="ok" x="530" y="226" width="260" height="50" rx="8"/>
+  <text x="660" y="256" text-anchor="middle">packet delivered</text>
+</svg>

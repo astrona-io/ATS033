@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 470" width="840" height="470" role="img" aria-labelledby="title desc">
+  <title id="title">How to diagnose a profile failure</title>
+  <desc id="desc">When a workload fails, ask whether the container started. If not, it is a delivery problem: read the pod events with kubectl describe pod and fix the missing or misnamed profile. If it started, it is a content problem: check the /proc state and the application log, then the kernel log on the node, and allow only the call or path that is needed.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M420 82 V108" marker-end="url(#arrow)"/>
+  <path class="line" d="M300 135 H200 V196" marker-end="url(#arrow)"/>
+  <path class="line" d="M540 135 H640 V196" marker-end="url(#arrow)"/>
+  <text class="label" x="250" y="125" text-anchor="middle">no</text>
+  <text class="label" x="590" y="125" text-anchor="middle">yes</text>
+  <path class="line" d="M200 254 V286" marker-end="url(#arrow)"/>
+  <path class="line" d="M640 254 V286" marker-end="url(#arrow)"/>
+  <path class="line" d="M640 344 V366" marker-end="url(#arrow)"/>
+
+  <rect class="drop" x="300" y="30" width="240" height="52" rx="8"/>
+  <text x="420" y="61" text-anchor="middle">workload fails</text>
+  <rect class="ask" x="300" y="110" width="240" height="50" rx="8"/>
+  <text x="420" y="140" text-anchor="middle">container started?</text>
+
+  <rect class="frame" x="70" y="160" width="260" height="202" rx="10"/>
+  <text class="label" x="318" y="182" text-anchor="end">delivery problem</text>
+  <rect class="box" x="90" y="198" width="220" height="56" rx="8"/>
+  <text class="code" x="200" y="222" text-anchor="middle">kubectl describe pod</text>
+  <text x="200" y="243" text-anchor="middle">read the events</text>
+  <rect class="ok" x="90" y="288" width="220" height="56" rx="8"/>
+  <text x="200" y="312" text-anchor="middle">fix the missing or</text>
+  <text x="200" y="332" text-anchor="middle">misnamed profile</text>
+
+  <rect class="frame" x="510" y="160" width="260" height="288" rx="10"/>
+  <text class="label" x="758" y="182" text-anchor="end">content problem</text>
+  <rect class="box" x="530" y="198" width="220" height="56" rx="8"/>
+  <text class="code" x="640" y="222" text-anchor="middle">/proc state</text>
+  <text x="640" y="243" text-anchor="middle">and the application log</text>
+  <rect class="box" x="530" y="288" width="220" height="56" rx="8"/>
+  <text x="640" y="312" text-anchor="middle">kernel log</text>
+  <text x="640" y="332" text-anchor="middle">on the node</text>
+  <rect class="ok" x="530" y="368" width="220" height="62" rx="8"/>
+  <text x="640" y="394" text-anchor="middle">allow only the needed</text>
+  <text x="640" y="414" text-anchor="middle">call or path</text>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 290" width="840" height="290" role="img" aria-labelledby="title desc">
+  <title id="title">A group gives one account one file</title>
+  <desc id="desc">The account training-reader becomes a member of the group training-readers. The group bits of public-report allow read access, so the account reads it. private-report belongs to root with mode 0600, so the read is denied.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <!-- Lines first, so the boxes sit on top. -->
+  <path class="okline" d="M115 140 V72 H298" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M490 72 H578" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M200 172 H340 V228 H578" marker-end="url(#arrowbad)"/>
+
+  <text class="label good" x="206" y="62" text-anchor="middle">member</text>
+  <text class="label good" x="534" y="62" text-anchor="middle">read (r--)</text>
+  <text class="label bad" x="460" y="218" text-anchor="middle">Permission denied</text>
+
+  <rect class="box" x="30" y="140" width="170" height="48" rx="8"/>
+  <text x="115" y="161" text-anchor="middle">account</text>
+  <text class="code" x="115" y="179" text-anchor="middle">training-reader</text>
+
+  <rect class="ok" x="300" y="48" width="190" height="48" rx="8"/>
+  <text x="395" y="69" text-anchor="middle">group</text>
+  <text class="code" x="395" y="87" text-anchor="middle">training-readers</text>
+
+  <rect class="ok" x="580" y="44" width="240" height="56" rx="8"/>
+  <text class="code strong" x="700" y="66" text-anchor="middle">public-report</text>
+  <text class="code" x="700" y="88" text-anchor="middle">root:training-readers 0640</text>
+
+  <rect class="drop" x="580" y="200" width="240" height="56" rx="8"/>
+  <text class="code strong" x="700" y="222" text-anchor="middle">private-report</text>
+  <text class="code" x="700" y="244" text-anchor="middle">root:root 0600</text>
+
+  <text class="label" x="30" y="232">Not the owner, not in group root:</text>
+  <text class="label" x="30" y="250">the empty other bits apply.</text>
+</svg>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 870 340" width="870" height="340" role="img" aria-labelledby="title desc">
+  <title id="title">Steps of an API server request</title>
+  <desc id="desc">A request passes authentication, then authorization, then admission. Failing authentication returns 401 and failing authorization returns 403. A request with no credentials continues as system:anonymous when --anonymous-auth is true, and gets 401 at once when it is false.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M160 174 H198" marker-end="url(#arrow)"/>
+  <path class="okline" d="M340 174 H378" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M520 174 H558" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M700 174 H728" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M270 198 V268" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M450 198 V268" marker-end="url(#arrowbad)"/>
+  <path class="line" d="M180 64 H270 V148" marker-end="url(#arrow)"/>
+
+  <text class="label bad" x="282" y="238">unknown caller</text>
+  <text class="label bad" x="462" y="238">not allowed</text>
+
+  <rect class="box" x="20" y="40" width="160" height="48" rx="8"/>
+  <text x="100" y="69" text-anchor="middle">no credentials</text>
+  <text x="300" y="56"><tspan class="code">--anonymous-auth=true</tspan>: continues as user</text>
+  <text x="300" y="78"><tspan class="code">system:anonymous</tspan>, group <tspan class="code">system:unauthenticated</tspan></text>
+  <text x="300" y="100"><tspan class="code">--anonymous-auth=false</tspan>: 401 at once</text>
+
+  <rect class="box" x="20" y="150" width="140" height="48" rx="8"/>
+  <text x="90" y="179" text-anchor="middle">request</text>
+  <rect class="ask" x="200" y="150" width="140" height="48" rx="8"/>
+  <text x="270" y="179" text-anchor="middle">authentication</text>
+  <rect class="ask" x="380" y="150" width="140" height="48" rx="8"/>
+  <text x="450" y="179" text-anchor="middle">authorization</text>
+  <rect class="ask" x="560" y="150" width="140" height="48" rx="8"/>
+  <text x="630" y="179" text-anchor="middle">admission</text>
+  <rect class="ok" x="730" y="150" width="120" height="48" rx="8"/>
+  <text x="790" y="179" text-anchor="middle">handled</text>
+
+  <rect class="drop" x="200" y="270" width="140" height="48" rx="8"/>
+  <text class="strong bad" x="270" y="299" text-anchor="middle">401</text>
+  <rect class="drop" x="380" y="270" width="140" height="48" rx="8"/>
+  <text class="strong bad" x="450" y="299" text-anchor="middle">403</text>
+</svg>

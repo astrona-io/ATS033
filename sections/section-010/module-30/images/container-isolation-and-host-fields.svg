@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 370" width="840" height="370" role="img" aria-labelledby="title desc">
+  <title id="title">What each host field replaces</title>
+  <desc id="desc">A normal container has its own network, PID and IPC namespaces, files from its image, and no node devices. hostNetwork, hostPID and hostIPC replace each namespace with the namespace of the node, hostPath mounts files of the node, and privileged gives node devices and almost all capabilities.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <text class="strong" x="160" y="40" text-anchor="middle">Normal container</text>
+  <text class="label" x="410" y="40" text-anchor="middle">Pod field</text>
+  <text class="strong" x="670" y="40" text-anchor="middle">Container with the host field</text>
+  <path class="dashed" d="M290 86 H528" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M290 146 H528" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M290 206 H528" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M290 266 H528" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M290 326 H528" marker-end="url(#arrowbad)"/>
+  <rect class="ok" x="30" y="64" width="260" height="44" rx="8"/>
+  <text x="160" y="91" text-anchor="middle">Own network namespace</text>
+  <rect class="drop" x="530" y="64" width="280" height="44" rx="8"/>
+  <text x="670" y="91" text-anchor="middle">Network namespace of the node</text>
+  <text class="code" x="410" y="79" text-anchor="middle">hostNetwork: true</text>
+  <rect class="ok" x="30" y="124" width="260" height="44" rx="8"/>
+  <text x="160" y="151" text-anchor="middle">Own PID namespace</text>
+  <rect class="drop" x="530" y="124" width="280" height="44" rx="8"/>
+  <text x="670" y="151" text-anchor="middle">PID namespace of the node</text>
+  <text class="code" x="410" y="139" text-anchor="middle">hostPID: true</text>
+  <rect class="ok" x="30" y="184" width="260" height="44" rx="8"/>
+  <text x="160" y="211" text-anchor="middle">Own IPC namespace</text>
+  <rect class="drop" x="530" y="184" width="280" height="44" rx="8"/>
+  <text x="670" y="211" text-anchor="middle">IPC namespace of the node</text>
+  <text class="code" x="410" y="199" text-anchor="middle">hostIPC: true</text>
+  <rect class="ok" x="30" y="244" width="260" height="44" rx="8"/>
+  <text x="160" y="271" text-anchor="middle">Files from the image</text>
+  <rect class="drop" x="530" y="244" width="280" height="44" rx="8"/>
+  <text x="670" y="271" text-anchor="middle">Files and directories of the node</text>
+  <text class="code" x="410" y="259" text-anchor="middle">hostPath</text>
+  <rect class="ok" x="30" y="304" width="260" height="44" rx="8"/>
+  <text x="160" y="331" text-anchor="middle">No node devices, few capabilities</text>
+  <rect class="drop" x="530" y="304" width="280" height="44" rx="8"/>
+  <text x="670" y="331" text-anchor="middle">Node devices, almost all capabilities</text>
+  <text class="code" x="410" y="319" text-anchor="middle">privileged: true</text>
+</svg>

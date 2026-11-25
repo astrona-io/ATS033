@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 400" width="840" height="400" role="img" aria-labelledby="title desc">
+  <title id="title">The layers to remove when access ends</title>
+  <desc id="desc">On the host, group membership, the sudoers rule, the SSH public key and the account itself each give access and must each be removed. In the cluster, deleting the RoleBinding ends the access, and an existing token with no binding can do nothing.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <!-- Lines first, so the boxes sit on top. -->
+  <rect class="frame" x="20" y="40" width="800" height="210" rx="10"/>
+  <text class="label" x="36" y="32">Host: the node</text>
+  <rect class="frame" x="20" y="290" width="800" height="100" rx="10"/>
+  <text class="label" x="36" y="282">Cluster: the Kubernetes API</text>
+
+  <path class="dashed" d="M250 78 H298" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M250 124 H298" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M250 170 H298" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M250 216 H298" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M250 320 H298" marker-end="url(#arrowbad)"/>
+
+  <rect class="box" x="40" y="58" width="210" height="40" rx="8"/>
+  <text x="145" y="83" text-anchor="middle">Group membership</text>
+  <text class="code" x="310" y="83">gpasswd --delete training-reader training-readers</text>
+
+  <rect class="box" x="40" y="104" width="210" height="40" rx="8"/>
+  <text x="145" y="129" text-anchor="middle">sudoers rule</text>
+  <text x="310" y="129">Delete its file in <tspan class="code">/etc/sudoers.d</tspan></text>
+
+  <rect class="box" x="40" y="150" width="210" height="40" rx="8"/>
+  <text x="145" y="175" text-anchor="middle">SSH public key</text>
+  <text x="310" y="175">Remove it from <tspan class="code">~/.ssh/authorized_keys</tspan></text>
+
+  <rect class="box" x="40" y="196" width="210" height="40" rx="8"/>
+  <text x="145" y="221" text-anchor="middle">Account and sessions</text>
+  <text class="code" x="310" y="221">usermod --lock, loginctl terminate-user, userdel</text>
+
+  <rect class="box" x="40" y="300" width="210" height="40" rx="8"/>
+  <text x="145" y="325" text-anchor="middle">RoleBinding</text>
+  <text class="code" x="310" y="325">kubectl delete rolebinding probe-reader-pod-reader</text>
+
+  <rect class="ask" x="40" y="346" width="210" height="36" rx="8"/>
+  <text x="145" y="369" text-anchor="middle">Existing token</text>
+  <text x="310" y="369">Valid until it expires, but with no binding it can do nothing</text>
+</svg>

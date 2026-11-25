@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 400" width="840" height="400" role="img" aria-labelledby="title desc">
+  <title id="title">One Ingress controller as the single entry point</title>
+  <desc id="desc">A client connects on port 443 to the Ingress controller, the only published workload. The controller sends host scout.example.test to the scout Service and host probe.example.test to the probe Service, and both Services stay ClusterIP. An old NodePort Service still opens a path to the probe pods that bypasses the Ingress rules.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="okline" d="M150 175 H218" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M400 175 H420 V84 H638" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M420 175 V193 H638" marker-end="url(#arrowok)"/>
+  <path class="line" d="M730 216 V288" marker-end="url(#arrow)"/>
+  <path class="dashed" d="M90 200 V325 H218" marker-end="url(#arrowbad)"/>
+  <path class="dashed" d="M400 325 H638" marker-end="url(#arrowbad)"/>
+
+  <rect class="frame" x="200" y="30" width="630" height="350" rx="10"/>
+  <text class="label" x="216" y="52">cluster</text>
+
+  <text class="label" x="184" y="162" text-anchor="middle">443</text>
+  <text class="code" x="432" y="76">host: scout.example.test</text>
+  <text class="code" x="432" y="185">host: probe.example.test</text>
+  <text class="label" x="100" y="270">node port</text>
+  <text class="label bad" x="520" y="315" text-anchor="middle">bypasses the Ingress rules</text>
+
+  <rect class="box" x="30" y="150" width="120" height="50" rx="8"/>
+  <text x="90" y="180" text-anchor="middle">client</text>
+
+  <rect class="ask" x="220" y="147" width="180" height="56" rx="8"/>
+  <text x="310" y="171" text-anchor="middle">Ingress controller</text>
+  <text class="label" x="310" y="191" text-anchor="middle">one published Service</text>
+
+  <rect class="ok" x="640" y="61" width="180" height="46" rx="8"/>
+  <text x="730" y="89" text-anchor="middle">Service <tspan class="code">scout</tspan></text>
+  <rect class="ok" x="640" y="170" width="180" height="46" rx="8"/>
+  <text x="730" y="198" text-anchor="middle">Service <tspan class="code">probe</tspan></text>
+  <rect class="box" x="640" y="290" width="180" height="46" rx="8"/>
+  <text x="730" y="318" text-anchor="middle"><tspan class="code">probe</tspan> pods</text>
+
+  <rect class="drop" x="220" y="300" width="180" height="50" rx="8"/>
+  <text x="310" y="330" text-anchor="middle">old <tspan class="code">NodePort</tspan> Service</text>
+</svg>

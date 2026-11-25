@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 250" width="840" height="250" role="img" aria-labelledby="title desc">
+  <title id="title">What kubectl auth can-i does</title>
+  <desc id="desc">kubectl auth can-i sends a SelfSubjectAccessReview to kube-apiserver. The RBAC authorizer reads the Roles, ClusterRoles and bindings of the identity and sends back yes or no. Nothing in the cluster is created or changed.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="line" d="M200 115 H463" marker-end="url(#arrow)"/>
+  <path class="line" d="M463 145 H202" marker-end="url(#arrow)"/>
+  <path class="line" d="M625 130 H648" marker-end="url(#arrow)"/>
+
+  <text class="code" x="320" y="105" text-anchor="middle">SelfSubjectAccessReview</text>
+  <text class="label" x="320" y="167" text-anchor="middle">yes or no</text>
+
+  <rect class="box" x="20" y="100" width="180" height="60" rx="8"/>
+  <text class="code" x="110" y="126" text-anchor="middle">kubectl auth can-i</text>
+  <text class="code label" x="110" y="146" text-anchor="middle">--as  -n  --list</text>
+
+  <rect class="frame" x="440" y="30" width="390" height="190" rx="10"/>
+  <text class="label" x="456" y="54">inside <tspan class="code">kube-apiserver</tspan></text>
+  <rect class="ask" x="465" y="100" width="160" height="60" rx="8"/>
+  <text x="545" y="126" text-anchor="middle">RBAC</text>
+  <text x="545" y="146" text-anchor="middle">authorizer</text>
+  <rect class="box" x="650" y="100" width="160" height="60" rx="8"/>
+  <text x="730" y="126" text-anchor="middle">Roles, ClusterRoles</text>
+  <text x="730" y="146" text-anchor="middle">and bindings</text>
+  <text class="label" x="456" y="204">Nothing in the cluster is created or changed.</text>
+</svg>

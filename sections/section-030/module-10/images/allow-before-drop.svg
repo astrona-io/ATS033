@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 300" width="840" height="300" role="img" aria-labelledby="title desc">
+  <title id="title">Allow rule before the drop rule</title>
+  <desc id="desc">A packet to TCP port 22 from 10.0.5.0/24 matches rule 1, ACCEPT, and is delivered. A packet to port 22 from any other source does not match rule 1, matches rule 2, DROP, and is discarded.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="okline" d="M210 70 H318" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M560 80 H648" marker-end="url(#arrowok)"/>
+  <text class="label good" x="604" y="70" text-anchor="middle">match</text>
+  <path class="line" d="M210 210 H260 V96 H318" marker-end="url(#arrow)"/>
+  <text class="label" x="268" y="170">no match</text>
+  <path class="line" d="M440 110 V184" marker-end="url(#arrow)"/>
+  <path class="dashed" d="M560 214 H648" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="604" y="204" text-anchor="middle">match</text>
+  <rect class="box" x="30" y="46" width="180" height="48" rx="8"/>
+  <text x="120" y="68" text-anchor="middle">from <tspan class="code">10.0.5.0/24</tspan></text>
+  <text x="120" y="86" text-anchor="middle" class="label">to port 22</text>
+  <rect class="box" x="30" y="186" width="180" height="48" rx="8"/>
+  <text x="120" y="208" text-anchor="middle">from any other address</text>
+  <text x="120" y="226" text-anchor="middle" class="label">to port 22</text>
+  <rect class="ask" x="320" y="50" width="240" height="60" rx="8"/>
+  <text x="440" y="74" text-anchor="middle" class="strong">rule 1: ACCEPT</text>
+  <text x="440" y="96" text-anchor="middle" class="code">--source 10.0.5.0/24</text>
+  <rect class="ask" x="320" y="186" width="240" height="56" rx="8"/>
+  <text x="440" y="208" text-anchor="middle" class="strong">rule 2: DROP</text>
+  <text x="440" y="229" text-anchor="middle" class="code">--dport 22</text>
+  <rect class="ok" x="650" y="56" width="160" height="48" rx="8"/>
+  <text x="730" y="85" text-anchor="middle">delivered</text>
+  <rect class="drop" x="650" y="190" width="160" height="48" rx="8"/>
+  <text x="730" y="219" text-anchor="middle">discarded</text>
+  <text class="label" x="30" y="280">If rule 2 came first, it would match both packets and rule 1 would never be checked.</text>
+</svg>

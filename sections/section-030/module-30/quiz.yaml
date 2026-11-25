@@ -1,0 +1,260 @@
+# Module quiz for section 030, module 03. Contract:
+# scripts/ci/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-030-03
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-030/module-30
+  title: Restrict Access To The API Server And Control-Plane Ports
+questions:
+- id: ats033-030-03-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Match the etcd peer port to the only callers that need it.
+  source_readings:
+  - sections/section-030/module-30/course-010-control-plane-ports-and-listeners.md
+  - sections/section-030/module-30/course-040-etcd-client-access.md
+  prompt: You write a firewall rule for port 2380 on a control-plane node. Which callers should the rule allow?
+  options:
+  - id: a
+    text: The API servers only.
+    explanation: The API servers use the client port 2379, not the peer port.
+  - id: b
+    text: All worker nodes, so that kubelets can read their pods.
+    explanation: Kubelets talk to the API server, not to etcd.
+  - id: c
+    text: The other etcd members only.
+    explanation: Correct. Port 2380 is the etcd peer port.
+  - id: d
+    text: The monitoring system and the API servers.
+    explanation: Monitoring is an expected caller of the kubelet port 10250, not of 2380.
+  correct_option: c
+  explanation: Port 2379 is for the API servers, and port 2380 is for the other etcd members. No user, node or pod needs either.
+- id: ats033-030-03-q02
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Fix a control-plane component that listens on a wider address than its job needs.
+  source_readings:
+  - sections/section-030/module-30/course-010-control-plane-ports-and-listeners.md
+  prompt: On a kubeadm control-plane node, `sudo ss -tlnp` shows `*:10259` for `kube-scheduler`. What is the correct fix?
+  options:
+  - id: a
+    text: Run `kubectl edit` on the scheduler Deployment in `kube-system` and wait for a rollout.
+    explanation: In a kubeadm cluster the scheduler is a static pod, started from a manifest file, not a Deployment.
+  - id: b
+    text: Set `--bind-address=127.0.0.1` in `/etc/kubernetes/manifests/kube-scheduler.yaml`; the kubelet restarts the static pod by itself.
+    explanation: Correct. Keep a copy of the manifest outside the manifests directory before you edit it.
+  - id: c
+    text: Nothing, because a firewall rule already protects every port.
+    explanation: A wildcard listener stays open to everything a firewall allows later. Check the bind address as well.
+  - id: d
+    text: Restart the scheduler with `systemctl restart kube-scheduler`.
+    explanation: The scheduler runs as a static pod, and a restart does not change its flag.
+  correct_option: b
+  explanation: A wildcard address for the scheduler is a finding, because its port gives metrics to any caller that reaches it.
+- id: ats033-030-03-q03
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Determine which value applies when a flag is missing from a static pod manifest.
+  source_readings:
+  - sections/section-030/module-30/course-020-api-server-authentication-and-authorization.md
+  prompt: "`sudo grep -E 'anonymous-auth|authorization-mode' /etc/kubernetes/manifests/kube-apiserver.yaml` prints only `--authorization-mode=Node,RBAC`. How does the API server treat a request without credentials?"
+  options:
+  - id: a
+    text: It rejects the request with status 401, because the flag is not set.
+    explanation: A 401 for every anonymous request needs `--anonymous-auth=false`.
+  - id: b
+    text: It allows the request, because RBAC has no rule for it.
+    explanation: A request that no authorizer allows is denied.
+  - id: c
+    text: It closes the TLS connection before reading the request.
+    explanation: The API server answers anonymous requests with an HTTP status.
+  - id: d
+    text: It uses the default `true`, treats the caller as `system:anonymous`, and lets authorization decide.
+    explanation: Correct. A missing flag means the default applies.
+  correct_option: d
+  explanation: "`--anonymous-auth` defaults to `true`. The caller becomes `system:anonymous` in the group `system:unauthenticated`."
+- id: ats033-030-03-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain why an anonymous request to /version succeeds on a default cluster.
+  source_readings:
+  - sections/section-030/module-30/course-020-api-server-authentication-and-authorization.md
+  prompt: "`curl --insecure` without credentials to `https://10.0.2.15:6443/version` returns the version document. Which part of the cluster allows this request?"
+  options:
+  - id: a
+    text: The ClusterRole `system:public-info-viewer`, which a built-in binding grants to the group `system:unauthenticated`.
+    explanation: Correct. It allows `/healthz`, `/livez`, `/readyz` and `/version`, and nothing else.
+  - id: b
+    text: The `Node` authorizer, which allows every request from a node address.
+    explanation: The `Node` authorizer allows each kubelet to read what its own pods need. It does not allow by address.
+  - id: c
+    text: The option `--insecure`, which sends the credentials of the administrator.
+    explanation: "`--insecure` only skips the certificate check of the server. It sends no credential."
+  - id: d
+    text: The mode `AlwaysAllow`, which kubeadm sets by default.
+    explanation: A kubeadm cluster uses `Node,RBAC`.
+  correct_option: a
+  explanation: Any other binding that names `system:anonymous` or `system:unauthenticated` is a finding.
+- id: ats033-030-03-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Choose a valid way to test what the anonymous user may do.
+  source_readings:
+  - sections/section-030/module-30/course-020-api-server-authentication-and-authorization.md
+  prompt: "`kubectl auth can-i list namespaces --as=system:anonymous` prints a `Forbidden` error about `selfsubjectaccessreviews`. What does this tell you?"
+  options:
+  - id: a
+    text: Anonymous access is disabled on the API server.
+    explanation: The error comes from RBAC, which means the anonymous user was accepted at authentication.
+  - id: b
+    text: The command cannot answer for this user, because the anonymous user may not create a SelfSubjectAccessReview; send a real request such as `kubectl get namespaces --as=system:anonymous`.
+    explanation: Correct. Test anonymous access with a real request and read the bindings.
+  - id: c
+    text: The anonymous user may list namespaces.
+    explanation: The error does not answer the question about namespaces at all.
+  - id: d
+    text: Impersonation is not allowed for the administrator.
+    explanation: The `--as` option works. The forbidden step is the review request sent as the anonymous user.
+  correct_option: b
+  explanation: "`kubectl auth can-i` sends a SelfSubjectAccessReview as the impersonated user, and `system:anonymous` cannot create one."
+- id: ats033-030-03-q06
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Identify what can break when anonymous authentication is turned off on the API server.
+  source_readings:
+  - sections/section-030/module-30/course-020-api-server-authentication-and-authorization.md
+  prompt: You plan to set `--anonymous-auth=false` on the API server. Which two things should you check first?
+  options:
+  - id: a
+    text: The kubelet `readOnlyPort` and the etcd peer certificates.
+    explanation: Neither depends on anonymous access to the API server.
+  - id: b
+    text: The `kube-proxy` mode and the NodePort range.
+    explanation: These do not call the API server without credentials.
+  - id: c
+    text: Load balancer health checks that call `/healthz` without credentials, and `kubeadm join`, which reads the ConfigMap `cluster-info` in `kube-public` without credentials.
+    explanation: Correct. Both stop working when anonymous requests get 401.
+  - id: d
+    text: All RBAC Roles in every namespace, because they stop working.
+    explanation: RBAC keeps working for authenticated callers.
+  correct_option: c
+  explanation: The change removes anonymous access, and it has a cost for callers that use it on purpose.
+- id: ats033-030-03-q07
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Evaluate a kubelet configuration where only one of the two settings is safe.
+  source_readings:
+  - sections/section-030/module-30/course-030-kubelet-api-authentication-and-authorization.md
+  prompt: 'A kubelet has `authentication.anonymous.enabled: false` and `authorization.mode: AlwaysAllow`. Who can use the kubelet API path `/run` on port 10250?'
+  options:
+  - id: a
+    text: Nobody, because anonymous access is off.
+    explanation: Anonymous access off stops callers without credentials only.
+  - id: b
+    text: Only the API server, because it holds the cluster certificate.
+    explanation: "`AlwaysAllow` does not check which authenticated caller sends the request."
+  - id: c
+    text: Only callers with a ClusterRole that allows `nodes/proxy`.
+    explanation: 'RBAC applies to kubelet requests only with `authorization.mode: Webhook`.'
+  - id: d
+    text: Every caller with any valid credential, because `AlwaysAllow` allows every authenticated request.
+    explanation: Correct. The two settings protect different steps, so both must be safe.
+  correct_option: d
+  explanation: Set anonymous access to `false` and the mode to `Webhook`, so that RBAC decides each request.
+- id: ats033-030-03-q08
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Read the result of a kubelet repair from status codes.
+  source_readings:
+  - sections/section-030/module-30/course-030-kubelet-api-authentication-and-authorization.md
+  prompt: Before the repair, `curl -sk -o /dev/null -w '%{http_code}' https://127.0.0.1:10250/pods` printed `200`. After the repair and `systemctl restart kubelet`, it prints `401`, and the node is `Ready`. What does this show?
+  options:
+  - id: a
+    text: The kubelet rejects callers without credentials, and the API server still reaches it with a client certificate that the kubelet trusts.
+    explanation: Correct. 401 means authentication refused the caller.
+  - id: b
+    text: The kubelet is down, and `Ready` is an old value.
+    explanation: A stopped kubelet would not answer with an HTTP status.
+  - id: c
+    text: The caller is known but not allowed to read `/pods`.
+    explanation: That would be 403. A 401 means the caller is not authenticated.
+  - id: d
+    text: The restart was not needed, because the kubelet reads the file on every request.
+    explanation: The kubelet reads its configuration file only at start.
+  correct_option: a
+  explanation: The `curl` request carries no certificate or token, so the kubelet now refuses it at authentication.
+- id: ats033-030-03-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Prevent a monitoring failure when the kubelet switches to Webhook authorization.
+  source_readings:
+  - sections/section-030/module-30/course-030-kubelet-api-authentication-and-authorization.md
+  prompt: 'After a kubelet changes to `authorization.mode: Webhook`, a monitoring system that scrapes `/metrics` with a token gets 403. What fixes it?'
+  options:
+  - id: a
+    text: Set `authentication.anonymous.enabled` back to `true`.
+    explanation: The scraper already sends a token, and this would open the kubelet to every caller.
+  - id: b
+    text: Set `readOnlyPort` to `10255` for the scraper.
+    explanation: That opens an unauthenticated read-only port, which is a new exposure.
+  - id: c
+    text: Grant the scraper a ClusterRole that allows `get` on `nodes/metrics`.
+    explanation: Correct. `Webhook` applies RBAC to `nodes/metrics`, so the scraper needs that permission.
+  - id: d
+    text: Restart the kubelet again.
+    explanation: A 403 is an authorization result. A restart does not change RBAC.
+  correct_option: c
+  explanation: Grant the role before the change, so the scraper keeps working.
+- id: ats033-030-03-q10
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Interpret curl exit statuses for a connection to etcd without a client certificate.
+  source_readings:
+  - sections/section-030/module-30/course-040-etcd-client-access.md
+  prompt: On the node, `curl -s https://127.0.0.1:2379/health` exits with status 60. With `-k` added, it exits with status 56. What do the two results show?
+  options:
+  - id: a
+    text: etcd is not running, so both connections failed.
+    explanation: The different statuses show that a TLS server answered on the port.
+  - id: b
+    text: Status 60 means curl could not check the server certificate from the separate etcd authority; status 56 means etcd ended the TLS handshake because the client sent no certificate.
+    explanation: Correct. Client certificate authentication is on.
+  - id: c
+    text: Client certificate authentication is off, because the server answered.
+    explanation: If it were off, a request with `-k` would return data.
+  - id: d
+    text: The firewall dropped both requests.
+    explanation: Both errors come from the TLS step, so the requests reached etcd.
+  correct_option: b
+  explanation: A request with the kubeadm health check certificate returns `{"health":"true","reason":""}`, which confirms that etcd accepts only clients with a trusted certificate.
+- id: ats033-030-03-q11
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Explain why direct access to etcd bypasses the controls of the API server.
+  source_readings:
+  - sections/section-030/module-30/course-040-etcd-client-access.md
+  prompt: A copy of the API server etcd client key is found on a backup server. Why is this a serious finding even though RBAC is configured correctly?
+  options:
+  - id: a
+    text: The key lets its holder read the kubelet API on every node.
+    explanation: The etcd client key is for etcd, not for the kubelet.
+  - id: b
+    text: The key only allows reads of the health endpoint, so the risk is small.
+    explanation: The API server client key gives full access to the database.
+  - id: c
+    text: RBAC also applies to etcd, so the key alone is not enough.
+    explanation: RBAC runs inside the API server. etcd does not check it.
+  - id: d
+    text: The holder can read and write every object, including every Secret, without passing the API server, so no RBAC rule, admission check or audit log applies.
+    explanation: Correct. Each additional holder of the key is a second place from which the database can be read.
+  correct_option: d
+  explanation: Keep the list of etcd callers as short as possible, and do not share the API server client key.
+placement:
+  position: after
+  reading: sections/section-030/module-30/course-100-summary.md

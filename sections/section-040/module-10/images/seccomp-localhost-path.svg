@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 330" width="840" height="330" role="img" aria-labelledby="title desc">
+  <title id="title">Where a Localhost seccomp profile lives</title>
+  <desc id="desc">The file block-mkdir.json is copied with podman cp from your machine into /var/lib/kubelet/seccomp/profiles on the node container. The kubelet seccomp directory is /var/lib/kubelet/seccomp, so the pod sets localhostProfile to profiles/block-mkdir.json, the path relative to that directory.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M210 150 H318" marker-end="url(#arrow)"/>
+  <text class="label code" x="252" y="140" text-anchor="middle">podman cp</text>
+  <path class="okline" d="M575 255 V200" marker-end="url(#arrowok)"/>
+
+  <rect class="box" x="30" y="120" width="180" height="60" rx="8"/>
+  <text x="120" y="144" text-anchor="middle">your machine</text>
+  <text class="code" x="120" y="166" text-anchor="middle">block-mkdir.json</text>
+
+  <rect class="frame" x="300" y="30" width="510" height="290" rx="10"/>
+  <text class="label code" x="315" y="52">astro-ats-033-playground-040-01-control-plane</text>
+  <rect class="ask" x="320" y="75" width="470" height="44" rx="8"/>
+  <text x="335" y="102">kubelet seccomp directory</text>
+  <text class="code" x="560" y="102">/var/lib/kubelet/seccomp/</text>
+  <rect class="ok" x="320" y="130" width="470" height="68" rx="8"/>
+  <text x="335" y="158">profile file</text>
+  <text class="code" x="440" y="158">/var/lib/kubelet/seccomp/</text>
+  <text class="code strong" x="440" y="180">profiles/block-mkdir.json</text>
+
+  <rect class="box" x="320" y="257" width="470" height="48" rx="8"/>
+  <text x="335" y="286">pod</text>
+  <text class="code" x="380" y="286">localhostProfile: profiles/block-mkdir.json</text>
+</svg>

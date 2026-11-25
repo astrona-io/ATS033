@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 270" width="840" height="270" role="img" aria-labelledby="title desc">
+  <title id="title">Change a running sshd safely</title>
+  <desc id="desc">Step 1: sshd -t checks the syntax. Step 2: systemctl reload ssh.service makes the running daemon read its files and keeps open sessions. Step 3: a new test login from a second session. The first session stays open during all three steps.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="okline" d="M230 85 H266" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M550 85 H586" marker-end="url(#arrowok)"/>
+  <rect class="ask" x="30" y="50" width="200" height="70" rx="8"/>
+  <text class="strong" x="130" y="78" text-anchor="middle">1. <tspan class="code">sshd -t</tspan></text>
+  <text x="130" y="100" text-anchor="middle">check the syntax</text>
+  <rect class="box" x="270" y="50" width="280" height="70" rx="8"/>
+  <text class="strong" x="410" y="78" text-anchor="middle">2. <tspan class="code">systemctl reload ssh.service</tspan></text>
+  <text x="410" y="100" text-anchor="middle">read the files, keep open sessions</text>
+  <rect class="ok" x="590" y="50" width="220" height="70" rx="8"/>
+  <text class="strong" x="700" y="78" text-anchor="middle">3. new test login</text>
+  <text x="700" y="100" text-anchor="middle">from a second session</text>
+  <rect class="frame" x="30" y="160" width="780" height="44" rx="8"/>
+  <text x="420" y="187" text-anchor="middle">The first session stays open during all three steps.</text>
+  <text x="30" y="245">If a step fails, repair the files from the first session.</text>
+</svg>

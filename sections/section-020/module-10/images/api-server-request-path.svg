@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 250" width="840" height="250" role="img" aria-labelledby="title desc">
+  <title id="title">Every request passes authentication, authorization and the audit policy</title>
+  <desc id="desc">A caller sends a request to the API server. The API server checks who the caller is, then whether RBAC allows the action, then the audit policy chooses a level, and the API server writes an entry to the audit log file.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <!-- Lines first, so the boxes sit on top. -->
+  <rect class="frame" x="165" y="60" width="490" height="110" rx="10"/>
+  <text class="label" x="181" y="52">API server (<tspan class="code">kube-apiserver</tspan>)</text>
+
+  <path class="line" d="M140 115 H183" marker-end="url(#arrow)"/>
+  <path class="line" d="M325 115 H343" marker-end="url(#arrow)"/>
+  <path class="line" d="M485 115 H503" marker-end="url(#arrow)"/>
+  <path class="okline" d="M645 115 H688" marker-end="url(#arrowok)"/>
+
+  <rect class="box" x="20" y="90" width="120" height="50" rx="8"/>
+  <text x="80" y="120" text-anchor="middle">Caller</text>
+
+  <rect class="ask" x="185" y="87" width="140" height="56" rx="8"/>
+  <text x="255" y="111" text-anchor="middle">authentication</text>
+  <text class="label" x="255" y="130" text-anchor="middle">who is it?</text>
+
+  <rect class="ask" x="345" y="87" width="140" height="56" rx="8"/>
+  <text x="415" y="111" text-anchor="middle">authorization</text>
+  <text class="label" x="415" y="130" text-anchor="middle">RBAC: allowed?</text>
+
+  <rect class="policy" x="505" y="87" width="140" height="56" rx="8"/>
+  <text x="575" y="111" text-anchor="middle">audit policy</text>
+  <text class="label" x="575" y="130" text-anchor="middle">which level?</text>
+
+  <rect class="ok" x="690" y="90" width="130" height="50" rx="8"/>
+  <text x="755" y="120" text-anchor="middle">audit log</text>
+
+  <text class="code" x="575" y="194" text-anchor="middle">--audit-policy-file</text>
+  <text class="code" x="755" y="194" text-anchor="middle">--audit-log-path</text>
+  <text class="label" x="410" y="228" text-anchor="middle">Levels: None, Metadata, Request, RequestResponse</text>
+</svg>

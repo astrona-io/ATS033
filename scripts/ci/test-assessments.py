@@ -9,7 +9,7 @@ import jsonschema
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-BANK = 'sections/section-020/module-01/quiz.yaml'
+BANK = 'sections/section-010/module-10/quiz.yaml'
 spec = importlib.util.spec_from_file_location('assessments', Path(__file__).with_name('check-assessments.py'))
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
@@ -23,7 +23,7 @@ class AssessmentTests(unittest.TestCase):
         self.addCleanup(work.cleanup)
         self.root = Path(work.name)
         shutil.copy(ROOT / 'astrona.yaml', self.root)
-        for folder in ('schemas', 'assessments', 'sections'):
+        for folder in ('sections',):
             shutil.copytree(ROOT / folder, self.root / folder,
                             ignore=shutil.ignore_patterns('labs', 'playground'))
 
@@ -70,13 +70,6 @@ class AssessmentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'question_count in astrona.yaml'):
             module.validate(self.root)
 
-    def test_stale_index_count(self):
-        index = self.load('assessments/index.yaml')
-        next(b for b in index['banks'] if b['path'] == BANK)['question_count'] += 1
-        self.save('assessments/index.yaml', index)
-        with self.assertRaisesRegex(ValueError, 'assessments/index.yaml'):
-            module.validate(self.root)
-
     def test_duplicate_id(self):
         bank = self.load(BANK)
         bank['questions'][1]['id'] = bank['questions'][0]['id']
@@ -86,7 +79,7 @@ class AssessmentTests(unittest.TestCase):
 
     def test_unknown_bank(self):
         shutil.copy(self.root / BANK, self.root / 'sections/extra-quiz.yaml')
-        with self.assertRaisesRegex(ValueError, 'neither registered nor indexed'):
+        with self.assertRaisesRegex(ValueError, 'not registered'):
             module.validate(self.root)
 
     def test_schema_bank_size(self):

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 330" width="840" height="330" role="img" aria-labelledby="title desc">
+  <title id="title">A seccomp filter checks every syscall</title>
+  <desc id="desc">A process in the container makes a syscall. The kernel checks it against the seccomp filter. SCMP_ACT_ALLOW runs the call, SCMP_ACT_ERRNO makes the call fail with an error code while the process keeps running, and SCMP_ACT_LOG runs the call and records it. A syscall that no rule names gets the default action.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M190 165 H268" marker-end="url(#arrow)"/>
+  <text class="label" x="222" y="155" text-anchor="middle">syscall</text>
+  <path class="okline" d="M470 150 C 520 150, 520 70, 568 70" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M470 165 H568" marker-end="url(#arrowbad)"/>
+  <path class="line" d="M470 180 C 520 180, 520 260, 568 260" marker-end="url(#arrow)"/>
+
+  <rect class="box" x="30" y="135" width="160" height="60" rx="8"/>
+  <text x="110" y="160" text-anchor="middle">process in</text>
+  <text x="110" y="180" text-anchor="middle">the container</text>
+
+  <rect class="frame" x="250" y="40" width="240" height="250" rx="10"/>
+  <text class="label" x="265" y="62">kernel</text>
+  <rect class="ask" x="270" y="125" width="200" height="80" rx="8"/>
+  <text class="strong" x="370" y="152" text-anchor="middle">seccomp filter</text>
+  <text x="370" y="174" text-anchor="middle">rule for this syscall,</text>
+  <text x="370" y="192" text-anchor="middle">or the default action</text>
+
+  <rect class="ok" x="570" y="40" width="240" height="60" rx="8"/>
+  <text class="code" x="690" y="64" text-anchor="middle">SCMP_ACT_ALLOW</text>
+  <text x="690" y="86" text-anchor="middle">the call runs</text>
+  <rect class="drop" x="570" y="135" width="240" height="60" rx="8"/>
+  <text class="code" x="690" y="159" text-anchor="middle">SCMP_ACT_ERRNO</text>
+  <text x="690" y="181" text-anchor="middle">the call fails, process runs on</text>
+  <rect class="box" x="570" y="230" width="240" height="60" rx="8"/>
+  <text class="code" x="690" y="254" text-anchor="middle">SCMP_ACT_LOG</text>
+  <text x="690" y="276" text-anchor="middle">the call runs and is recorded</text>
+</svg>

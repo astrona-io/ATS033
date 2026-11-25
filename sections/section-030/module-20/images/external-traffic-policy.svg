@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 420" width="840" height="420" role="img" aria-labelledby="title desc">
+  <title id="title">externalTrafficPolicy Cluster compared with Local</title>
+  <desc id="desc">With Cluster, both nodes accept the request. The control-plane node has no probe pod, so it forwards the request to the worker node and replaces the source address with its own (SNAT), and the application sees the node address. With Local, the worker node forwards the request to its own probe pod and keeps the client address, and the control-plane node drops the request because it has no ready pod.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <line class="sep" x1="420" y1="20" x2="420" y2="400"/>
+  <text class="strong" x="210" y="36" text-anchor="middle">Cluster (the default)</text>
+  <path class="okline" d="M240 100 L310 158" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M315 216 V288" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M180 100 L110 158" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M105 216 V312 H228" marker-end="url(#arrowok)"/>
+  <text class="label" x="160" y="356" text-anchor="middle">forwards to the other node, with SNAT</text>
+  <rect class="box" x="140" y="56" width="140" height="44" rx="8"/>
+  <text x="210" y="83" text-anchor="middle">client</text>
+  <rect class="box" x="20" y="160" width="170" height="56" rx="8"/>
+  <text x="105" y="184" text-anchor="middle">control-plane node</text>
+  <text class="label" x="105" y="204" text-anchor="middle">no <tspan class="code">probe</tspan> pod</text>
+  <rect class="box" x="230" y="160" width="170" height="56" rx="8"/>
+  <text x="315" y="184" text-anchor="middle">worker node</text>
+  <text class="label" x="315" y="204" text-anchor="middle">runs <tspan class="code">probe</tspan> pods</text>
+  <rect class="ok" x="230" y="290" width="170" height="44" rx="8"/>
+  <text x="315" y="317" text-anchor="middle"><tspan class="code">probe</tspan> pod</text>
+  <text x="210" y="396" text-anchor="middle">The application sees the node address.</text>
+  <text class="strong" x="630" y="36" text-anchor="middle">Local</text>
+  <path class="okline" d="M660 100 L730 158" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M735 216 V288" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M600 100 L530 158" marker-end="url(#arrowbad)"/>
+  <text class="label good" x="727" y="258" text-anchor="end">keeps client IP</text>
+  <text class="label bad" x="525" y="240" text-anchor="middle">drops: no ready pod</text>
+  <rect class="box" x="560" y="56" width="140" height="44" rx="8"/>
+  <text x="630" y="83" text-anchor="middle">client</text>
+  <rect class="drop" x="440" y="160" width="170" height="56" rx="8"/>
+  <text x="525" y="184" text-anchor="middle">control-plane node</text>
+  <text class="label" x="525" y="204" text-anchor="middle">no <tspan class="code">probe</tspan> pod</text>
+  <rect class="box" x="650" y="160" width="170" height="56" rx="8"/>
+  <text x="735" y="184" text-anchor="middle">worker node</text>
+  <text class="label" x="735" y="204" text-anchor="middle">runs <tspan class="code">probe</tspan> pods</text>
+  <rect class="ok" x="650" y="290" width="170" height="44" rx="8"/>
+  <text x="735" y="317" text-anchor="middle"><tspan class="code">probe</tspan> pod</text>
+  <text x="630" y="396" text-anchor="middle">The application sees the client address.</text>
+</svg>
