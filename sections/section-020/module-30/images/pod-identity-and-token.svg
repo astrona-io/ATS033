@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 360" width="860" height="360" role="img" aria-labelledby="title desc">
+  <title id="title">How a pod gets its identity and token</title>
+  <desc id="desc">The pod spec names a ServiceAccount in serviceAccountName. The kubelet writes the token, ca.crt and namespace files for that ServiceAccount into /var/run/secrets/kubernetes.io/serviceaccount in the container. A process sends the token to the API server as a bearer token, and the API server treats the caller as system:serviceaccount:starfleet:default.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M170 75 H348" marker-end="url(#arrow)"/>
+  <text class="label code" x="260" y="66" text-anchor="middle">serviceAccountName</text>
+  <path class="line" d="M435 100 V150 H110 V208" marker-end="url(#arrow)"/>
+  <text class="label" x="272" y="142" text-anchor="middle">identity for</text>
+  <path class="line" d="M190 252 H253" marker-end="url(#arrow)"/>
+  <text class="label" x="214" y="274" text-anchor="middle">writes</text>
+  <path class="line" d="M305 274 V318 H740 V144" marker-end="url(#arrow)"/>
+  <text class="label" x="530" y="338" text-anchor="middle">bearer token in each API request</text>
+
+  <rect class="box" x="30" y="50" width="140" height="50" rx="8"/>
+  <text x="100" y="80" text-anchor="middle">Pod spec</text>
+  <rect class="box" x="350" y="50" width="170" height="50" rx="8"/>
+  <text x="435" y="80" text-anchor="middle">ServiceAccount</text>
+  <rect class="box" x="640" y="40" width="200" height="102" rx="8"/>
+  <text class="strong" x="740" y="64" text-anchor="middle">API server</text>
+  <text x="740" y="86" text-anchor="middle">treats the caller as</text>
+  <text class="code" x="740" y="108" text-anchor="middle">system:serviceaccount:</text>
+  <text class="code" x="740" y="126" text-anchor="middle">starfleet:default</text>
+  <rect class="box" x="30" y="210" width="160" height="50" rx="8"/>
+  <text x="110" y="240" text-anchor="middle">kubelet</text>
+
+  <rect class="frame" x="240" y="170" width="380" height="130" rx="10"/>
+  <text class="label" x="255" y="190">container in the pod</text>
+  <text class="code" x="255" y="214">/var/run/secrets/kubernetes.io/serviceaccount</text>
+  <rect class="ask" x="255" y="232" width="100" height="40" rx="6"/>
+  <text class="code" x="305" y="257" text-anchor="middle">token</text>
+  <rect class="box" x="370" y="232" width="100" height="40" rx="6"/>
+  <text class="code" x="420" y="257" text-anchor="middle">ca.crt</text>
+  <rect class="box" x="485" y="232" width="120" height="40" rx="6"/>
+  <text class="code" x="545" y="257" text-anchor="middle">namespace</text>
+</svg>
