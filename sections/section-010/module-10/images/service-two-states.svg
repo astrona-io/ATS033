@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 330" width="840" height="330" role="img" aria-labelledby="title desc">
+  <title id="title">Active state and enabled state of a service</title>
+  <desc id="desc">Two separate facts describe a service. Active says whether it runs now, enabled says whether systemd starts it at boot. A service that is stopped but still enabled runs again after a reboot. Only a service that is stopped and disabled stays off.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <text class="label" x="370" y="40" text-anchor="middle">enabled (starts at boot)</text>
+  <text class="label" x="670" y="40" text-anchor="middle">disabled (no start at boot)</text>
+  <text class="strong" x="30" y="105">active</text>
+  <text class="label" x="30" y="125">running now</text>
+  <text class="strong" x="30" y="235">inactive</text>
+  <text class="label" x="30" y="255">not running now</text>
+
+  <rect class="drop" x="230" y="60" width="280" height="100" rx="8"/>
+  <text class="strong" x="370" y="92" text-anchor="middle">Runs now</text>
+  <text x="370" y="116" text-anchor="middle">Runs again after a reboot</text>
+  <text class="code" x="370" y="140" text-anchor="middle">active + enabled</text>
+
+  <rect class="ask" x="530" y="60" width="280" height="100" rx="8"/>
+  <text class="strong" x="670" y="92" text-anchor="middle">Runs now</text>
+  <text x="670" y="116" text-anchor="middle">Does not start at the next boot</text>
+  <text class="code" x="670" y="140" text-anchor="middle">active + disabled</text>
+
+  <rect class="ask" x="230" y="190" width="280" height="100" rx="8"/>
+  <text class="strong" x="370" y="222" text-anchor="middle">Stopped now</text>
+  <text x="370" y="246" text-anchor="middle">Runs again after a reboot</text>
+  <text class="code" x="370" y="270" text-anchor="middle">result of systemctl stop</text>
+
+  <rect class="ok" x="530" y="190" width="280" height="100" rx="8"/>
+  <text class="strong" x="670" y="222" text-anchor="middle">Stopped now</text>
+  <text x="670" y="246" text-anchor="middle">Stays off after a reboot</text>
+  <text class="code" x="670" y="270" text-anchor="middle">result of disable --now</text>
+
+  <text class="label" x="420" y="318" text-anchor="middle">For a service with no purpose, only the green cell is the finished state.</text>
+</svg>

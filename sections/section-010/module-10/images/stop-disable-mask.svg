@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 360" width="840" height="360" role="img" aria-labelledby="title desc">
+  <title id="title">What stop, disable --now and mask change</title>
+  <desc id="desc">From a service that runs and is enabled, stop leaves it enabled, so a reboot starts it again. disable --now stops it and removes the boot link, so it stays off. mask on top of that blocks every start: by a person, at boot and as a dependency.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M110 140 V70 H328" marker-end="url(#arrow)"/>
+  <text class="code" x="220" y="62" text-anchor="middle">stop</text>
+  <path class="dashed" d="M330 90 H160 V138" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="245" y="110" text-anchor="middle">reboot</text>
+  <path class="okline" d="M125 200 V270 H328" marker-end="url(#arrowok)"/>
+  <text class="code" x="225" y="262" text-anchor="middle">disable --now</text>
+  <path class="okline" d="M540 270 H618" marker-end="url(#arrowok)"/>
+  <text class="code" x="579" y="262" text-anchor="middle">mask</text>
+
+  <rect class="drop" x="30" y="140" width="190" height="60" rx="8"/>
+  <text x="125" y="166" text-anchor="middle">Running</text>
+  <text x="125" y="186" text-anchor="middle">and enabled</text>
+
+  <rect class="ask" x="330" y="40" width="210" height="60" rx="8"/>
+  <text x="435" y="66" text-anchor="middle">Stopped</text>
+  <text x="435" y="86" text-anchor="middle">still enabled</text>
+
+  <rect class="ok" x="330" y="240" width="210" height="60" rx="8"/>
+  <text x="435" y="266" text-anchor="middle">Stopped</text>
+  <text x="435" y="286" text-anchor="middle">and disabled</text>
+  <text class="label" x="435" y="324" text-anchor="middle">stays off after a reboot</text>
+
+  <rect class="ok" x="620" y="240" width="200" height="60" rx="8"/>
+  <text x="720" y="266" text-anchor="middle">Masked</text>
+  <text x="720" y="286" text-anchor="middle">cannot start</text>
+  <text class="label" x="720" y="324" text-anchor="middle">no start by a person,</text>
+  <text class="label" x="720" y="342" text-anchor="middle">at boot or by a dependency</text>
+</svg>
