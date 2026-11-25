@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 270" width="840" height="270" role="img" aria-labelledby="title desc">
+  <title id="title">Only the persistent rule survives a restart of auditd</title>
+  <desc id="desc">Before the restart, the kernel has the watch on /etc/sudoers.d from rules.d and the watch on /etc/ssh/sshd_config added with auditctl only. systemctl restart auditd runs augenrules --load, whose -D setting deletes all rules before the file loads. After the restart, only the watch on /etc/sudoers.d is back.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <!-- Lines first, so the boxes sit on top. -->
+  <rect class="frame" x="20" y="50" width="280" height="190" rx="10"/>
+  <text class="label" x="36" y="42">Kernel rules before</text>
+  <rect class="frame" x="540" y="50" width="280" height="190" rx="10"/>
+  <text class="label" x="556" y="42">Kernel rules after</text>
+
+  <path class="line" d="M300 145 H318" marker-end="url(#arrow)"/>
+  <path class="line" d="M520 145 H538" marker-end="url(#arrow)"/>
+
+  <rect class="ok" x="40" y="74" width="240" height="56" rx="8"/>
+  <text class="code" x="160" y="97" text-anchor="middle">-w /etc/sudoers.d</text>
+  <text class="label" x="160" y="118" text-anchor="middle">key sudoers-change, from rules.d</text>
+
+  <rect class="ask" x="40" y="160" width="240" height="56" rx="8"/>
+  <text class="code" x="160" y="183" text-anchor="middle">-w /etc/ssh/sshd_config</text>
+  <text class="label" x="160" y="204" text-anchor="middle">key sshd-config, auditctl only</text>
+
+  <rect class="policy" x="320" y="100" width="200" height="90" rx="8"/>
+  <text class="code" x="420" y="125" text-anchor="middle">restart auditd</text>
+  <text x="420" y="148" text-anchor="middle"><tspan class="code">augenrules --load</tspan> runs</text>
+  <text x="420" y="170" text-anchor="middle"><tspan class="code">-D</tspan>, then the file</text>
+
+  <rect class="ok" x="560" y="74" width="240" height="56" rx="8"/>
+  <text class="code" x="680" y="97" text-anchor="middle">-w /etc/sudoers.d</text>
+  <text class="label" x="680" y="118" text-anchor="middle">loaded again from the file</text>
+
+  <rect class="drop" x="560" y="160" width="240" height="56" rx="8" opacity="0.55"/>
+  <text class="code" x="680" y="183" text-anchor="middle" opacity="0.7">-w /etc/ssh/sshd_config</text>
+  <text class="label bad" x="680" y="204" text-anchor="middle">gone after the restart</text>
+</svg>
