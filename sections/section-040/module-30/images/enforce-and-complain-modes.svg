@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 280" width="850" height="280" role="img" aria-labelledby="title desc">
+  <title id="title">Enforce mode and complain mode</title>
+  <desc id="desc">Access that an allow rule covers is allowed in both modes. Access that an explicit deny rule covers is blocked in both modes, and in complain mode it is not logged by default. Access that no rule covers is blocked and logged as DENIED in enforce mode, and allowed and logged as ALLOWED in complain mode.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <text class="strong" x="30" y="40" text-anchor="start">Kind of access</text>
+  <text class="strong" x="470" y="40" text-anchor="middle">Enforce mode</text>
+  <text class="strong" x="705" y="40" text-anchor="middle">Complain mode</text>
+  <text x="30" y="87">An allow rule covers it</text>
+  <rect class="ok" x="350" y="60" width="240" height="44" rx="8"/>
+  <text x="470" y="87" text-anchor="middle">allowed</text>
+  <rect class="ok" x="600" y="60" width="230" height="44" rx="8"/>
+  <text x="715" y="87" text-anchor="middle">allowed</text>
+  <line class="sep" x1="30" y1="122" x2="830" y2="122"/>
+  <text x="30" y="157">An explicit <tspan class="code">deny</tspan> rule covers it</text>
+  <rect class="drop" x="350" y="130" width="240" height="44" rx="8"/>
+  <text x="470" y="157" text-anchor="middle">blocked</text>
+  <rect class="drop" x="600" y="130" width="230" height="44" rx="8"/>
+  <text x="715" y="157" text-anchor="middle">blocked, not logged</text>
+  <line class="sep" x1="30" y1="192" x2="830" y2="192"/>
+  <text x="30" y="227">No rule covers it</text>
+  <rect class="drop" x="350" y="200" width="240" height="44" rx="8"/>
+  <text x="470" y="227" text-anchor="middle">blocked, logged as <tspan class="code">DENIED</tspan></text>
+  <rect class="ok" x="600" y="200" width="230" height="44" rx="8"/>
+  <text x="715" y="227" text-anchor="middle">allowed, logged as <tspan class="code">ALLOWED</tspan></text>
+</svg>

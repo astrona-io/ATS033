@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 360" width="840" height="360" role="img" aria-labelledby="title desc">
+  <title id="title">Pod level and container level in apparmor-two</title>
+  <desc id="desc">The pod apparmor-two sets appArmorProfile type RuntimeDefault at pod level. The container general has no value of its own and runs under cri-containerd.apparmor.d in enforce mode, so its write to /tmp succeeds. The container guarded overrides the pod value with Localhost k8s-deny-tmp-write, so its write to /tmp is denied.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <rect class="frame" x="20" y="20" width="800" height="320" rx="10"/>
+  <text class="label" x="34" y="40" text-anchor="start">pod <tspan class="code">apparmor-two</tspan></text>
+  <path class="okline" d="M230 100 V138" marker-end="url(#arrowok)"/>
+  <text class="label good" x="240" y="124" text-anchor="start">inherits</text>
+  <path class="line" d="M610 100 V138" marker-end="url(#arrow)"/>
+  <text class="label" x="620" y="124" text-anchor="start">overridden</text>
+  <path class="line" d="M230 210 V238" marker-end="url(#arrow)"/>
+  <path class="line" d="M610 210 V238" marker-end="url(#arrow)"/>
+  <rect class="policy" x="40" y="44" width="760" height="56" rx="8"/>
+  <text x="420" y="77" text-anchor="middle">pod level: <tspan class="code">appArmorProfile</tspan> type <tspan class="code">RuntimeDefault</tspan></text>
+  <rect class="box" x="60" y="140" width="340" height="70" rx="8"/>
+  <text x="230" y="170" text-anchor="middle">container <tspan class="code">general</tspan></text>
+  <text x="230" y="190" text-anchor="middle">no value of its own</text>
+  <rect class="policy" x="440" y="140" width="340" height="70" rx="8"/>
+  <text x="610" y="170" text-anchor="middle">container <tspan class="code">guarded</tspan></text>
+  <text x="610" y="190" text-anchor="middle"><tspan class="code">Localhost</tspan>: <tspan class="code">k8s-deny-tmp-write</tspan></text>
+  <rect class="ok" x="60" y="240" width="340" height="70" rx="8"/>
+  <text x="230" y="270" text-anchor="middle"><tspan class="code">cri-containerd.apparmor.d (enforce)</tspan></text>
+  <text x="230" y="290" text-anchor="middle">write to <tspan class="code">/tmp</tspan> succeeds</text>
+  <rect class="drop" x="440" y="240" width="340" height="70" rx="8"/>
+  <text x="610" y="270" text-anchor="middle"><tspan class="code">k8s-deny-tmp-write (enforce)</tspan></text>
+  <text x="610" y="290" text-anchor="middle">write to <tspan class="code">/tmp</tspan>: Permission denied</text>
+</svg>

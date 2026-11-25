@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-labelledby="title desc">
+  <title id="title">Who enforces an AppArmor profile</title>
+  <desc id="desc">apparmor_parser loads the profile file from /etc/apparmor.d into the kernel of the node. The kubelet and the container runtime containerd only pass on the profile name. The kernel attaches the loaded profile to the container process and enforces it.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <rect class="frame" x="20" y="170" width="350" height="130" rx="10"/>
+  <text class="label" x="34" y="190" text-anchor="start">kernel of the node</text>
+  <path class="line" d="M190 116 V212" marker-end="url(#arrow)"/>
+  <text class="label" x="200" y="160" text-anchor="start"><tspan class="code">apparmor_parser -r</tspan></text>
+  <path class="line" d="M450 88 H538" marker-end="url(#arrow)"/>
+  <text class="label" x="494" y="78" text-anchor="middle">profile name</text>
+  <path class="line" d="M650 116 V212" marker-end="url(#arrow)"/>
+  <text class="label" x="660" y="160" text-anchor="start">profile name</text>
+  <path class="okline" d="M340 240 H548" marker-end="url(#arrowok)"/>
+  <text class="label good" x="444" y="230" text-anchor="middle">attaches and enforces</text>
+  <rect class="box" x="40" y="60" width="300" height="56" rx="8"/>
+  <text x="190" y="83" text-anchor="middle">profile file</text>
+  <text x="190" y="103" text-anchor="middle"><tspan class="code">/etc/apparmor.d/k8s-deny-tmp-write</tspan></text>
+  <rect class="box" x="350" y="60" width="100" height="56" rx="8"/>
+  <text x="400" y="93" text-anchor="middle">kubelet</text>
+  <rect class="box" x="540" y="60" width="220" height="56" rx="8"/>
+  <text x="650" y="83" text-anchor="middle">container runtime</text>
+  <text x="650" y="103" text-anchor="middle"><tspan class="code">containerd</tspan></text>
+  <rect class="ask" x="40" y="212" width="300" height="56" rx="8"/>
+  <text x="190" y="235" text-anchor="middle">loaded profile</text>
+  <text x="190" y="255" text-anchor="middle"><tspan class="code">k8s-deny-tmp-write</tspan></text>
+  <rect class="ok" x="550" y="212" width="210" height="56" rx="8"/>
+  <text x="655" y="245" text-anchor="middle">container process</text>
+</svg>

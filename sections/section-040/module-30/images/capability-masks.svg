@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 220" width="840" height="220" role="img" aria-labelledby="title desc">
+  <title id="title">Capability masks of three pods</title>
+  <desc id="desc">caps-default keeps the runtime default set 00000000a80425fb in CapEff and CapBnd, with NoNewPrivs 0. caps-none has 0000000000000000 in both sets, with NoNewPrivs 1. caps-bind has 0000000000000400, only bit 10 for NET_BIND_SERVICE, with NoNewPrivs 1.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <text class="strong" x="150" y="38" text-anchor="middle"><tspan class="code">caps-default</tspan></text>
+  <rect class="box" x="20" y="54" width="260" height="96" rx="8"/>
+  <text class="code" x="40" y="82">CapEff:</text>
+  <text class="code" x="260" y="82" text-anchor="end">00000000a80425fb</text>
+  <text class="code" x="40" y="106">CapBnd:</text>
+  <text class="code" x="260" y="106" text-anchor="end">00000000a80425fb</text>
+  <text class="code" x="40" y="130">NoNewPrivs:</text>
+  <text class="code" x="260" y="130" text-anchor="end">0</text>
+  <text x="150" y="178" text-anchor="middle">runtime default set,</text>
+  <text x="150" y="198" text-anchor="middle">escalation allowed</text>
+  <text class="strong" x="425" y="38" text-anchor="middle"><tspan class="code">caps-none</tspan></text>
+  <rect class="ok" x="295" y="54" width="260" height="96" rx="8"/>
+  <text class="code" x="315" y="82">CapEff:</text>
+  <text class="code" x="535" y="82" text-anchor="end">0000000000000000</text>
+  <text class="code" x="315" y="106">CapBnd:</text>
+  <text class="code" x="535" y="106" text-anchor="end">0000000000000000</text>
+  <text class="code" x="315" y="130">NoNewPrivs:</text>
+  <text class="code" x="535" y="130" text-anchor="end">1</text>
+  <text x="425" y="178" text-anchor="middle">no capabilities,</text>
+  <text x="425" y="198" text-anchor="middle">escalation blocked</text>
+  <text class="strong" x="700" y="38" text-anchor="middle"><tspan class="code">caps-bind</tspan></text>
+  <rect class="ok" x="570" y="54" width="260" height="96" rx="8"/>
+  <text class="code" x="590" y="82">CapEff:</text>
+  <text class="code" x="810" y="82" text-anchor="end">0000000000000400</text>
+  <text class="code" x="590" y="106">CapBnd:</text>
+  <text class="code" x="810" y="106" text-anchor="end">0000000000000400</text>
+  <text class="code" x="590" y="130">NoNewPrivs:</text>
+  <text class="code" x="810" y="130" text-anchor="end">1</text>
+  <text x="700" y="178" text-anchor="middle">only bit 10, <tspan class="code">NET_BIND_SERVICE</tspan>,</text>
+  <text x="700" y="198" text-anchor="middle">escalation blocked</text>
+</svg>
