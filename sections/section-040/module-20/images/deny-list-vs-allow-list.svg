@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 316" width="840" height="316" role="img" aria-labelledby="title desc">
+  <title id="title">Deny list compared with allow list</title>
+  <desc id="desc">A deny list allows by default: the named syscalls are blocked, every other syscall runs, and a new unknown syscall also runs. An allow list blocks by default: the named syscalls run, every other syscall is blocked, and a new unknown syscall is blocked too.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <line class="sep" x1="425" y1="20" x2="425" y2="300"/>
+  <text class="strong" x="30" y="40">Deny list</text>
+  <text class="code" x="30" y="64">defaultAction: SCMP_ACT_ALLOW</text>
+  <text class="strong" x="455" y="40">Allow list</text>
+  <text class="code" x="455" y="64">defaultAction: SCMP_ACT_ERRNO</text>
+  <path class="dashed" d="M240 112 H298" marker-end="url(#arrowbad)"/>
+  <path class="okline" d="M665 112 H723" marker-end="url(#arrowok)"/>
+  <rect class="box" x="30" y="90" width="210" height="44" rx="8"/>
+  <text x="135" y="117" text-anchor="middle">syscalls named in rules</text>
+  <rect class="drop" x="300" y="90" width="100" height="44" rx="8"/>
+  <text x="350" y="117" text-anchor="middle">blocked</text>
+  <rect class="box" x="455" y="90" width="210" height="44" rx="8"/>
+  <text x="560" y="117" text-anchor="middle">syscalls named in rules</text>
+  <rect class="ok" x="725" y="90" width="100" height="44" rx="8"/>
+  <text x="775" y="117" text-anchor="middle">runs</text>
+  <path class="okline" d="M240 178 H298" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M665 178 H723" marker-end="url(#arrowbad)"/>
+  <rect class="box" x="30" y="156" width="210" height="44" rx="8"/>
+  <text x="135" y="183" text-anchor="middle">every other syscall</text>
+  <rect class="ok" x="300" y="156" width="100" height="44" rx="8"/>
+  <text x="350" y="183" text-anchor="middle">runs</text>
+  <rect class="box" x="455" y="156" width="210" height="44" rx="8"/>
+  <text x="560" y="183" text-anchor="middle">every other syscall</text>
+  <rect class="drop" x="725" y="156" width="100" height="44" rx="8"/>
+  <text x="775" y="183" text-anchor="middle">blocked</text>
+  <path class="okline" d="M240 244 H298" marker-end="url(#arrowok)"/>
+  <path class="dashed" d="M665 244 H723" marker-end="url(#arrowbad)"/>
+  <rect class="box" x="30" y="222" width="210" height="44" rx="8"/>
+  <text x="135" y="249" text-anchor="middle">a new, unknown syscall</text>
+  <rect class="ok" x="300" y="222" width="100" height="44" rx="8"/>
+  <text x="350" y="249" text-anchor="middle">runs</text>
+  <rect class="box" x="455" y="222" width="210" height="44" rx="8"/>
+  <text x="560" y="249" text-anchor="middle">a new, unknown syscall</text>
+  <rect class="drop" x="725" y="222" width="100" height="44" rx="8"/>
+  <text x="775" y="249" text-anchor="middle">blocked</text>
+  <text class="label bad" x="200" y="296" text-anchor="middle">Short, but gaps stay open</text>
+  <text class="label good" x="625" y="296" text-anchor="middle">Strong, but the list is long</text>
+</svg>

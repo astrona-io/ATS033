@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 450" width="840" height="450" role="img" aria-labelledby="title desc">
+  <title id="title">How to find the cause of a seccomp failure</title>
+  <desc id="desc">When an operation fails, first check whether the container started. If it did not, read the pod events and fix the profile name, the copy on the node or the JSON. If it did, read the Seccomp line in /proc, map the action to syscall names, test with SCMP_ACT_LOG and allow only that syscall.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="line" d="M420 64 V94" marker-end="url(#arrow)"/>
+  <path class="line" d="M360 140 L202 188" marker-end="url(#arrow)"/>
+  <text class="label" x="268" y="156" text-anchor="end">no</text>
+  <path class="line" d="M480 140 L638 188" marker-end="url(#arrow)"/>
+  <text class="label" x="572" y="156">yes</text>
+  <path class="line" d="M200 230 V268" marker-end="url(#arrow)"/>
+  <path class="line" d="M640 230 V248" marker-end="url(#arrow)"/>
+  <path class="line" d="M640 290 V308" marker-end="url(#arrow)"/>
+  <path class="line" d="M640 350 V368" marker-end="url(#arrow)"/>
+  <rect class="drop" x="320" y="20" width="200" height="44" rx="8"/>
+  <text x="420" y="47" text-anchor="middle">Operation fails</text>
+  <rect class="ask" x="310" y="96" width="220" height="44" rx="8"/>
+  <text x="420" y="123" text-anchor="middle">Container started?</text>
+  <rect class="box" x="70" y="190" width="260" height="40" rx="8"/>
+  <text x="200" y="215" text-anchor="middle"><tspan class="code">kubectl describe pod</tspan>: events</text>
+  <rect class="ok" x="50" y="270" width="300" height="40" rx="8"/>
+  <text x="200" y="295" text-anchor="middle">Fix the name, the copy or the JSON</text>
+  <rect class="box" x="500" y="190" width="280" height="40" rx="8"/>
+  <text x="640" y="215" text-anchor="middle">Read the <tspan class="code">Seccomp:</tspan> line in <tspan class="code">/proc</tspan></text>
+  <rect class="box" x="500" y="250" width="280" height="40" rx="8"/>
+  <text x="640" y="275" text-anchor="middle">Map the action to syscall names</text>
+  <rect class="ask" x="500" y="310" width="280" height="40" rx="8"/>
+  <text x="640" y="335" text-anchor="middle">Test with <tspan class="code">SCMP_ACT_LOG</tspan></text>
+  <rect class="ok" x="500" y="370" width="280" height="40" rx="8"/>
+  <text x="640" y="395" text-anchor="middle">Allow only that syscall</text>
+  <text class="label" x="200" y="338" text-anchor="middle">delivery problem</text>
+  <text class="label" x="640" y="436" text-anchor="middle">content problem</text>
+</svg>

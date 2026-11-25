@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 270" width="860" height="270" role="img" aria-labelledby="title desc">
+  <title id="title">How the kubelet picks the seccomp profile</title>
+  <desc id="desc">The kubelet uses the seccompProfile of the container if it is set. If not, it uses the value of the pod. If neither is set, it applies RuntimeDefault when seccompDefault is true on the node, and Unconfined when it is false.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <text class="strong" x="40" y="34">The kubelet checks in this order</text>
+  <path class="line" d="M240 85 H318" marker-end="url(#arrow)"/>
+  <text class="label" x="279" y="77" text-anchor="middle">no</text>
+  <path class="line" d="M520 85 H598" marker-end="url(#arrow)"/>
+  <text class="label" x="559" y="77" text-anchor="middle">no</text>
+  <path class="line" d="M140 110 V198" marker-end="url(#arrow)"/>
+  <text class="label" x="148" y="160">yes</text>
+  <path class="line" d="M420 110 V198" marker-end="url(#arrow)"/>
+  <text class="label" x="428" y="160">yes</text>
+  <path class="okline" d="M670 110 L632 198" marker-end="url(#arrowok)"/>
+  <text class="label good" x="642" y="160" text-anchor="end">true</text>
+  <path class="dashed" d="M750 110 L778 198" marker-end="url(#arrowbad)"/>
+  <text class="label bad" x="774" y="160">false</text>
+  <rect class="ask" x="40" y="60" width="200" height="50" rx="8"/>
+  <text x="140" y="90" text-anchor="middle">Container value set?</text>
+  <rect class="ask" x="320" y="60" width="200" height="50" rx="8"/>
+  <text x="420" y="90" text-anchor="middle">Pod value set?</text>
+  <rect class="ask" x="600" y="60" width="220" height="50" rx="8"/>
+  <text class="code" x="710" y="90" text-anchor="middle">seccompDefault: true?</text>
+  <rect class="box" x="40" y="200" width="200" height="50" rx="8"/>
+  <text x="140" y="230" text-anchor="middle">Use the container value</text>
+  <rect class="box" x="320" y="200" width="200" height="50" rx="8"/>
+  <text x="420" y="230" text-anchor="middle">Use the pod value</text>
+  <rect class="ok" x="560" y="200" width="140" height="50" rx="8"/>
+  <text class="code" x="630" y="230" text-anchor="middle">RuntimeDefault</text>
+  <rect class="drop" x="720" y="200" width="120" height="50" rx="8"/>
+  <text class="code" x="780" y="230" text-anchor="middle">Unconfined</text>
+</svg>
