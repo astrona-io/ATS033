@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 380" width="840" height="380" role="img" aria-labelledby="title desc">
+  <title id="title">Four paths into a node that an audit checks</title>
+  <desc id="desc">An outside client can reach a node through a node port or load balancer, an address listed in externalIPs, the published Service of an Ingress controller, or a pod that uses hostNetwork. kubectl get services, kubectl get ingress and kubectl get pods show each of them.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="line" d="M180 200 L308 85" marker-end="url(#arrow)"/>
+  <path class="line" d="M180 200 L308 160" marker-end="url(#arrow)"/>
+  <path class="line" d="M180 200 L308 235" marker-end="url(#arrow)"/>
+  <path class="line" d="M180 200 L308 310" marker-end="url(#arrow)"/>
+  <rect class="frame" x="250" y="30" width="570" height="330" rx="10"/>
+  <text class="label" x="266" y="52">node</text>
+  <text class="label" x="600" y="52">check with</text>
+  <rect class="box" x="30" y="175" width="150" height="50" rx="8"/>
+  <text x="105" y="205" text-anchor="middle">outside client</text>
+  <rect class="ask" x="310" y="60" width="260" height="52" rx="8"/>
+  <text x="440" y="82" text-anchor="middle">node port or load balancer</text>
+  <text class="code" x="440" y="102" text-anchor="middle">type NodePort / LoadBalancer</text>
+  <text class="code" x="600" y="91">kubectl get services</text>
+  <rect class="ask" x="310" y="135" width="260" height="52" rx="8"/>
+  <text x="440" y="157" text-anchor="middle">address in externalIPs</text>
+  <text class="code" x="440" y="177" text-anchor="middle">spec.externalIPs</text>
+  <text class="code" x="600" y="166">kubectl get services</text>
+  <rect class="ask" x="310" y="210" width="260" height="52" rx="8"/>
+  <text x="440" y="232" text-anchor="middle">Ingress controller Service</text>
+  <text class="code" x="440" y="252" text-anchor="middle">Ingress objects</text>
+  <text class="code" x="600" y="241">kubectl get ingress</text>
+  <rect class="ask" x="310" y="285" width="260" height="52" rx="8"/>
+  <text x="440" y="307" text-anchor="middle">pod with hostNetwork</text>
+  <text class="code" x="440" y="327" text-anchor="middle">spec.hostNetwork</text>
+  <text class="code" x="600" y="316">kubectl get pods</text>
+</svg>
