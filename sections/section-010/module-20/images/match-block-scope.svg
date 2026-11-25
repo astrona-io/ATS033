@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 380" width="840" height="380" role="img" aria-labelledby="title desc">
+  <title id="title">A Match block covers every line after it</title>
+  <desc id="desc">The main file sshd_config has a global part with the Include line at line 12 and PermitRootLogin at line 134, and a Match User backup block from line 137 to the end. An AllowUsers line appended to the end of the file lands in the Match block and applies to the backup account only. Lines in drop-in files are read at line 12, so they are global.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="okline" d="M520 70 H576" marker-end="url(#arrowok)"/>
+  <rect class="box" x="40" y="40" width="480" height="140" rx="8"/>
+  <text class="label" x="56" y="62">global part: applies to every login</text>
+  <text class="code" x="56" y="90">12: Include /etc/ssh/sshd_config.d/*.conf</text>
+  <text class="code" x="56" y="120">134: PermitRootLogin yes</text>
+  <text class="code" x="56" y="150">135: PasswordAuthentication no</text>
+  <rect class="policy" x="40" y="200" width="480" height="160" rx="8"/>
+  <text class="label" x="56" y="222">Match block: applies to the account backup only</text>
+  <text class="code" x="56" y="250">137: Match User backup</text>
+  <text class="code" x="56" y="275">139:     ForceCommand internal-sftp</text>
+  <text class="code" x="56" y="300">140:     AllowTcpForwarding no</text>
+  <rect class="drop" x="56" y="312" width="448" height="34" rx="6"/>
+  <text class="code" x="72" y="334">AllowUsers opsadmin student astrona</text>
+  <text class="label bad" x="400" y="334">appended</text>
+  <rect class="ok" x="580" y="44" width="230" height="54" rx="8"/>
+  <text x="695" y="66" text-anchor="middle">drop-in files</text>
+  <text class="code" x="695" y="86" text-anchor="middle">10-allow-users.conf</text>
+  <text x="580" y="124">Read at line 12,</text>
+  <text x="580" y="144">so every line is global.</text>
+  <text x="560" y="262">Every line below <tspan class="code">Match</tspan></text>
+  <text x="560" y="284">applies to <tspan class="code">backup</tspan> only,</text>
+  <text x="560" y="306">including an appended line.</text>
+</svg>

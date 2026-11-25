@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 270" width="840" height="270" role="img" aria-labelledby="title desc">
+  <title id="title">The seven fields of an /etc/passwd line</title>
+  <desc id="desc">The line olduser:x:1004:1004::/home/olduser:/bin/bash split at the colons into seven fields: name olduser, password placeholder x, UID 1004, GID 1004, an empty description, home directory /home/olduser and login shell /bin/bash.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <text class="code" x="420" y="50" text-anchor="middle" style="font-size:16px">olduser:x:1004:1004::/home/olduser:/bin/bash</text>
+  <rect class="box" x="21" y="90" width="100" height="50" rx="8"/>
+  <text class="code" x="71" y="120" text-anchor="middle">olduser</text>
+  <text class="label" x="71" y="166" text-anchor="middle">1 name</text>
+  <rect class="box" x="129" y="90" width="100" height="50" rx="8"/>
+  <text class="code" x="179" y="120" text-anchor="middle">x</text>
+  <text class="label" x="179" y="166" text-anchor="middle">2 password</text>
+  <rect class="box" x="237" y="90" width="80" height="50" rx="8"/>
+  <text class="code" x="277" y="120" text-anchor="middle">1004</text>
+  <text class="label" x="277" y="166" text-anchor="middle">3 UID</text>
+  <rect class="box" x="325" y="90" width="80" height="50" rx="8"/>
+  <text class="code" x="365" y="120" text-anchor="middle">1004</text>
+  <text class="label" x="365" y="166" text-anchor="middle">4 GID</text>
+  <rect class="box" x="413" y="90" width="110" height="50" rx="8"/>
+  <text class="label" x="468" y="120" text-anchor="middle">empty</text>
+  <text class="label" x="468" y="166" text-anchor="middle">5 description</text>
+  <rect class="box" x="531" y="90" width="150" height="50" rx="8"/>
+  <text class="code" x="606" y="120" text-anchor="middle">/home/olduser</text>
+  <text class="label" x="606" y="166" text-anchor="middle">6 home</text>
+  <rect class="ask" x="689" y="90" width="130" height="50" rx="8"/>
+  <text class="code" x="754" y="120" text-anchor="middle">/bin/bash</text>
+  <text class="label" x="754" y="166" text-anchor="middle">7 login shell</text>
+  <text x="21" y="220">The fields are split by colons. The seventh field, the login shell,</text>
+  <text x="21" y="242">decides which program starts when the account logs in.</text>
+</svg>
