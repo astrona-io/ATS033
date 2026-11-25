@@ -78,8 +78,8 @@ class CoverageTests(unittest.TestCase):
         content, first, second = self.stack_first_two_labs()
         content.insert(content.index(first) + 1, {
             'type': 'reading', 'title': 'Unrelated reading',
-            'path': 'sections/section-999/module-01/course-01-extra.md'})
-        self.coverage['additional_readings'].append('sections/section-999/module-01/course-01-extra.md')
+            'path': 'sections/section-999/module-10/course-01-extra.md'})
+        self.coverage['additional_readings'].append('sections/section-999/module-10/course-01-extra.md')
         with self.assertRaisesRegex(ValueError, 'after the previous lab'):
             module.validate(self.course, self.coverage)
 

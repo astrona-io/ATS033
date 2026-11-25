@@ -1,0 +1,272 @@
+# Module quiz for section 020, module 03. Contract:
+# schemas/question-bank.schema.json. Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-020-03
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-020/module-30
+  title: Restrict ServiceAccounts And API Tokens
+placement:
+  position: after
+  reading: sections/section-020/module-30/course-100-summary.md
+questions:
+  - id: ats033-020-03-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict whether a pod receives a token when the ServiceAccount and the pod disagree."
+    source_readings:
+      - sections/section-020/module-30/course-010-dedicated-serviceaccounts-and-automount.md
+    prompt: "The ServiceAccount `report-agent` has `automountServiceAccountToken: false`. A new pod uses `serviceAccountName: report-agent` and sets `automountServiceAccountToken: true` in its own spec. Does the kubelet mount a token into the pod?"
+    options:
+      - id: a
+        text: "No, because the ServiceAccount setting always wins."
+        explanation: "The ServiceAccount setting applies only when the pod does not set the field itself."
+      - id: b
+        text: "Yes, because the pod setting overrides the ServiceAccount setting."
+        explanation: "Correct. When both are set, the pod setting wins."
+      - id: c
+        text: "No, because the API server refuses a pod whose setting differs from its ServiceAccount."
+        explanation: "The API server accepts the pod. Different values are allowed."
+      - id: d
+        text: "Yes, but only after the Deployment is rolled."
+        explanation: "This is a new pod, and it reads the setting when it starts."
+    correct_option: b
+    explanation: "Set `false` in both places for a workload that does not call the API, so that a change to one object cannot bring the token back."
+
+  - id: ats033-020-03-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Apply a token mount change to pods that are already running."
+    source_readings:
+      - sections/section-020/module-30/course-010-dedicated-serviceaccounts-and-automount.md
+      - sections/section-020/module-30/course-030-the-default-serviceaccount-and-unused-tokens.md
+    prompt: "You set `automountServiceAccountToken: false` on the ServiceAccount that the running `monitor` Deployment uses. The token file is still in the `monitor` pod. What makes the change take effect?"
+    options:
+      - id: a
+        text: "Wait one hour until the kubelet refreshes the token."
+        explanation: "A refresh writes a new token. It does not remove the mount."
+      - id: b
+        text: "Delete the Role that the ServiceAccount uses."
+        explanation: "This removes permissions, but the token file stays in the pod."
+      - id: c
+        text: "Run `kubectl apply` on the ServiceAccount a second time."
+        explanation: "The ServiceAccount already has the new value. The running pod does not read it again."
+      - id: d
+        text: "Roll the Deployment, so that new pods start and read the setting."
+        explanation: "Correct. Pods read the setting at start and keep their token until they restart."
+    correct_option: d
+    explanation: "Running pods keep what they started with, so a Deployment must roll for the change to take effect."
+
+  - id: ats033-020-03-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Diagnose a workload that calls the API after its token mount was turned off."
+    source_readings:
+      - sections/section-020/module-30/course-010-dedicated-serviceaccounts-and-automount.md
+    prompt: "A controller pod lists pods through the Kubernetes API. After a review, someone sets `automountServiceAccountToken: false` on the pod. What happens to its API calls, and what is the least-privilege fix?"
+    options:
+      - id: a
+        text: "The calls fail with an authentication error. Turn the mount back on for this pod and bind a Role that allows only `list` on pods."
+        explanation: "Correct. A workload that calls the API needs its token, with the smallest set of permissions it uses."
+      - id: b
+        text: "The calls keep working, because the controller uses the token of the node."
+        explanation: "The pod has no credential without its token. It does not borrow one from the node."
+      - id: c
+        text: "The calls fail. Bind the ServiceAccount to `cluster-admin` so the controller works again."
+        explanation: "The calls fail because no token is mounted, not because of missing permissions, and `cluster-admin` grants far too much."
+      - id: d
+        text: "The calls keep working, because the setting only affects pods that use the `default` ServiceAccount."
+        explanation: "The setting applies to any pod and any ServiceAccount."
+    correct_option: a
+    explanation: "The goal is not to remove all tokens. Each token exists for a reason and carries the smallest permission set."
+
+  - id: ats033-020-03-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain why each workload needs its own ServiceAccount."
+    source_readings:
+      - sections/section-020/module-30/course-010-dedicated-serviceaccounts-and-automount.md
+    prompt: "Three Deployments in `starfleet` share one ServiceAccount. One needs to read Secrets, one needs to list pods and one never calls the API. What is the main problem?"
+    options:
+      - id: a
+        text: "The API server refuses to start more than one pod per ServiceAccount."
+        explanation: "Many pods can use the same ServiceAccount. The problem is security, not a limit."
+      - id: b
+        text: "The ServiceAccount token expires faster when several pods use it."
+        explanation: "The lifetime comes from the token request, not from the number of pods that use the ServiceAccount."
+      - id: c
+        text: "Their permissions merge, so all three pods can read Secrets and list pods, and the audit log cannot tell them apart."
+        explanation: "Correct. A dedicated ServiceAccount per workload keeps permissions separate and makes an audit possible."
+      - id: d
+        text: "Only the first Deployment receives a token."
+        explanation: "Every pod of the shared ServiceAccount receives a token unless the mount is turned off."
+    correct_option: c
+    explanation: "Give each workload its own ServiceAccount and bind only what that workload uses."
+
+  - id: ats033-020-03-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Configure a valid lifetime for a projected ServiceAccount token."
+    source_readings:
+      - sections/section-020/module-30/course-020-bound-projected-tokens.md
+    prompt: "A pod spec has a projected volume with a `serviceAccountToken` source and `expirationSeconds: 300`. What happens when you apply it?"
+    options:
+      - id: a
+        text: "The API server refuses the request, because the minimum `expirationSeconds` is 600."
+        explanation: "Correct. A projected token must live at least ten minutes."
+      - id: b
+        text: "The pod starts, and the kubelet writes a token that expires after five minutes."
+        explanation: "Five minutes is below the minimum, so the request does not pass."
+      - id: c
+        text: "The pod starts, and the token never expires."
+        explanation: "A projected token always has an expiry."
+      - id: d
+        text: "The pod starts with the default lifetime of one hour."
+        explanation: "The value is not silently replaced. The request is refused."
+    correct_option: a
+    explanation: "Set `expirationSeconds` to 600 or more for a projected token."
+
+  - id: ats033-020-03-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain how the audience of a token limits where it is accepted."
+    source_readings:
+      - sections/section-020/module-30/course-020-bound-projected-tokens.md
+    prompt: "The pod `token-client` holds a projected token with `audience: probe`. A process in the pod sends this token to a vault service that requires its own audience. What happens?"
+    options:
+      - id: a
+        text: "The vault service accepts it, because every token from the API server is valid everywhere."
+        explanation: "A token carries an audience, and a service accepts only tokens meant for it."
+      - id: b
+        text: "The vault service accepts it if the ServiceAccount has a RoleBinding."
+        explanation: "A RoleBinding gives permissions in the Kubernetes API. It does not change the audience of a token."
+      - id: c
+        text: "The kubelet issues a second token for the vault service automatically."
+        explanation: "The kubelet only issues the tokens that the pod spec asks for."
+      - id: d
+        text: "The vault service rejects it, because the audience `probe` does not match its own."
+        explanation: "Correct. A token for the wrong audience fails at the receiving service."
+    correct_option: d
+    explanation: "The audience names the service that should accept the token, so a token for `probe` works only there."
+
+  - id: ats033-020-03-q07
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Separate what a token proves from what RBAC allows."
+    source_readings:
+      - sections/section-020/module-30/course-020-bound-projected-tokens.md
+    prompt: "You run `kubectl -n starfleet create token token-client --duration=10m`. The ServiceAccount `token-client` has no RoleBinding. A script then uses the printed token to list pods in `starfleet` within the ten minutes. What happens, and which part of the system decides?"
+    options:
+      - id: a
+        text: "The request succeeds, because a fresh token from TokenRequest carries read permissions."
+        explanation: "A token carries no permissions. Permissions come only from bindings."
+      - id: b
+        text: "The API server accepts the token as `token-client`, and RBAC then refuses the request, because no binding allows it."
+        explanation: "Correct. The token proves who the caller is. RBAC decides what the caller may do."
+      - id: c
+        text: "The API server rejects the token, because `kubectl create token` stores no copy in the cluster."
+        explanation: "The token is not stored anywhere, but it is still valid until it expires."
+      - id: d
+        text: "The request fails, because a token from `kubectl create token` works only inside a pod."
+        explanation: "A script outside the cluster can use the token. That is why you must treat it like a password."
+    correct_option: b
+    explanation: "Authentication and authorization are separate steps. A valid token without a binding can do nothing."
+
+  - id: ats033-020-03-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Describe when the kubelet refreshes a projected token."
+    source_readings:
+      - sections/section-020/module-30/course-020-bound-projected-tokens.md
+    prompt: "A pod receives a token through a projected volume with the default lifetime. When does the kubelet start to refresh it, and what makes the API server reject it before its expiry?"
+    options:
+      - id: a
+        text: "After 60 minutes, when it has already expired; nothing rejects it before expiry."
+        explanation: "The kubelet refreshes before expiry, and deleting the pod invalidates the token early."
+      - id: b
+        text: "After 10 minutes; restarting the kubelet rejects it."
+        explanation: "Ten minutes is the minimum lifetime, not the refresh point. The token ends at expiry or when its pod is deleted."
+      - id: c
+        text: "After about 48 minutes, at 80 percent of its one-hour lifetime; deleting the pod rejects it."
+        explanation: "Correct. The default lifetime is one hour, the kubelet refreshes at 80 percent, and the token is bound to the pod."
+      - id: d
+        text: "Never, because projected tokens do not expire; deleting the ServiceAccount Secret rejects it."
+        explanation: "Projected tokens always expire, and they are not stored in a Secret."
+    correct_option: c
+    explanation: "A bound token carries an expiry and the name and UID of its pod, so it ends at expiry or when the pod is deleted."
+
+  - id: ats033-020-03-q09
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Find long-lived ServiceAccount token Secrets in a cluster."
+    source_readings:
+      - sections/section-020/module-30/course-030-the-default-serviceaccount-and-unused-tokens.md
+    prompt: "Which command lists every Secret in the cluster that holds a long-lived ServiceAccount token?"
+    options:
+      - id: a
+        text: "`kubectl get serviceaccounts --all-namespaces`"
+        explanation: "This lists ServiceAccounts, not the token Secrets that belong to them."
+      - id: b
+        text: "`kubectl get secrets --all-namespaces --field-selector type=kubernetes.io/service-account-token`"
+        explanation: "Correct. The field selector on the Secret type returns only ServiceAccount token Secrets."
+      - id: c
+        text: "`kubectl auth can-i --list --as=system:serviceaccount:starfleet:default -n starfleet`"
+        explanation: "This lists permissions of one identity. It does not show Secrets."
+      - id: d
+        text: "`kubectl -n starfleet create token legacy-monitor`"
+        explanation: "This issues a new short-lived token. It does not find old ones."
+    correct_option: b
+    explanation: "Filter Secrets by the type `kubernetes.io/service-account-token` to find tokens that never expire."
+
+  - id: ats033-020-03-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Replace a long-lived token Secret that a system still uses without breaking that system."
+    source_readings:
+      - sections/section-020/module-30/course-030-the-default-serviceaccount-and-unused-tokens.md
+      - sections/section-020/module-30/course-020-bound-projected-tokens.md
+    prompt: "A continuous integration (CI) job still reads the long-lived Secret `legacy-monitor-token` to call the API. You want to remove the Secret. Which order of steps is safest?"
+    options:
+      - id: a
+        text: "Delete the Secret first; the CI job will request a new token by itself."
+        explanation: "The job loses access immediately when the Secret is deleted, and it has no way to get a new token by itself."
+      - id: b
+        text: "Rename the Secret, so that attackers cannot find it, and keep it."
+        explanation: "The token stays valid under any name, and it still has no expiry."
+      - id: c
+        text: "Give the job a short-lived token from `kubectl create token` or a projected token, then delete the Secret."
+        explanation: "Correct. Replace the credential first, because the deleted token stops working at once."
+      - id: d
+        text: "Add an expiry date to the existing Secret."
+        explanation: "A Secret of this type holds a token with no expiry. It stays valid until the Secret or the ServiceAccount is deleted."
+    correct_option: c
+    explanation: "Find the user of each token Secret first, move it to a short-lived token, and then delete the Secret."
+
+  - id: ats033-020-03-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a cluster on a current Kubernetes version can still hold long-lived token Secrets."
+    source_readings:
+      - sections/section-020/module-30/course-030-the-default-serviceaccount-and-unused-tokens.md
+      - sections/section-020/module-30/course-020-bound-projected-tokens.md
+    prompt: "A cluster runs Kubernetes 1.35, but the search for Secrets of type `kubernetes.io/service-account-token` returns several entries. Which explanation fits?"
+    options:
+      - id: a
+        text: "The control plane still creates one token Secret for each new ServiceAccount."
+        explanation: "Since version 1.24 the control plane no longer creates a token Secret for each ServiceAccount."
+      - id: b
+        text: "The kubelet stores each projected token in a Secret of this type."
+        explanation: "Projected tokens go into a projected volume in the pod, not into a Secret."
+      - id: c
+        text: "`kubectl create token` saves each token it prints in such a Secret."
+        explanation: "`kubectl create token` prints a token that is not stored anywhere in the cluster."
+      - id: d
+        text: "The cluster was upgraded from an older version that created them, or someone created them by hand with the annotation `kubernetes.io/service-account.name`."
+        explanation: "Correct. The control plane fills such a Secret only when someone creates it with that annotation, and upgraded clusters keep the old ones."
+    correct_option: d
+    explanation: "Current clusters do not create these Secrets on their own, so each one comes from an upgrade or a manual step and needs review."

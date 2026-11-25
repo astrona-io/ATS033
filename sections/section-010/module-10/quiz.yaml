@@ -1,0 +1,243 @@
+# Section quiz for section 010. Contract: schemas/question-bank.schema.json.
+# Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-010-01
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-010
+  title: Minimize The Host Operating-System Footprint
+questions:
+  - id: ats033-010-01-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the action that stops a service now and keeps it off after a reboot."
+    source_readings:
+      - sections/section-010/module-10/course-020-stop-disable-and-mask-services.md
+    prompt: "An administrator runs `systemctl stop training-extra.service` on a node. The service is enabled. What happens at the next reboot?"
+    options:
+      - id: a
+        text: "The service stays stopped, because it was stopped by an administrator."
+        explanation: "systemd does not remember a manual stop across a reboot."
+      - id: b
+        text: "The service starts again, because `stop` does not change the enabled state."
+        explanation: "Correct. Only `disable` removes the boot behavior."
+      - id: c
+        text: "The service is masked and cannot start."
+        explanation: "Masking needs `systemctl mask`."
+      - id: d
+        text: "systemd deletes the unit file during shutdown."
+        explanation: "systemd never deletes unit files on its own."
+    correct_option: b
+    explanation: "`stop` changes the running state. `disable --now` changes the boot behavior and stops the process."
+
+  - id: ats033-010-01-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Distinguish `disable` from `mask`."
+    source_readings:
+      - sections/section-010/module-10/course-020-stop-disable-and-mask-services.md
+    prompt: "A package ships `legacy-agent.service`. Another package needs the first package installed, so you cannot uninstall it. You must make sure that nothing, not even a dependency, starts the agent. Which command does that?"
+    options:
+      - id: a
+        text: "`systemctl stop legacy-agent.service`"
+        explanation: "The service can start again at boot or by dependency."
+      - id: b
+        text: "`systemctl disable legacy-agent.service`"
+        explanation: "A disabled unit can still be started by hand or as a dependency of another unit."
+      - id: c
+        text: "`systemctl mask --now legacy-agent.service`"
+        explanation: "Correct. Masking links the unit to `/dev/null`, so it cannot be started at all, and `--now` stops it."
+      - id: d
+        text: "`systemctl daemon-reload`"
+        explanation: "This reloads unit files. It does not change the state of a service."
+    correct_option: c
+    explanation: "`mask` blocks every start of the unit and package updates do not undo it."
+
+  - id: ats033-010-01-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Simulate a package removal and read the result."
+    source_readings:
+      - sections/section-010/module-10/course-030-remove-packages-and-keep-the-node-working.md
+    prompt: "`apt-get remove --simulate tool-x` prints `Remv tool-x` and also `Remv containerd.io`. What should you do?"
+    options:
+      - id: a
+        text: "Run `apt-get remove --yes tool-x`, because the simulation changes nothing."
+        explanation: "The real command would remove `containerd.io` as well and stop the runtime."
+      - id: b
+        text: "Keep `tool-x`, because the container runtime depends on it."
+        explanation: "Correct. Removing the package removes the runtime package too, so the package is a dependency of the node."
+      - id: c
+        text: "Run `apt-get autoremove` to clean up the dependency first."
+        explanation: "`autoremove` removes unused packages. It does not remove a dependency relationship."
+      - id: d
+        text: "Run the removal with `purge` instead, which skips dependent packages."
+        explanation: "`purge` removes dependent packages in the same way as `remove`."
+    correct_option: b
+    explanation: "Each extra `Remv` line is another package the removal takes with it. A runtime package in that list means the package must stay."
+
+  - id: ats033-010-01-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict the effective value of an sshd setting that appears in two files."
+    source_readings:
+      - sections/section-010/module-20/course-010-read-the-sshd-settings.md
+    prompt: "The main file `/etc/ssh/sshd_config` sets `PermitRootLogin yes` after an `Include /etc/ssh/sshd_config.d/*.conf` line. A drop-in file in that directory sets `PermitRootLogin no`. Which value does sshd use?"
+    options:
+      - id: a
+        text: "`yes`, because the main file is read last and overrides the drop-in."
+        explanation: "sshd keeps the first value it reads for a setting, not the last."
+      - id: b
+        text: "`no`, because the Include line comes first and the first value wins."
+        explanation: "Correct. The drop-in is read at the Include line, before the later line in the main file."
+      - id: c
+        text: "`prohibit-password`, because sshd merges conflicting values."
+        explanation: "sshd does not merge values."
+      - id: d
+        text: "sshd refuses to start because the value is set twice."
+        explanation: "Repeated settings are allowed. The first one is used."
+    correct_option: b
+    explanation: "Use `sshd -T` to print the effective values instead of reading the files by eye."
+
+  - id: ats033-010-01-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain the effect of AllowUsers on SSH login."
+    source_readings:
+      - sections/section-010/module-20/course-020-limit-who-can-log-in.md
+    prompt: "A node has the line `AllowUsers opsadmin` in its sshd configuration. The user `olduser` has a valid key in `authorized_keys`. What happens when `olduser` connects with SSH?"
+    options:
+      - id: a
+        text: "The login works, because the key is valid."
+        explanation: "AllowUsers is checked as well as the key."
+      - id: b
+        text: "The login is refused, because `olduser` is not in the AllowUsers list."
+        explanation: "Correct. Only listed users may log in."
+      - id: c
+        text: "The login works only from the local machine."
+        explanation: "AllowUsers does not depend on the source address unless a pattern says so."
+      - id: d
+        text: "The login works after a password prompt."
+        explanation: "A user outside the list is refused before authentication."
+    correct_option: b
+    explanation: "When AllowUsers is set, a user that does not match it cannot log in with any method."
+
+  - id: ats033-010-01-q13
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Separate a locked password from key-based SSH login."
+    source_readings:
+      - sections/section-010/module-20/course-030-login-shells-and-unused-accounts.md
+    prompt: "An administrator runs `usermod -L olduser` to retire an account. The account keeps its `authorized_keys` file and its shell is `/bin/bash`. Can an attacker with the private key still start a session?"
+    options:
+      - id: a
+        text: "No, because locking the account disables every login method."
+        explanation: "The lock affects the password only."
+      - id: b
+        text: "Yes, key-based SSH login can still work, so also set a `nologin` shell or remove the key."
+        explanation: "Correct. Locking the password does not stop public-key authentication on every system setup."
+      - id: c
+        text: "No, because `usermod -L` deletes the home directory."
+        explanation: "It does not delete anything."
+      - id: d
+        text: "Yes, but only as root."
+        explanation: "The key belongs to `olduser`, so the session runs as that user."
+    correct_option: b
+    explanation: "Retire an account by locking the password, setting the shell to `nologin` and removing its keys."
+
+  - id: ats033-010-01-q14
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "State what hostPID gives a pod."
+    source_readings:
+      - sections/section-010/module-30/course-010-host-namespaces-hostpath-and-privileged-containers.md
+    prompt: "A pod sets `hostPID: true`. What can a process in the pod do that a normal pod cannot?"
+    options:
+      - id: a
+        text: "See the processes of the node, including the kubelet and the container runtime."
+        explanation: "Correct. The pod joins the PID namespace of the node."
+      - id: b
+        text: "Use the IP address of the node."
+        explanation: "That is `hostNetwork`."
+      - id: c
+        text: "Mount any directory of the node."
+        explanation: "That needs a `hostPath` volume."
+      - id: d
+        text: "Skip the scheduler."
+        explanation: "`hostPID` does not change scheduling."
+    correct_option: a
+    explanation: "Each host field removes one kind of isolation: network, PID, IPC, files or capabilities."
+
+  - id: ats033-010-01-q15
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Find where Pod Security Admission rejects a Deployment with host access."
+    source_readings:
+      - sections/section-010/module-30/course-020-enforce-limits-with-pod-security-admission.md
+    prompt: "A namespace has the label `pod-security.kubernetes.io/enforce=baseline`. You apply a Deployment whose pod template sets `hostPID: true`. `kubectl apply` succeeds. What do you see next?"
+    options:
+      - id: a
+        text: "The Deployment has no ready replicas, and the ReplicaSet records a `FailedCreate` event."
+        explanation: "Correct. Admission checks the pod, so the rejection appears when the ReplicaSet creates it."
+      - id: b
+        text: "The Deployment is rejected with an error from `kubectl apply`."
+        explanation: "Admission checks pods, not Deployments."
+      - id: c
+        text: "The pod starts, and a warning is printed."
+        explanation: "A warning belongs to the `warn` mode. `enforce` rejects."
+      - id: d
+        text: "The kubelet refuses the pod on the node."
+        explanation: "The API server rejects it before scheduling."
+    correct_option: a
+    explanation: "Read the events of the ReplicaSet when a Deployment shows no ready replicas."
+
+  - id: ats033-010-01-q16
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Combine a taint, a label, a node selector and a toleration to dedicate a node."
+    source_readings:
+      - sections/section-010/module-30/course-030-kubelet-settings-and-dedicated-nodes.md
+    prompt: "A node has the taint `dedicated=ledger:NoSchedule` and the label `node-restriction.kubernetes.io/dedicated=ledger`. A pod has the matching toleration and no `nodeSelector`. Where can the pod run?"
+    options:
+      - id: a
+        text: "Only on the dedicated node."
+        explanation: "A toleration does not send the pod to the node."
+      - id: b
+        text: "On the dedicated node or on any other node that it tolerates."
+        explanation: "Correct. Only the `nodeSelector` limits the pod to the labelled node."
+      - id: c
+        text: "On no node, because it needs a label."
+        explanation: "The pod can run on untainted nodes."
+      - id: d
+        text: "Only on the control-plane node."
+        explanation: "Placement does not depend on the node role here."
+    correct_option: b
+    explanation: "The taint repels other pods. The label with a selector attracts the sensitive pod."
+
+  - id: ats033-010-01-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the kubelet settings that protect its API."
+    source_readings:
+      - sections/section-010/module-30/course-030-kubelet-settings-and-dedicated-nodes.md
+    prompt: "Which kubelet configuration is the secure one?"
+    options:
+      - id: a
+        text: "`anonymous.enabled: true` and `readOnlyPort: 10255`"
+        explanation: "Both settings open the kubelet to unauthenticated callers."
+      - id: b
+        text: "`anonymous.enabled: false`, `authorization.mode: Webhook` and `readOnlyPort: 0`"
+        explanation: "Correct. Callers must authenticate and the API server decides what they may do."
+      - id: c
+        text: "`anonymous.enabled: false` and `authorization.mode: AlwaysAllow`"
+        explanation: "AlwaysAllow accepts every authenticated caller."
+      - id: d
+        text: "`authorization.mode: Webhook` and `readOnlyPort: 10255`"
+        explanation: "The read-only port serves data with no authentication."
+    correct_option: b
+    explanation: "An anonymous request to port 10250 should return 401."

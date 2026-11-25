@@ -9,7 +9,7 @@ import jsonschema
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-BANK = 'sections/section-020/module-01/quiz.yaml'
+BANK = 'sections/section-020/module-10/quiz.yaml'
 spec = importlib.util.spec_from_file_location('assessments', Path(__file__).with_name('check-assessments.py'))
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

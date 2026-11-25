@@ -10,9 +10,9 @@ Three technical readings are listed under `additional_readings` and have no lab 
 
 | Reading | Ungraded practice | Related graded labs in other modules |
 | --- | --- | --- |
-| `sections/section-010/module-01/course-04-privileged-host-interfaces.md` | 010/01 playground | 010/03: Remove Host Access From A Workload; Enforce The Baseline Pod Security Standard |
-| `sections/section-020/module-01/course-03-kubernetes-identities-and-rbac.md` | 020/01 playground | 020/02: Scope Access With resourceNames And A RoleBinding; 020/03: Close The Default ServiceAccount |
-| `sections/section-030/module-01/course-04-nodeports-control-plane-ports-and-api-access.md` | 030/01 playground | 030/02: Close An Accidental NodePort; 030/03: Remove Anonymous Access From RBAC Bindings; Close The Kubelet API To Anonymous Callers |
+| `sections/section-010/module-10/course-040-privileged-host-interfaces.md` | 010/01 playground | 010/03: Remove Host Access From A Workload; Enforce The Baseline Pod Security Standard |
+| `sections/section-020/module-10/course-030-kubernetes-identities-and-rbac.md` | 020/01 playground | 020/02: Scope Access With resourceNames And A RoleBinding; 020/03: Close The Default ServiceAccount |
+| `sections/section-030/module-10/course-040-nodeports-control-plane-ports-and-api-access.md` | 030/01 playground | 030/02: Close An Accidental NodePort; 030/03: Remove Anonymous Access From RBAC Bindings; Close The Kubelet API To Anonymous Callers |
 
 ## Remaining practical gaps and boundaries
 

@@ -1,0 +1,292 @@
+# Module quiz for section 010, module 03. Contract: schemas/question-bank.schema.json.
+# Keep question ids stable once published.
+schema_version: 1
+kind: question_bank
+id: ats033-010-03
+course_id: ATS033
+exam_code: CKS
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-010/module-30
+  title: Restrict Workload Access To The Host
+placement:
+  position: after
+  reading: sections/section-010/module-30/course-100-summary.md
+questions:
+  - id: ats033-010-03-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Identify the pod field that gives a pod the network namespace of its node."
+    source_readings:
+      - sections/section-010/module-30/course-010-host-namespaces-hostpath-and-privileged-containers.md
+    prompt: "`kubectl -n starfleet get pod host-view -o wide` shows a pod `IP` that is the same as the address of its node. A normal pod such as `shuttle` shows an address from the pod network. Which field of the `host-view` pod causes this?"
+    options:
+      - id: a
+        text: "`hostPID: true`"
+        explanation: "This shares the process list of the node, not its network."
+      - id: b
+        text: "`hostNetwork: true`"
+        explanation: "Correct. The pod joins the network namespace of the node, so it has the node's address and sees the node's interfaces."
+      - id: c
+        text: "`hostIPC: true`"
+        explanation: "This shares the shared memory and message queues of the node, not its network."
+      - id: d
+        text: "`securityContext.privileged: true`"
+        explanation: "This gives capabilities and device access. It does not change the network namespace."
+    correct_option: b
+    explanation: "A pod on the host network can also connect to services that listen only on the node's loopback address."
+
+  - id: ats033-010-03-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Rank hostPath mounts by the access they give to the node."
+    source_readings:
+      - sections/section-010/module-30/course-010-host-namespaces-hostpath-and-privileged-containers.md
+    prompt: "Four pods each mount one `hostPath` volume. Which mount is closest to root on the node?"
+    options:
+      - id: a
+        text: "`/var/log`, read-only"
+        explanation: "This exposes logs. It is a risk, but it does not let the pod control the node."
+      - id: b
+        text: "`/etc`, read-only"
+        explanation: "This exposes node configuration, but a read-only mount cannot change it."
+      - id: c
+        text: "An `emptyDir` volume mounted at `/tmp`"
+        explanation: "An `emptyDir` is a new empty directory for the pod. It exposes no existing node directory and is not a `hostPath`."
+      - id: d
+        text: "`/run/containerd/containerd.sock`"
+        explanation: "Correct. The container runtime socket lets the pod start any container on the node."
+    correct_option: d
+    explanation: "`privileged: true` and a `hostPath` of `/` or of a runtime socket are close to root on the node."
+
+  - id: ats033-010-03-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the component that can refuse a pod that asks for host access."
+    source_readings:
+      - sections/section-010/module-30/course-010-host-namespaces-hostpath-and-privileged-containers.md
+    prompt: "A pod specification sets `hostPID: true` and `privileged: true`. Which component can refuse to run this pod?"
+    options:
+      - id: a
+        text: "An admission check in the API server, such as Pod Security Admission."
+        explanation: "Correct. The API server can reject the pod before it is stored. After that, the node does what the specification says."
+      - id: b
+        text: "The kubelet, which checks host fields before it starts a container."
+        explanation: "The kubelet reads the specification and asks the runtime to create the container. It does not refuse host fields."
+      - id: c
+        text: "The container runtime (containerd), which blocks privileged containers by default."
+        explanation: "The runtime sets the namespaces, mounts and security settings that the specification asks for."
+      - id: d
+        text: "The scheduler, which places no pod with host fields on a node."
+        explanation: "The scheduler chooses a node. It does not check host access fields."
+    correct_option: a
+    explanation: "The kubelet and the container runtime carry out what the pod specification says. Only an admission check in the API server can refuse it."
+
+  - id: ats033-010-03-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Replace a hostPath scratch directory with settings that keep a container writable and non-root."
+    source_readings:
+      - sections/section-010/module-30/course-010-host-namespaces-hostpath-and-privileged-containers.md
+    prompt: "You remove a `hostPath` that a pod used only for temporary files, and you set `readOnlyRootFilesystem: true`. The program now fails when it writes its temporary files. What is the fix?"
+    options:
+      - id: a
+        text: "Set `readOnlyRootFilesystem: false` again."
+        explanation: "This works but gives up the hardening. A writable volume fixes the error and keeps the root read-only."
+      - id: b
+        text: "Add `privileged: true` so that the process may write anywhere."
+        explanation: "This gives almost every capability and access to the devices of the node. It is the setting you want to avoid."
+      - id: c
+        text: "Mount an `emptyDir` volume at the directory where the program writes."
+        explanation: "Correct. The kubelet creates an empty directory for the pod and deletes it with the pod, so no node directory is exposed."
+      - id: d
+        text: "Add `runAsNonRoot: true` so that the process gets its own writable home directory."
+        explanation: "`runAsNonRoot` only makes the kubelet refuse a container that would run as UID 0. It does not create a writable directory."
+    correct_option: c
+    explanation: "The usual pattern is a read-only root, a non-root UID, no capabilities and one `emptyDir` mounted where the program writes."
+
+  - id: ats033-010-03-q05
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the Pod Security Admission modes that report violations without rejecting pods."
+    source_readings:
+      - sections/section-010/module-30/course-020-enforce-limits-with-pod-security-admission.md
+    prompt: "You want to learn which pods in a namespace would break under `baseline`, but no pod may be rejected yet. Which label modes do you set first?"
+    options:
+      - id: a
+        text: "`enforce` only"
+        explanation: "`enforce` makes the API server reject a pod that violates the level."
+      - id: b
+        text: "`warn` and `audit`"
+        explanation: "Correct. `warn` accepts the pod and returns a warning to the user, and `audit` accepts it and records an audit event."
+      - id: c
+        text: "`enforce` and `audit`"
+        explanation: "The `enforce` label would reject violating pods."
+      - id: d
+        text: "`privileged`"
+        explanation: "`privileged` is a level, not a mode. It allows everything and reports nothing."
+    correct_option: b
+    explanation: "The label key is `pod-security.kubernetes.io/<mode>` and its value is the level. A common rollout sets `warn` and `audit` first, and `enforce` after that."
+
+  - id: ats033-010-03-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Preview the effect of a Pod Security Admission label without changing the namespace."
+    source_readings:
+      - sections/section-010/module-30/course-020-enforce-limits-with-pod-security-admission.md
+    prompt: "Before you enforce `baseline` on `starfleet`, you want to see which running pods already violate it, without changing the namespace. Which command does that?"
+    options:
+      - id: a
+        text: "`kubectl label namespace starfleet pod-security.kubernetes.io/warn=baseline`"
+        explanation: "This changes the namespace by adding a real label."
+      - id: b
+        text: "`kubectl get pods -n starfleet -o wide`"
+        explanation: "This lists pods and nodes. It does not check them against a Pod Security Standard."
+      - id: c
+        text: "`kubectl label namespace starfleet pod-security.kubernetes.io/enforce=baseline`"
+        explanation: "This enforces the level for real. Every new pod that violates it is rejected from then on."
+      - id: d
+        text: "`kubectl label namespace starfleet pod-security.kubernetes.io/enforce=baseline --dry-run=server --overwrite`"
+        explanation: "Correct. The API server checks the existing pods and returns warnings for those that violate the level, and the namespace stays unchanged."
+    correct_option: d
+    explanation: "A server-side dry run of the label is the safe first step before any `enforce` label."
+
+  - id: ats033-010-03-q07
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Distinguish the rules that restricted adds to baseline."
+    source_readings:
+      - sections/section-010/module-30/course-020-enforce-limits-with-pod-security-admission.md
+    prompt: "A pod uses no host namespaces, no `hostPath` and no privileged container. It passes `baseline` but is rejected under `restricted`. Which missing setting can explain the rejection?"
+    options:
+      - id: a
+        text: "`hostPID: false`"
+        explanation: "Host namespaces are already blocked by `baseline`, and the pod does not use them."
+      - id: b
+        text: "`securityContext.privileged: false`"
+        explanation: "Privileged containers are already blocked by `baseline`."
+      - id: c
+        text: "`runAsNonRoot: true`"
+        explanation: "Correct. `restricted` adds rules on top of `baseline`: no privilege escalation, a non-root user, dropped capabilities and a seccomp profile."
+      - id: d
+        text: "No `hostPath` volume"
+        explanation: "`hostPath` volumes are already blocked by `baseline`."
+    correct_option: c
+    explanation: "`restricted` includes `baseline`. A container must also set `allowPrivilegeEscalation: false`, run as non-root, drop all capabilities and use a seccomp profile of type `RuntimeDefault` or `Localhost`."
+
+  - id: ats033-010-03-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict what an enforce label does to pods that already run."
+    source_readings:
+      - sections/section-010/module-30/course-020-enforce-limits-with-pod-security-admission.md
+    prompt: "A namespace runs a Deployment whose pods use `hostNetwork: true`. You add `pod-security.kubernetes.io/enforce=baseline` to the namespace. Later one of those pods is deleted. What happens?"
+    options:
+      - id: a
+        text: "The running pods kept working, but the ReplicaSet cannot create the replacement pod."
+        explanation: "Correct. `enforce` checks pods when they are created or updated. The replacement is a new pod, so the API server rejects it."
+      - id: b
+        text: "The API server deleted every violating pod as soon as the label was added."
+        explanation: "`enforce` does not remove pods that already run."
+      - id: c
+        text: "The replacement pod starts, because it belongs to a Deployment that was accepted earlier."
+        explanation: "Pod Security Admission checks each new pod, whatever created it."
+      - id: d
+        text: "The Deployment is rejected and removed from the namespace."
+        explanation: "Pod Security Admission checks pods, not Deployments. The Deployment stays."
+    correct_option: a
+    explanation: "Fix the pod template first and add the `enforce` label after that."
+
+  - id: ats033-010-03-q09
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Interpret an anonymous request to the kubelet API and choose the fix."
+    source_readings:
+      - sections/section-010/module-30/course-030-kubelet-settings-and-dedicated-nodes.md
+    prompt: "On a node, `curl -sk -o /dev/null -w '%{http_code}\\n' https://127.0.0.1:10250/pods` prints `200`. What does this mean, and what do you do?"
+    options:
+      - id: a
+        text: "The kubelet works normally. No change is needed."
+        explanation: "The request has no credentials. The expected answer is `401`."
+      - id: b
+        text: "Anonymous access is on. Set `authentication.anonymous.enabled: false` in `/var/lib/kubelet/config.yaml` and restart the kubelet."
+        explanation: "Correct. The kubelet reads its configuration file at start, so the change needs `systemctl restart kubelet` on the node."
+      - id: c
+        text: "The read-only port is open. Set `readOnlyPort: 10255`."
+        explanation: "Port 10250 is the authenticated HTTPS API, not the read-only port. A secure read-only port value is `0` or absent."
+      - id: d
+        text: "The `-k` option bypassed authentication. Run the request again without `-k`."
+        explanation: "`-k` only skips certificate checking on the client. It does not send credentials or bypass the kubelet's checks."
+    correct_option: b
+    explanation: "The kubelet can run commands inside pods, so it must refuse callers without a valid identity."
+
+  - id: ats033-010-03-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why the node-restriction.kubernetes.io/ label prefix protects a dedicated node."
+    source_readings:
+      - sections/section-010/module-30/course-030-kubelet-settings-and-dedicated-nodes.md
+    prompt: "Why does the dedicated node use the label key `node-restriction.kubernetes.io/dedicated` instead of a plain key such as `dedicated`?"
+    options:
+      - id: a
+        text: "The scheduler only reads labels with this prefix in a `nodeSelector`."
+        explanation: "A `nodeSelector` can match any label key."
+      - id: b
+        text: "The prefix adds a `NoSchedule` taint to the node automatically."
+        explanation: "A label never adds a taint. The taint is set with `kubectl taint`."
+      - id: c
+        text: "The prefix makes Pod Security Admission reject pods without a toleration."
+        explanation: "Pod Security Admission checks host access fields, not tolerations."
+      - id: d
+        text: "The NodeRestriction admission plugin stops a kubelet from setting labels with this prefix on its own node."
+        explanation: "Correct. A compromised node therefore cannot label itself to attract sensitive workloads."
+    correct_option: d
+    explanation: "An administrator sets the label with `kubectl label node`. The kubelet of that node cannot set or change it."
+
+  - id: ats033-010-03-q11
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Choose the taint effect that also removes pods already running on a node."
+    source_readings:
+      - sections/section-010/module-30/course-030-kubelet-settings-and-dedicated-nodes.md
+    prompt: "You add `dedicated=ledger:NoSchedule` to a worker node that already runs several pods without a toleration. What happens to those pods, and which effect would move them off?"
+    options:
+      - id: a
+        text: "They are evicted at once. `NoSchedule` already removes them."
+        explanation: "`NoSchedule` affects scheduling only. Pods that already run on the node stay."
+      - id: b
+        text: "They stay. No taint effect can remove running pods."
+        explanation: "The effect `NoExecute` also evicts running pods that lack a toleration."
+      - id: c
+        text: "They stay. The effect `NoExecute` would also evict running pods that lack a toleration."
+        explanation: "Correct. Taint a node before the workloads arrive, or use `NoExecute`."
+      - id: d
+        text: "They restart on the same node with an automatic toleration."
+        explanation: "The scheduler does not add tolerations to pods."
+    correct_option: c
+    explanation: "A `NoSchedule` taint does not move running pods, and it blocks replacement pods that lack a toleration."
+
+  - id: ats033-010-03-q12
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Explain why taints and tolerations are not a security boundary on their own."
+    source_readings:
+      - sections/section-010/module-30/course-030-kubelet-settings-and-dedicated-nodes.md
+    prompt: "A worker node has the taint `dedicated=ledger:NoSchedule` and the label `node-restriction.kubernetes.io/dedicated=ledger`. A developer who may create pods copies the toleration and the `nodeSelector` of the `ledger` pod into their own pod. What happens?"
+    options:
+      - id: a
+        text: "The pod runs on the dedicated node. Combine the dedicated node with admission rules that limit who may use the label and the toleration."
+        explanation: "Correct. Taints and labels guide the scheduler. A user who may create pods can add the same toleration."
+      - id: b
+        text: "The scheduler rejects the pod, because the toleration belongs to the `ledger` pod."
+        explanation: "A toleration is a field in the pod specification. Any pod can carry it."
+      - id: c
+        text: "The NodeRestriction admission plugin rejects the pod."
+        explanation: "NodeRestriction limits which labels a kubelet may set on its own node. It does not check pods that select the label."
+      - id: d
+        text: "The pod stays `Pending`, because only one pod may tolerate a taint."
+        explanation: "Any number of pods can tolerate the same taint."
+    correct_option: a
+    explanation: "Both features guide the scheduler. They are not a security boundary against someone who can create pods."

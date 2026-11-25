@@ -4,9 +4,9 @@ Applied astrona-course-expand-material with this repository's CLAUDE.md writing 
 
 | Section/module | Expanded readings | Playground | Checkpoints | Skill validator |
 | --- | ---: | --- | ---: | --- |
-| section-010/module-01 | 1 | plain | 0 | pass |
-| section-020/module-01 | 1 | plain | 0 | pass |
-| section-030/module-01 | 1 | plain | 0 | pass |
-| section-040/module-01 | 1 | plain | 0 | pass |
+| section-010/module-10 | 1 | plain | 0 | pass |
+| section-020/module-10 | 1 | plain | 0 | pass |
+| section-030/module-10 | 1 | plain | 0 | pass |
+| section-040/module-10 | 1 | plain | 0 | pass |
 
 No playground was built and no CLI version is claimed. Module changes and section introductions have separate signed-off commits. Existing question banks, IDs and weights are preserved. The pages no longer carry `draft: true` front matter, because the course is published. Source chapter validation and course-contract checks pass. This does not constitute live cluster verification.

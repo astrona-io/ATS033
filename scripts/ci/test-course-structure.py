@@ -8,8 +8,8 @@ import unittest
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-LAB = 'sections/section-020/module-02/labs/lab-01'
-VM_LAB = 'sections/section-030/module-03/labs/lab-04'
+LAB = 'sections/section-020/module-20/labs/lab-01'
+VM_LAB = 'sections/section-030/module-30/labs/lab-04'
 spec = importlib.util.spec_from_file_location('structure', Path(__file__).with_name('check-course-structure.py'))
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
@@ -138,7 +138,7 @@ class StructureTests(unittest.TestCase):
             module.validate(self.root)
 
     def test_playground_grader_leftover(self):
-        (self.root / 'sections/section-030/module-02/playground/validate.sh').write_text('#!/usr/bin/env bash\n')
+        (self.root / 'sections/section-030/module-20/playground/validate.sh').write_text('#!/usr/bin/env bash\n')
         with self.assertRaisesRegex(ValueError, 'ungraded playground'):
             module.validate(self.root)
 

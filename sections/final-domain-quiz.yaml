@@ -17,7 +17,7 @@ questions:
   difficulty: intermediate
   learning_objective: Distinguish `disable` from `mask`.
   source_readings:
-  - sections/section-010/module-01/course-02-stop-disable-and-mask-services.md
+  - sections/section-010/module-10/course-020-stop-disable-and-mask-services.md
   prompt: A package ships `legacy-agent.service`. Another package needs the first
     package installed, so you cannot uninstall it. You must make sure that nothing,
     not even a dependency, starts the agent. Which command does that?
@@ -45,7 +45,7 @@ questions:
   learning_objective: Predict the effective value of an sshd setting that appears
     in two files.
   source_readings:
-  - sections/section-010/module-02/course-01-read-the-sshd-settings.md
+  - sections/section-010/module-20/course-010-read-the-sshd-settings.md
   prompt: The main file `/etc/ssh/sshd_config` sets `PermitRootLogin yes` after an
     `Include /etc/ssh/sshd_config.d/*.conf` line. A drop-in file in that directory
     sets `PermitRootLogin no`. Which value does sshd use?
@@ -72,7 +72,7 @@ questions:
   learning_objective: Find where Pod Security Admission rejects a Deployment with
     host access.
   source_readings:
-  - sections/section-010/module-03/course-02-enforce-limits-with-pod-security-admission.md
+  - sections/section-010/module-30/course-020-enforce-limits-with-pod-security-admission.md
   prompt: 'A namespace has the label `pod-security.kubernetes.io/enforce=baseline`.
     You apply a Deployment whose pod template sets `hostPID: true`. `kubectl apply`
     succeeds. What do you see next?'
@@ -99,7 +99,7 @@ questions:
   difficulty: intermediate
   learning_objective: Turn off an account completely.
   source_readings:
-  - sections/section-020/module-01/course-02-privilege-elevation-and-account-locking.md
+  - sections/section-020/module-10/course-020-privilege-elevation-and-account-locking.md
   prompt: An employee leaves. You run `usermod --lock` on the account. The employee
     can still log in over SSH with a private key. Why?
   options:
@@ -124,7 +124,7 @@ questions:
   difficulty: intermediate
   learning_objective: Remove a wide grant completely after adding a narrow one.
   source_readings:
-  - sections/section-020/module-02/course-02-wildcards-cluster-admin-and-escalation.md
+  - sections/section-020/module-20/course-020-wildcards-cluster-admin-and-escalation.md
   prompt: You create a narrow Role and RoleBinding for a ServiceAccount. It can still
     delete Secrets in every namespace. A ClusterRoleBinding to `cluster-admin` still
     names it. What fixes this?
@@ -149,7 +149,7 @@ questions:
   difficulty: intermediate
   learning_objective: Explain a bound projected token.
   source_readings:
-  - sections/section-020/module-03/course-02-bound-projected-tokens.md
+  - sections/section-020/module-30/course-020-bound-projected-tokens.md
   prompt: Which statement about the token that the kubelet projects into a current
     pod is correct?
   options:
@@ -175,7 +175,7 @@ questions:
   difficulty: beginner
   learning_objective: Tell a refused connection from a timeout.
   source_readings:
-  - sections/section-030/module-01/course-01-listeners-and-bind-addresses.md
+  - sections/section-030/module-10/course-010-listeners-and-bind-addresses.md
   prompt: A client gets `Connection refused` immediately when it connects to a node
     port. What does this most likely mean?
   options:
@@ -200,7 +200,7 @@ questions:
   difficulty: intermediate
   learning_objective: Explain what externalTrafficPolicy Local changes.
   source_readings:
-  - sections/section-030/module-02/course-02-narrowing-nodeports-and-load-balancers.md
+  - sections/section-030/module-20/course-020-narrowing-nodeports-and-load-balancers.md
   prompt: 'A NodePort Service has `externalTrafficPolicy: Local`. A client sends a
     request to a node that has no ready pod of the Service. What happens?'
   options:
@@ -225,7 +225,7 @@ questions:
   difficulty: advanced
   learning_objective: Choose the kubelet settings that close port 10250.
   source_readings:
-  - sections/section-030/module-03/course-03-kubelet-api-authentication-and-authorization.md
+  - sections/section-030/module-30/course-030-kubelet-api-authentication-and-authorization.md
   prompt: 'A kubelet has `authentication.anonymous.enabled: true` and `authorization.mode:
     AlwaysAllow`. Which change closes the kubelet API to anonymous callers, and what
     must follow?'
@@ -251,7 +251,7 @@ questions:
   difficulty: intermediate
   learning_objective: Contrast AppArmor with seccomp.
   source_readings:
-  - sections/section-040/module-01/course-02-apparmor-profiles-for-files-and-capabilities.md
+  - sections/section-040/module-10/course-020-apparmor-profiles-for-files-and-capabilities.md
   prompt: A root process in a container must not write under `/tmp`, although `/tmp`
     is writable by file mode. Which control fits?
   options:
@@ -275,7 +275,7 @@ questions:
   difficulty: advanced
   learning_objective: Diagnose a denied operation caused by a seccomp profile.
   source_readings:
-  - sections/section-040/module-02/course-03-find-blocked-syscalls-and-fix-failures.md
+  - sections/section-040/module-20/course-030-find-blocked-syscalls-and-fix-failures.md
   prompt: A container runs as root and owns a file, but `mv` on it fails with `Operation
     not permitted`. The pod uses a `Localhost` seccomp profile and keeps running.
     What is the best next step?
@@ -301,7 +301,7 @@ questions:
   difficulty: intermediate
   learning_objective: Drop Linux capabilities and read the result.
   source_readings:
-  - sections/section-040/module-03/course-03-drop-capabilities-and-block-privilege-escalation.md
+  - sections/section-040/module-30/course-030-drop-capabilities-and-block-privilege-escalation.md
   prompt: A container needs only to listen on port 80 as user 1000. Which securityContext
     fits the least-privilege rule, and where do you read the result?
   options:
