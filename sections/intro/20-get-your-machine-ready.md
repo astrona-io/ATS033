@@ -46,7 +46,7 @@ podman info
 python3 --version
 ```
 
-Give the container engine enough room. Each node of a kind playground is a container that needs memory, and a kind playground in this course has two nodes. A QEMU playground asks for 2 CPUs and 4 GiB of memory just for its virtual machine. When you run `astrona check` with a lab, it also tells you whether that lab's estimated memory fits. On macOS, you can give the Podman machine more memory with `podman machine set --memory` while the machine is stopped.
+Give the container engine enough room. Each node of a kind playground is a container that needs memory, and most kind playgrounds in this course have two nodes. A QEMU playground asks for 2 CPUs and 4 GiB of memory just for its virtual machine. When you run `astrona check` with a lab, it also tells you whether that lab's estimated memory fits. On macOS, you can give the Podman machine more memory with `podman machine set --memory` while the machine is stopped.
 
 ## Start and use a playground
 
