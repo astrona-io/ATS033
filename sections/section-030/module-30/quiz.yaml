@@ -1,5 +1,5 @@
 # Module quiz for section 030, module 03. Contract:
-# schemas/question-bank.schema.json. Keep question ids stable once published.
+# scripts/ci/question-bank.schema.json. Keep question ids stable once published.
 schema_version: 1
 kind: question_bank
 id: ats033-030-03

@@ -276,7 +276,7 @@ the CKS labs keep theirs. ATS031 applies it to the CKS labs; copy from it. In sh
 
 The course covers **System Hardening**, worth **10%** of
 **Certified Kubernetes Security Specialist (CKS)**. It is part of **ATP007**.
-The official objectives are listed in `astrona.yaml` and mapped in `CURRICULUM.md`.
+The official objectives are listed in `astrona.yaml`, and `README.md` lists the modules under each one.
 
 ### Playground and graded lab scope
 
@@ -297,17 +297,19 @@ self-contained-page and Mermaid rules apply throughout.
 
 ### Reusable question data
 
-Write original single-choice questions as YAML banks under section folders and
-`assessments/`. Use the versioned contract in `schemas/question-bank.schema.json`
-and teaching order in `assessments/index.yaml`. Each bank has 5–15 questions with
-stable IDs, one correct option, per-option feedback, a measurable learning
-objective and source reading paths for author traceability.
+Write original single-choice questions as YAML question banks. Each module has
+one `sections/section-0N0/module-N0/quiz.yaml` with 5–15 questions, and the course
+ends with `sections/final-domain-quiz.yaml`. Use the versioned contract in
+`scripts/ci/question-bank.schema.json`: stable IDs, one correct option, per-option
+feedback, a measurable learning objective and source reading paths for author
+traceability.
 
-Do not register YAML as a Markdown reading. A future renderer consumes the bank
-index and presents the checkpoint after its declared reading, preserving bank
-order when several share an anchor. Do not expose answer keys before submission
-in a production quiz interface. These public banks are practice material, not
-secure or official exam questions.
+Register every bank in astrona.yaml as a `type: quiz` entry with `path`,
+`question_count` (equal to the number of questions) and `pass_score`, after the
+module summary it checks. Content sync turns the bank into a knowledge-check page
+that grades in the browser. `scripts/ci/check-assessments.py` checks that every
+bank is registered, matches the schema and comes after the readings it uses.
+These public banks are practice material, not secure or official exam questions.
 
 ### Review and authoring checks
 
@@ -315,7 +317,8 @@ Preserve the shared CLAUDE.md prefix copied from ATS015. Keep course IDs, offici
 domain weights and ATP links unchanged. Technical pages carry no `draft: true`
 front matter. The course registration in `astrona-content` is published (ATP007 version 1.0.0, approved 2026-11-21); maturity stays `alpha`.
 
-Primary author sources are recorded in `SOURCES.md`. The objective list was
-verified on 2026-10-11. Detailed reading expansions were written on 2026-10-11.
-Validate manifest paths, summary ordering, curriculum coverage and question
+Check facts against primary sources: the official CKS objectives
+(https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/,
+last checked 2026-10-11) and the upstream project documentation (kubernetes.io, CIS,
+and each tool's own docs). Validate manifest paths, summary ordering, curriculum coverage and question
 contracts. Do not claim live verification until the actual runtime result has been recorded.

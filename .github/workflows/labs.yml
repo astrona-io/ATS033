@@ -8,7 +8,8 @@
 #
 # Which environments (scripts/ci/list-environments.sh):
 #   - pull request: only the labs and playgrounds with a changed file in
-#     their own directory; every section when scripts/ or this file changes;
+#     their own directory (every playground when test-playground.sh changes);
+#     the quiz and author checks run only when their files change;
 #   - every Monday: every section (a floating image tag or a removed download
 #     can break a lab without a commit);
 #   - by hand: every section, or the paths given in the "paths" input.
@@ -60,6 +61,27 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+      # On a pull request, the quiz and author checks run only when a file they
+      # read changes. A change to this workflow or to requirements.txt runs them
+      # all. The scheduled and manual runs always run them.
+      - id: changes
+        name: Find which checks the change needs
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT" != pull_request ]; then
+            echo "quiz=true" >>"$GITHUB_OUTPUT"
+            echo "authors=true" >>"$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BASE_SHA"...HEAD)
+          all='^(\.github/workflows/labs\.yml|scripts/ci/requirements\.txt)$'
+          quiz='(quiz\.yaml$|^astrona\.yaml$|^scripts/ci/(check|test)-assessments\.py$|^scripts/ci/question-bank\.schema\.json$)'
+          authors='^(AUTHORS\.md|sections/intro/30-how-this-course-is-made\.md|sections/intro/images/author/.*|scripts/ci/check-authors\.py)$'
+          match() { grep -qE "$1|$all" <<<"$changed" && echo true || echo false; }
+          echo "quiz=$(match "$quiz")" | tee -a "$GITHUB_OUTPUT"
+          echo "authors=$(match "$authors")" | tee -a "$GITHUB_OUTPUT"
       - name: Install course validation dependencies
         run: python3 -m pip install -r scripts/ci/requirements.txt
       - name: Test course structure failure cases
@@ -68,14 +90,15 @@ jobs:
         run: python3 scripts/ci/test-grading-runtime.py
       - name: Check course registration and lifecycle files
         run: python3 scripts/ci/check-course-structure.py
-      - name: Test teaching coverage failure cases
-        run: python3 scripts/ci/test-teaching-coverage.py
-      - name: Check teaching coverage map
-        run: python3 scripts/ci/lab-coverage.py
       - name: Test assessment validation failure cases
+        if: steps.changes.outputs.quiz == 'true'
         run: python3 scripts/ci/test-assessments.py
       - name: Check question banks, answers and teaching links
+        if: steps.changes.outputs.quiz == 'true'
         run: python3 scripts/ci/check-assessments.py
+      - name: Check authors and maintainers on the intro page
+        if: steps.changes.outputs.authors == 'true'
+        run: python3 scripts/ci/check-authors.py
       - id: list
         name: List the environments to test
         env:

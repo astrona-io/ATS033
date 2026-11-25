@@ -1,5 +1,5 @@
 # Knowledge check for section 040. Contract:
-# schemas/question-bank.schema.json. Keep question ids stable once published.
+# scripts/ci/question-bank.schema.json. Keep question ids stable once published.
 schema_version: 1
 kind: question_bank
 id: ats033-040-01

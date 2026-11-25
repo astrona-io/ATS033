@@ -1,4 +1,4 @@
-# Section quiz for section 010. Contract: schemas/question-bank.schema.json.
+# Section quiz for section 010. Contract: scripts/ci/question-bank.schema.json.
 # Keep question ids stable once published.
 schema_version: 1
 kind: question_bank

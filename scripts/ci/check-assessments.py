@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check question banks against the schema, the bank index and the teaching order."""
+"""Check question banks against the schema, astrona.yaml and the teaching order."""
 from pathlib import Path
 import json
 import sys
@@ -26,44 +26,31 @@ def check_bank(root, path, bank, readings, anchor, ids):
 
 
 def validate(root):
-    schema = json.loads((root / 'schemas/question-bank.schema.json').read_text())
-    # The final domain quiz is registered but not indexed, so the 5-15 bank size does not apply.
-    registered_only = json.loads(json.dumps(schema))
-    registered_only['properties']['questions'].pop('maxItems')
+    schema = json.loads((Path(__file__).with_name('question-bank.schema.json')).read_text())
+    # The final domain quiz covers the whole course, so the 5-15 module bank size does not apply.
+    final_quiz = json.loads(json.dumps(schema))
+    final_quiz['properties']['questions'].pop('maxItems')
     course = yaml.safe_load((root / 'astrona.yaml').read_text())
     entries = [entry for module in course['modules'] for entry in module.get('content', [])]
     readings = {entry['path']: index for index, entry in enumerate(entries) if entry['type'] == 'reading'}
     quizzes = {entry['path']: (index, entry) for index, entry in enumerate(entries) if entry['type'] == 'quiz'}
-    index_banks = yaml.safe_load((root / 'assessments/index.yaml').read_text())['banks']
-    indexed = {bank['path']: bank for bank in index_banks}
-    actual = {str(path.relative_to(root)) for pattern in ('sections/**/*quiz.yaml', 'assessments/*.yaml')
-              for path in root.glob(pattern) if path.name != 'index.yaml'}
-    if set(quizzes) | set(indexed) != actual:
-        raise ValueError(f'banks on disk are neither registered nor indexed: {sorted(actual - set(quizzes) - set(indexed))}')
+    actual = {str(path.relative_to(root)) for path in root.glob('sections/**/*quiz.yaml')}
+    if set(quizzes) != actual:
+        unregistered, missing = sorted(actual - set(quizzes)), sorted(set(quizzes) - actual)
+        raise ValueError(f'banks on disk are not registered: {unregistered}; registered but missing: {missing}')
     ids, banks, count = set(), set(), 0
     for path in sorted(actual):
         bank = yaml.safe_load((root / path).read_text())
-        jsonschema.validate(bank, schema if path in indexed else registered_only)
+        jsonschema.validate(bank, schema if Path(path).name == 'quiz.yaml' else final_quiz)
         if bank['id'] in banks:
             raise ValueError(f'duplicate bank id: {bank["id"]}')
         banks.add(bank['id'])
-        size = len(bank['questions'])
-        # A registered quiz sits at its manifest position; an indexed bank sits after its reading.
-        if path in quizzes:
-            anchor, entry = quizzes[path]
-            if entry.get('question_count') != size:
-                raise ValueError(f'{path}: question_count in astrona.yaml differs from bank length')
-        if path in indexed:
-            listed = indexed[path]
-            if (listed['id'], listed['question_count']) != (bank['id'], size):
-                raise ValueError(f'{path}: assessments/index.yaml id or question_count differs from the bank')
-            if bank.get('placement') and bank['placement'] != listed['placement']:
-                raise ValueError(f'{path}: placement differs from assessments/index.yaml')
-            reading = listed['placement']['reading']
-            if reading not in readings:
-                raise ValueError(f'{path}: placement reading {reading} is not registered')
-            if path not in quizzes:
-                anchor = readings[reading]
+        anchor, entry = quizzes[path]
+        if entry.get('question_count') != len(bank['questions']):
+            raise ValueError(f'{path}: question_count in astrona.yaml differs from bank length')
+        reading = (bank.get('placement') or {}).get('reading')
+        if reading and reading not in readings:
+            raise ValueError(f'{path}: placement reading {reading} is not registered')
         count += check_bank(root, path, bank, readings, anchor, ids)
     return len(banks), count
 
