@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 320" width="840" height="320" role="img" aria-labelledby="title desc">
+  <title id="title">A Deployment is accepted while its pod is rejected</title>
+  <desc id="desc">kubectl apply gets a success because the API server accepts the Deployment. The ReplicaSet controller then creates the pod, Pod Security Admission rejects it because of hostPID, and a FailedCreate event records the error. The Deployment shows no ready replica.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="okline" d="M180 72 H378" marker-end="url(#arrowok)"/>
+  <path class="line" d="M550 72 H618" marker-end="url(#arrow)"/>
+  <path class="line" d="M715 94 V222 H552" marker-end="url(#arrow)"/>
+  <path class="dashed" d="M330 222 H232" marker-end="url(#arrowbad)"/>
+  <text class="label good" x="279" y="60" text-anchor="middle">Deployment: accepted</text>
+  <text class="label" x="584" y="60" text-anchor="middle">watches</text>
+  <text class="label" x="725" y="160">creates pod</text>
+  <text class="label bad" x="281" y="212" text-anchor="middle">rejected</text>
+  <rect class="box" x="30" y="50" width="150" height="44" rx="8"/>
+  <text class="code" x="105" y="77" text-anchor="middle">kubectl apply</text>
+  <rect class="box" x="380" y="50" width="170" height="44" rx="8"/>
+  <text x="465" y="77" text-anchor="middle">API server</text>
+  <rect class="box" x="620" y="50" width="190" height="44" rx="8"/>
+  <text x="715" y="77" text-anchor="middle">ReplicaSet controller</text>
+  <rect class="ask" x="330" y="200" width="220" height="44" rx="8"/>
+  <text x="440" y="227" text-anchor="middle">Pod Security Admission</text>
+  <rect class="drop" x="30" y="200" width="200" height="44" rx="8"/>
+  <text x="130" y="227" text-anchor="middle">Event: <tspan class="code">FailedCreate</tspan></text>
+  <text class="code" x="30" y="120">deployment.apps/scanner created</text>
+  <text class="label" x="30" y="272">The event names PodSecurity, baseline and hostPID</text>
+  <text class="label" x="30" y="300">The Deployment shows 0/1 ready replicas</text>
+</svg>
