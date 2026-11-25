@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 380" width="840" height="380" role="img" aria-labelledby="title desc">
+  <title id="title">Who should reach the cluster ports</title>
+  <desc id="desc">Administrators and nodes on known networks reach kube-apiserver on port 6443. kube-apiserver reaches etcd on ports 2379 and 2380 and the kubelet API on port 10250. A caller on the internet is blocked from all of these ports.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <rect class="frame" x="300" y="30" width="510" height="330" rx="10"/>
+  <text class="label" x="316" y="54">cluster</text>
+  <path class="okline" d="M220 110 H368" marker-end="url(#arrowok)"/>
+  <text class="label good" x="260" y="100" text-anchor="middle">6443</text>
+  <path class="okline" d="M530 100 H618" marker-end="url(#arrowok)"/>
+  <text class="label good" x="574" y="90" text-anchor="middle">2379, 2380</text>
+  <path class="okline" d="M450 135 V250 H618" marker-end="url(#arrowok)"/>
+  <text class="label good" x="540" y="240" text-anchor="middle">10250</text>
+  <path class="dashed" d="M190 300 H268" marker-end="url(#arrowbad)"/>
+  <rect x="272" y="270" width="10" height="60" rx="2" fill="#c53030"/>
+  <text class="label bad" x="230" y="345" text-anchor="middle">firewall blocks</text>
+  <rect class="box" x="30" y="80" width="190" height="60" rx="8"/>
+  <text x="125" y="106" text-anchor="middle">administrators and nodes</text>
+  <text x="125" y="126" text-anchor="middle" class="label">from known networks</text>
+  <rect class="drop" x="30" y="275" width="160" height="50" rx="8"/>
+  <text x="110" y="305" text-anchor="middle">internet</text>
+  <rect class="box" x="370" y="80" width="160" height="55" rx="8"/>
+  <text x="450" y="112" text-anchor="middle" class="code">kube-apiserver</text>
+  <rect class="ask" x="620" y="75" width="170" height="55" rx="8"/>
+  <text x="705" y="99" text-anchor="middle" class="code">etcd</text>
+  <text x="705" y="118" text-anchor="middle" class="label">holds every Secret</text>
+  <rect class="box" x="620" y="225" width="170" height="55" rx="8"/>
+  <text x="705" y="257" text-anchor="middle">kubelet API</text>
+</svg>

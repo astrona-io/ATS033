@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 280" width="840" height="280" role="img" aria-labelledby="title desc">
+  <title id="title">Connection refused compared with a timeout</title>
+  <desc id="desc">Connection refused: the request reaches the host, no process listens on the port, and the host TCP stack answers at once with a reset. Timeout: a firewall drops the packet, no answer comes back, and the client gives up after its time limit.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <line class="sep" x1="30" y1="140" x2="810" y2="140"/>
+  <text class="strong" x="30" y="36">Connection refused</text>
+  <path class="line" d="M150 66 H328" marker-end="url(#arrow)"/>
+  <path class="line" d="M330 92 H152" marker-end="url(#arrow)"/>
+  <text class="label" x="240" y="58" text-anchor="middle">request</text>
+  <text class="label bad" x="240" y="112" text-anchor="middle">reset, at once</text>
+  <rect class="box" x="30" y="54" width="120" height="50" rx="8"/>
+  <text x="90" y="84" text-anchor="middle">client</text>
+  <rect class="ask" x="330" y="54" width="160" height="50" rx="8"/>
+  <text x="410" y="84" text-anchor="middle">host, no listener</text>
+  <text x="520" y="72">The packet reached the host.</text>
+  <text x="520" y="94">Look at the bind address or the service.</text>
+  <text class="strong" x="30" y="176">Timeout</text>
+  <path class="dashed" d="M150 220 H258" marker-end="url(#arrowbad)"/>
+  <rect x="262" y="192" width="10" height="56" rx="2" fill="#c53030"/>
+  <text class="label bad" x="267" y="266" text-anchor="middle">firewall drops</text>
+  <rect class="box" x="30" y="195" width="120" height="50" rx="8"/>
+  <text x="90" y="225" text-anchor="middle">client</text>
+  <rect class="box" x="330" y="195" width="160" height="50" rx="8" opacity="0.55"/>
+  <text x="410" y="225" text-anchor="middle" opacity="0.55">host, listener</text>
+  <text x="520" y="214">No answer comes back at all.</text>
+  <text x="520" y="236">Look at filtering or routing.</text>
+</svg>
