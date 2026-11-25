@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" role="img" aria-labelledby="title desc">
+  <title id="title">Authorizer chain for Node,RBAC</title>
+  <desc id="desc">The API server asks the Node authorizer first. If it has no opinion, the API server asks RBAC. Each of these two authorizers either allows the request or has no opinion. A request that no authorizer allows is denied.</desc>
+  <style>
+    .box { fill: #f4f5f7; stroke: #5b6472; }
+    .ask { fill: #fff7e0; stroke: #b7791f; }
+    .ok { fill: #e3f5e8; stroke: #2f855a; }
+    .drop { fill: #fde8e8; stroke: #c53030; }
+    .box, .ask, .ok, .drop { stroke-width: 1.5; }
+    .frame { fill: none; stroke: #9aa5b4; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .policy { fill: #fff7e0; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; fill: #1f2933; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .label { font-size: 13px; font-weight: 600; fill: #7b8494; }
+    .good { fill: #2f855a; }
+    .bad { fill: #c53030; }
+    .strong { font-weight: 600; }
+    .line { fill: none; stroke: #7b8494; stroke-width: 1.5; }
+    .okline { fill: none; stroke: #2f855a; stroke-width: 1.75; }
+    .dashed { fill: none; stroke: #c53030; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .sep { stroke: #d5dae1; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#7b8494" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#2f855a" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="arrowbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path fill="#c53030" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+
+  <path class="line" d="M160 174 H218" marker-end="url(#arrow)"/>
+  <path class="line" d="M380 174 H448" marker-end="url(#arrow)"/>
+  <path class="dashed" d="M610 174 H720 V268" marker-end="url(#arrowbad)"/>
+  <path class="okline" d="M300 150 V100 H368" marker-end="url(#arrowok)"/>
+  <path class="okline" d="M530 150 V100 H492" marker-end="url(#arrowok)"/>
+
+  <text class="label" x="414" y="164" text-anchor="middle">no opinion</text>
+  <text class="label" x="665" y="164" text-anchor="middle">no opinion</text>
+  <text class="label good" x="290" y="128" text-anchor="end">allow</text>
+  <text class="label good" x="540" y="128">allow</text>
+
+  <rect class="box" x="20" y="150" width="140" height="48" rx="8"/>
+  <text x="90" y="179" text-anchor="middle">request</text>
+  <rect class="ask" x="220" y="150" width="160" height="48" rx="8"/>
+  <text class="code" x="300" y="179" text-anchor="middle">Node</text>
+  <rect class="ask" x="450" y="150" width="160" height="48" rx="8"/>
+  <text class="code" x="530" y="179" text-anchor="middle">RBAC</text>
+  <rect class="ok" x="370" y="76" width="120" height="48" rx="8"/>
+  <text x="430" y="105" text-anchor="middle">allowed</text>
+  <rect class="drop" x="220" y="270" width="560" height="48" rx="8"/>
+  <text x="500" y="299" text-anchor="middle">denied (403)</text>
+  <text class="label" x="20" y="44"><tspan class="code">--authorization-mode=Node,RBAC</tspan></text>
+</svg>

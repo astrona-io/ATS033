@@ -1,10 +1,8 @@
----
-exam_objectives:
-- Minimize external access to the network
----
 # Control-Plane Ports And Listeners
 
-A firewall rule is only as good as the list of ports behind it, and the list comes from what the components actually listen on. This part names the ports of a Kubernetes control-plane node, says who should connect to each, and then reads the real listeners of a node with `ss`. The goal is to turn "the API server port is open" into a precise statement about address, port and caller.
+A firewall rule is only as good as the list of ports behind it. That list comes from what the components really listen on. If you do not know which process opens which port, on which address, you cannot write a rule that closes the right things.
+
+This page names the ports of a Kubernetes control-plane node and says who should connect to each one. Then you read the real listeners of a node with `ss`. The goal is to turn a vague sentence like "the API server port is open" into a precise statement about address, port and caller.
 
 ## The ports and their callers
 
@@ -19,25 +17,30 @@ A kubeadm cluster, such as the one in the playground, runs the control-plane com
 | 10257 | kube-controller-manager | Health checks and metrics, from the node |
 | 10259 | kube-scheduler | Health checks and metrics, from the node |
 
-The default bind address differs by component. The API server listens on all addresses (`--bind-address` defaults to `0.0.0.0`), since users and nodes connect from other machines. The kubelet also listens on all addresses. In a kubeadm cluster, the controller manager and the scheduler are started with `--bind-address=127.0.0.1`, so their ports accept only connections from the node itself. etcd listens on the loopback address and on the node address for clients (port 2379), and on the node address for peers (port 2380).
+Each component also has a default bind address. The bind address is the network address on which a component waits for connections. The defaults differ by component:
+
+- The API server listens on all addresses (`--bind-address` defaults to `0.0.0.0`), because users and nodes connect from other machines.
+- The kubelet also listens on all addresses.
+- In a kubeadm cluster, kubeadm starts the controller manager and the scheduler with `--bind-address=127.0.0.1`. Their ports accept connections only from the node itself.
+- etcd listens for clients (port 2379) on the loopback address and on the node address. It listens for peers (port 2380) on the node address.
+
+![Diagram: a user or node connects to kube-apiserver on port 6443, kube-controller-manager also connects to port 6443, and only kube-apiserver connects to etcd on port 2379 and to the kubelet on port 10250](images/expected-port-paths.svg)
+
+The drawing shows the expected paths. Only the API server connects to etcd, and only the API server connects to the kubelet, for logs and exec. Any other path to those ports is a finding.
 
 ## Who does the work
 
-Two layers limit a port. The bind address, set in the component's flags, decides on which interface the component listens. The network filter, a host firewall or a cloud security group, decides which source addresses may reach a listener that is open. A well-run cluster uses both, because a changed flag or a deleted firewall rule alone would reopen the port.
+So far you know which port belongs to which component. Two separate layers decide who can actually reach each port.
 
-```mermaid
-flowchart TB
-    U["user"] -->|"6443"| A["kube-apiserver"]
-    A -->|"2379"| E["etcd"]
-    A -->|"10250"| K["kubelet"]
-    M["controller-manager"] -->|"6443"| A
-```
+The first layer is the bind address, set in the flags of the component. It decides on which network interface the component listens. The second layer is the network filter, such as a host firewall or a cloud security group. It decides which source addresses may reach a listener that is open.
 
-The diagram shows the expected paths. Only the API server connects to etcd and, for logs and exec, to the kubelet. Any other path to those ports is a finding.
+![Diagram: a remote caller is stopped by the firewall or by a loopback bind address, a caller from an allowed network passes the firewall and reaches a listener on all addresses](images/bind-address-and-firewall.svg)
+
+The drawing shows the two layers one after the other. A well-run cluster uses both, because a changed flag or a deleted firewall rule alone would reopen the port.
 
 ## Read the listeners of the control-plane node
 
-Open a shell on the playground VM (virtual machine) and check that `kubectl` uses the playground cluster:
+Now look at the real node. Open a shell on the playground VM (virtual machine) and check that `kubectl` uses the playground cluster:
 
 <!-- astrona:playground:renew -->
 
@@ -78,9 +81,16 @@ LISTEN 0      4096               *:10256            *:*    users:(("kube-proxy",
 LISTEN 0      4096               *:6443             *:*    users:(("kube-apiserver",pid=1651,fd=4))
 ```
 
-The command `ss -tlnp` lists TCP listeners (`-t`), only in the listening state (`-l`), with numbers instead of names (`-n`) and the process of each socket (`-p`). Without `sudo`, `ss` cannot show the process of a socket that belongs to root. The column `Local Address:Port` shows the bind address. A line with `127.0.0.1:10257` accepts connections from the node only, and a line with `*:6443` or `0.0.0.0:22` accepts connections on every interface.
+The command `ss -tlnp` lists sockets, and its options choose what to show:
 
-The node address in this playground is `10.0.2.15`. Your process numbers can differ. To show only the six ports of the table, filter the output:
+- `-t` shows TCP sockets.
+- `-l` shows only sockets in the listening state.
+- `-n` prints numbers instead of names.
+- `-p` shows the process of each socket.
+
+Without `sudo`, `ss` cannot show the process of a socket that belongs to root. The column `Local Address:Port` shows the bind address. A line with `127.0.0.1:10257` accepts connections from the node only. A line with `*:6443` or `0.0.0.0:22` accepts connections on every interface.
+
+The node address in this playground is `10.0.2.15`, and your process numbers can differ. The full list is long, so filter it down to the six ports of the table:
 
 ```sh
 sudo ss -tlnp | grep -E ':(6443|10250|2379|2380|10257|10259) '
@@ -96,7 +106,9 @@ LISTEN 0      4096               *:10250            *:*    users:(("kubelet",pid
 LISTEN 0      4096               *:6443             *:*    users:(("kube-apiserver",pid=1651,fd=4))
 ```
 
-The API server and the kubelet use the wildcard address `*`. The controller manager and the scheduler use the loopback address. etcd has two client listeners, one on loopback and one on the node address, and its peer listener on the node address. If the scheduler showed a wildcard address instead, it would be a finding, since its port gives metrics to any caller that reaches it.
+The API server and the kubelet use the wildcard address `*`. The controller manager and the scheduler use the loopback address. etcd has two client listeners, one on loopback and one on the node address, and its peer listener is on the node address.
+
+If the scheduler showed a wildcard address instead, that would be a finding. Its port gives metrics to any caller that reaches it.
 
 ## Confirm the setting in the manifest
 
@@ -111,18 +123,23 @@ sudo grep -H 'bind-address' /etc/kubernetes/manifests/kube-controller-manager.ya
 /etc/kubernetes/manifests/kube-scheduler.yaml:    - --bind-address=127.0.0.1
 ```
 
-Each file has the line `--bind-address=127.0.0.1`. When you find a wide listener, correct the flag in the manifest. The kubelet watches the directory and restarts the static pod by itself.
+Each file has the line `--bind-address=127.0.0.1`. When you find a wide listener, correct the flag in the manifest. The kubelet watches the manifests directory and restarts the static pod by itself.
 
 ## When a port is wider than its job
 
-If a port must accept remote connections, such as 6443, the bind address is not the control and the network filter takes over. A host firewall rule that accepts port 6443 from the networks of administrators and nodes and drops the rest is the standard answer. In a cloud, the equivalent is a security group. Ports 2379 and 2380 get a rule that allows only the control-plane nodes. Port 10250 allows the control-plane nodes and the monitoring system.
+Some ports must accept remote connections, such as 6443. For those, the bind address cannot be the control, so the network filter takes over. The standard answer is a host firewall rule that accepts port 6443 from the networks of administrators and nodes and drops the rest. In a cloud, a security group does the same job.
 
-You have mapped each port to a component, a caller and a bind address. The next question is what the API server does with a caller that does reach port 6443.
+The other ports get their own rules:
+
+- Ports 2379 and 2380 get a rule that allows only the control-plane nodes.
+- Port 10250 allows the control-plane nodes and the monitoring system.
+
+You have now mapped each port to a component, a caller and a bind address. You also know that the bind address and the network filter are two separate layers. The open question is what the API server does with a caller that does reach port 6443.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - **Reading only the firewall.** A listener on `0.0.0.0` stays open to everything the firewall allows later. Check the bind address as well.
-> - **Treating loopback as protection against local pods.** A pod with `hostNetwork: true` shares the node's loopback.
+> - **Reading only the firewall.** A listener on `0.0.0.0` stays open to everything that a later firewall change allows. Check the bind address as well.
+> - **Treating loopback as protection against local pods.** A pod with `hostNetwork: true` shares the loopback address of the node.
 > - **Editing a static pod manifest in place without a copy.** A typo makes the component fail to start. Keep a copy outside the manifests directory first.
 > - **Checking IPv4 only.** A component can also listen on `::`. Read every line of the `ss` output.
